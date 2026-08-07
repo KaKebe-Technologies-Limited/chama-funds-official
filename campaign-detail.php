@@ -1013,6 +1013,10 @@ include __DIR__ . '/includes/header.php';
 /* ── Body layout ───────────────────────────────────────────── */
 .cd-body { padding:32px 0 80px; }
 .cd-layout { display:grid; grid-template-columns:1fr 360px; gap:24px; align-items:start; }
+/* Grid items default to min-width:auto, which lets non-wrapping content
+   (like the photo thumbnail strip) force the track wider than the
+   viewport instead of shrinking to fit — min-width:0 fixes that. */
+.cd-left, .cd-right { min-width:0; }
 
 /* ── Panels ────────────────────────────────────────────────── */
 .cd-panel { display:none; }
