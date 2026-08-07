@@ -1758,7 +1758,7 @@ function trackShare() {
   .catch(function() {});
 }
 
-// ── Donate button → Pesapal Checkout ──────────────────────────
+// ── Donate button → ioTec Pay mobile money collection ──────────
 document.getElementById('donateBtn')?.addEventListener('click', async function() {
   var errDiv  = document.getElementById('donationError');
   errDiv.style.display = 'none';
@@ -1787,7 +1787,7 @@ document.getElementById('donateBtn')?.addEventListener('click', async function()
   // ── Show loading state ─────────────────────────────────────
   var btn = this;
   btn.disabled = true;
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting to Pesapal…';
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending payment request…';
 
   var fd = new FormData();
   fd.append('action',                'submit');
@@ -1805,8 +1805,12 @@ document.getElementById('donateBtn')?.addEventListener('click', async function()
     var data = {};
     try { data = JSON.parse(text); } catch (e) { data = { message: text }; }
 
-    if (res.ok && data.success && data.redirect_url) {
-      window.location.href = data.redirect_url;
+    if (res.ok && data.success && data.donation_id) {
+      // ioTec Pay sends a USSD/app prompt straight to the payer's phone —
+      // there's no hosted checkout page to redirect to. Send them to the
+      // "waiting for confirmation" page, which polls until it resolves.
+      var status = data.status === 'completed' ? '' : '&status=pending';
+      window.location.href = '<?= BASE ?>/donation_success.php?donation_id=' + data.donation_id + status;
     } else {
       errDiv.textContent   = data.message || 'Payment initiation failed. Please try again.';
       errDiv.style.display = 'block';

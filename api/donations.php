@@ -1,7 +1,7 @@
 <?php
 // ============================================================
 // ChamaFunds – api/donations.php
-// Initiates Pesapal payment + lists donations
+// Initiates ioTec Pay mobile money payment + lists donations
 // ============================================================
 
 if (session_status() === PHP_SESSION_NONE) session_start();
@@ -10,9 +10,9 @@ header('Content-Type: application/json');
 require_once __DIR__ . '/../includes/config.php';
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
-// ── INITIATE DONATION via Pesapal ─────────────────────────────
+// ── INITIATE DONATION via ioTec Pay ───────────────────────────
 if ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    require_once __DIR__ . '/../includes/pesapal_functions.php';
+    require_once __DIR__ . '/../includes/iotec_functions.php';
 
     $campaignId = (int)($_POST['campaign_id'] ?? 0);
     $amount     = (float)($_POST['amount'] ?? 0);
@@ -68,7 +68,7 @@ if ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         'donor_id'             => $donorIdSql,
     ];
 
-    // ── Call Pesapal ──────────────────────────────────────────
+    // ── Call ioTec Pay ──────────────────────────────────────────
     $result = initiateDonationPayment($conn, $campaignId, $donorData, $amount, $currency);
 
     if (isset($result['error'])) {
@@ -77,12 +77,27 @@ if ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Return the Pesapal hosted-checkout URL to the front-end
+    // Payer gets a USSD/app prompt on their phone — no hosted checkout URL to redirect to.
     echo json_encode([
-        'success'      => true,
-        'redirect_url' => $result['redirect_url'],
-        'donation_id'  => $result['donation_id'],
+        'success'     => true,
+        'donation_id' => $result['donation_id'],
+        'status'      => $result['status'],
     ]);
+    exit;
+}
+
+// ── POLL DONATION STATUS (used by the "waiting for confirmation" UI) ─
+if ($action === 'check_status' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    require_once __DIR__ . '/../includes/iotec_functions.php';
+
+    $donationId = (int)($_GET['donation_id'] ?? 0);
+    if ($donationId <= 0) {
+        echo json_encode(['success' => false, 'message' => 'donation_id is required.']);
+        exit;
+    }
+
+    $result = verifyIotecTransaction($conn, $donationId);
+    echo json_encode($result);
     exit;
 }
 

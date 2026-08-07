@@ -7,7 +7,6 @@ if (session_status() === PHP_SESSION_NONE) session_start();
 require_once __DIR__ . '/includes/config.php';
 
 $donation_id    = (int)($_GET['donation_id'] ?? 0);
-$pendingStatus  = (isset($_GET['status']) && $_GET['status'] === 'pending');
 
 if ($donation_id <= 0) {
     header('Location: index.php');
@@ -28,7 +27,7 @@ if (!$donation) {
     exit;
 }
 
-$isPending  = $pendingStatus || $donation['status'] === 'pending';
+$isPending  = ($donation['status'] === 'pending');
 $currency   = htmlspecialchars($donation['currency'] ?? 'UGX');
 $amount     = number_format($donation['amount']);
 $donorName  = $donation['is_anonymous'] ? 'Anonymous' : htmlspecialchars($donation['donor_name']);
@@ -75,6 +74,23 @@ $payDate    = $donation['payment_date']
            class="block bg-gray-100 text-gray-700 px-6 py-3 rounded-xl font-medium hover:bg-gray-200 transition">
             Return to Home
         </a>
+
+        <script>
+        // Poll for the mobile money confirmation (webhook may take a few seconds)
+        // and reload once ioTec Pay resolves the transaction.
+        (function poll() {
+            fetch('<?= BASE ?>/api/donations.php?action=check_status&donation_id=<?= $donation_id ?>')
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.success && data.status !== 'pending') {
+                        window.location.reload();
+                    } else {
+                        setTimeout(poll, 4000);
+                    }
+                })
+                .catch(function() { setTimeout(poll, 6000); });
+        })();
+        </script>
 
         <?php else: ?>
         <!-- Success state -->

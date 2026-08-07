@@ -3,6 +3,12 @@
 // ChamaFunds – includes/config.php
 // ============================================================
 
+// Pin PHP to the same timezone as the database (East Africa, UTC+3, no DST).
+// Without this, date()/strtotime()/time() drift against MySQL's NOW() by
+// whatever the server's ambient default timezone happens to be, which
+// breaks "time ago" displays and any other PHP-side date math.
+date_default_timezone_set('Africa/Nairobi');
+
 function getBaseUrl() {
     $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
     $isLocal = strpos($host, 'localhost') !== false ||

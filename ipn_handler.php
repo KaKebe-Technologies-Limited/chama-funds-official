@@ -1,12 +1,13 @@
 <?php
 /**
  * IPN Handler
- * Pesapal posts payment status updates here in the background.
+ * ioTec Pay posts payment status updates here in the background
+ * (configured per-wallet in the ioTec Pay portal under Callback URLs).
  * This endpoint must respond with HTTP 200 quickly.
  */
 
 require_once __DIR__ . '/includes/config.php';
-require_once __DIR__ . '/includes/pesapal_functions.php';
+require_once __DIR__ . '/includes/iotec_functions.php';
 
 // ── Log helper ────────────────────────────────────────────────
 function logIpn($data) {
@@ -17,7 +18,7 @@ function logIpn($data) {
 
 logIpn(['request' => $_REQUEST, 'input' => file_get_contents('php://input')]);
 
-$result = processPesapalIpn($conn);
+$result = processIotecIpn($conn);
 
 logIpn(['result' => $result]);
 

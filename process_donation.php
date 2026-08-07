@@ -38,7 +38,7 @@
     </div>
     
     <button type="submit" class="donate-btn">
-        <i class="fas fa-lock"></i> Donate Securely with Pesapal
+        <i class="fas fa-lock"></i> Donate Securely with ioTec Pay
     </button>
 </form>
 
