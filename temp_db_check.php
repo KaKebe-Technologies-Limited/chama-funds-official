@@ -1,0 +1,1 @@
+<?php\n = require_once __DIR__ . '/db/connection.php';\n = ->query('SELECT setting_value FROM platform_settings WHERE setting_key = \'pesapal_ipn_id\' LIMIT 1');\nvar_dump( ? ->fetch_assoc() : null);\n

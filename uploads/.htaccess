@@ -1,0 +1,5 @@
+# Prevent execution of PHP in uploads directory
+<FilesMatch "\.php$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>

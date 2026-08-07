@@ -1,0 +1,474 @@
+=== 2026-07-01 15:24:25 ===
+URL: https://pay.pesapal.com/v3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+=== 2026-07-01 15:24:26 ===
+URL: https://pay.pesapal.com/v3/api/Transactions/SubmitOrderRequest
+METHOD: POST
+TOKEN: eyJhbGciOi...
+BODY: {"id":"CF_6a451509c432b_1782912265","currency":"UGX","amount":1000,"description":"Donation to: Family Medical Fund for Baby Grace","callback_url":"https:\/\/localhost\/chama\/payment_callback.php?donation_id=38","billing_address":{"email_address":"256700000000@donor.chamafunds.com","phone_number":"256700000000","country_code":"UG","first_name":"Test User","last_name":"","line_1":"N\/A","city":"Uganda","state":"","postal_code":""}}
+
+=== 2026-07-01 15:24:46 ===
+URL: https://pay.pesapal.com/v3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+=== 2026-07-01 15:24:47 ===
+URL: https://pay.pesapal.com/v3/api/Transactions/SubmitOrderRequest
+METHOD: POST
+TOKEN: eyJhbGciOi...
+BODY: {"id":"CF_6a45151e9be21_1782912286","currency":"UGX","amount":1000,"description":"Donation to: Johnson Opio Heart Surgery","callback_url":"https:\/\/localhost\/chama\/payment_callback.php?donation_id=39","billing_address":{"email_address":"dovinsmart@gmail.com","phone_number":"0777512529","country_code":"UG","first_name":"Dovin Ssenyange","last_name":"","line_1":"N\/A","city":"Uganda","state":"","postal_code":""}}
+
+=== 2026-07-01 15:30:08 ===
+URL: https://pay.pesapal.com/pesapalv3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+=== 2026-07-01 15:33:22 ===
+URL: https://pay.pesapal.com/pesapalv3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+=== 2026-07-01 15:33:40 ===
+URL: https://pay.pesapal.com/pesapalv3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+=== 2026-07-01 15:33:50 ===
+URL: https://pay.pesapal.com/pesapalv3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+=== 2026-07-01 15:34:09 ===
+URL: https://pay.pesapal.com/pesapalv3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+=== 2026-07-01 15:34:22 ===
+URL: https://pay.pesapal.com/pesapalv3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+=== 2026-07-01 15:35:19 ===
+URL: https://pay.pesapal.com/v3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+=== 2026-07-01 15:35:20 ===
+URL: https://pay.pesapal.com/v3/api/URLSetup/RegisterIPN
+METHOD: POST
+TOKEN: eyJhbGciOi...
+BODY: {"url":"https:\/\/localhost\/chama\/ipn_handler.php","ipn_notification_type":"POST"}
+
+=== 2026-07-01 15:35:46 ===
+URL: https://pay.pesapal.com/v3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+=== 2026-07-01 15:35:47 ===
+URL: https://pay.pesapal.com/v3/api/URLSetup/RegisterIPN
+METHOD: POST
+TOKEN: eyJhbGciOi...
+BODY: {"url":"https:\/\/localhost\/chama\/ipn_handler.php","ipn_notification_type":"POST"}
+
+=== 2026-07-01 15:51:28 ===
+URL: https://pay.pesapal.com/v3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+=== 2026-07-01 15:51:29 ===
+URL: https://pay.pesapal.com/v3/api/URLSetup/RegisterIPN
+METHOD: POST
+TOKEN: eyJhbGciOi...
+BODY: {"url":"https:\/\/localhost\/chama\/ipn_handler.php","ipn_notification_type":"POST"}
+
+=== 2026-07-01 15:53:42 ===
+URL: https://pay.pesapal.com/v3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+=== 2026-07-01 15:53:42 ===
+URL: https://pay.pesapal.com/v3/api/URLSetup/RegisterIPN
+METHOD: POST
+TOKEN: eyJhbGciOi...
+BODY: {"url":"https:\/\/chama.kakebeshop.com\/chama\/ipn_handler.php","ipn_notification_type":"POST"}
+
+=== 2026-07-01 15:55:25 ===
+URL: https://pay.pesapal.com/v3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+RESPONSE_CODE: 0
+RESPONSE_BODY: No URL set!
+
+=== 2026-07-01 15:55:26 ===
+URL: https://pay.pesapal.com/v3/api/URLSetup/RegisterIPN
+METHOD: POST
+TOKEN: eyJhbGciOi...
+BODY: {"url":"https:\/\/chama.kakebeshop.com\/chama\/ipn_handler.php","ipn_notification_type":"POST"}
+
+RESPONSE_CODE: 0
+RESPONSE_BODY: No URL set!
+
+=== 2026-07-01 16:03:57 ===
+URL: https://pay.pesapal.com/v3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3VzZXJkYXRhIjoiM2NiYzg0NDUtNzk1NS00OTA4LWIxNzYtZGRjNmI1YTk0NDhiIiwidWlkIjoidStuQWZJSVQveTB2dFpkd2Q0eXBNdW1kcFVVUG15WW0iLCJuYmYiOjE3ODI5MTQ2NDAsImV4cCI6MTc4MjkxNDk0MCwiaWF0IjoxNzgyOTE0NjQwLCJpc3MiOiJodHRwOi8vcGF5LnBlc2FwYWwuY29tLyIsImF1ZCI6Imh0dHA6Ly9wYXkucGVzYXBhbC5jb20vIn0.7VFG6ejFeJ2nAp9VjlJhm_x5FdoHkO523bVy310Z5w0","expiryDate":"2026-07-01T14:09:00.7378936Z","error":null,"status":"200","message":"Request processed successfully"}
+
+=== 2026-07-01 16:04:01 ===
+URL: https://pay.pesapal.com/v3/api/Transactions/SubmitOrderRequest
+METHOD: POST
+TOKEN: eyJhbGciOi...
+BODY: {"id":"CF_6a451e4de0398_1782914637","currency":"UGX","amount":10000,"description":"Donation to: Johnson Opio Heart Surgery","callback_url":"https:\/\/localhost\/chama\/payment_callback.php?donation_id=44","billing_address":{"email_address":"dovinsmart@gmail.com","phone_number":"0777512529","country_code":"UG","first_name":"Dovin Ssenyange","last_name":"","line_1":"N\/A","city":"Uganda","state":"","postal_code":""},"notification_id":"124d3334-69f7-47df-bbfd-da32eecb8735"}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"order_tracking_id":"4a3084e2-cdd5-43d5-8b3e-da327717a6d7","merchant_reference":"CF_6a451e4de0398_1782914637","redirect_url":"https://pay.pesapal.com/iframe/PesapalIframe3/Index?OrderTrackingId=4a3084e2-cdd5-43d5-8b3e-da327717a6d7","error":null,"status":"200"}
+
+=== 2026-07-01 16:13:57 ===
+URL: https://pay.pesapal.com/v3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3VzZXJkYXRhIjoiM2NiYzg0NDUtNzk1NS00OTA4LWIxNzYtZGRjNmI1YTk0NDhiIiwidWlkIjoidStuQWZJSVQveTB2dFpkd2Q0eXBNdW1kcFVVUG15WW0iLCJuYmYiOjE3ODI5MTUyNDAsImV4cCI6MTc4MjkxNTU0MCwiaWF0IjoxNzgyOTE1MjQwLCJpc3MiOiJodHRwOi8vcGF5LnBlc2FwYWwuY29tLyIsImF1ZCI6Imh0dHA6Ly9wYXkucGVzYXBhbC5jb20vIn0.iPszTvRikT7txFJr3QkFZ-U5I71rTRNqx95HtBtla5w","expiryDate":"2026-07-01T14:19:00.6538648Z","error":null,"status":"200","message":"Request processed successfully"}
+
+=== 2026-07-01 16:13:59 ===
+URL: https://pay.pesapal.com/v3/api/URLSetup/RegisterIPN
+METHOD: POST
+TOKEN: eyJhbGciOi...
+BODY: {"url":"https:\/\/localhost\/chama\/ipn_handler.php","ipn_notification_type":"POST"}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"url":"https://localhost/chama/ipn_handler.php","created_date":"2026-07-01T13:35:20.27","ipn_id":"29251393-21c3-4b72-9403-da322310d3c8","notification_type":0,"ipn_notification_type_description":"GET","ipn_status":1,"ipn_status_decription":"Active","status":"200","message":"Request processed successfully"}
+
+=== 2026-07-01 16:13:59 ===
+URL: https://pay.pesapal.com/v3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3VzZXJkYXRhIjoiM2NiYzg0NDUtNzk1NS00OTA4LWIxNzYtZGRjNmI1YTk0NDhiIiwidWlkIjoidStuQWZJSVQveTB2dFpkd2Q0eXBNdW1kcFVVUG15WW0iLCJuYmYiOjE3ODI5MTUyNDEsImV4cCI6MTc4MjkxNTU0MSwiaWF0IjoxNzgyOTE1MjQxLCJpc3MiOiJodHRwOi8vcGF5LnBlc2FwYWwuY29tLyIsImF1ZCI6Imh0dHA6Ly9wYXkucGVzYXBhbC5jb20vIn0.IxAlfCkk3gErJuiCn6hj0FN9DQam22vBhGzWhA1OJV4","expiryDate":"2026-07-01T14:19:01.9427864Z","error":null,"status":"200","message":"Request processed successfully"}
+
+=== 2026-07-01 16:14:00 ===
+URL: https://pay.pesapal.com/v3/api/Transactions/SubmitOrderRequest
+METHOD: POST
+TOKEN: eyJhbGciOi...
+BODY: {"id":"CF_6a4520a5a7d42_1782915237","currency":"UGX","amount":1000,"description":"Donation to: Sedricks School Fees","callback_url":"https:\/\/localhost\/chama\/payment_callback.php?donation_id=25","billing_address":{"email_address":"ot.sedrick@gmail.com","phone_number":"0777676206","country_code":"UG","first_name":"Sedu Otolo","last_name":"","line_1":"N\/A","city":"Uganda","state":"","postal_code":""},"notification_id":"29251393-21c3-4b72-9403-da322310d3c8"}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"order_tracking_id":"b94522fd-403f-40bd-8545-da3275c7d860","merchant_reference":"CF_6a4520a5a7d42_1782915237","redirect_url":"https://pay.pesapal.com/iframe/PesapalIframe3/Index?OrderTrackingId=b94522fd-403f-40bd-8545-da3275c7d860","error":null,"status":"200"}
+
+=== 2026-07-01 16:14:46 ===
+URL: https://pay.pesapal.com/v3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3VzZXJkYXRhIjoiM2NiYzg0NDUtNzk1NS00OTA4LWIxNzYtZGRjNmI1YTk0NDhiIiwidWlkIjoidStuQWZJSVQveTB2dFpkd2Q0eXBNdW1kcFVVUG15WW0iLCJuYmYiOjE3ODI5MTUyODgsImV4cCI6MTc4MjkxNTU4OCwiaWF0IjoxNzgyOTE1Mjg4LCJpc3MiOiJodHRwOi8vcGF5LnBlc2FwYWwuY29tLyIsImF1ZCI6Imh0dHA6Ly9wYXkucGVzYXBhbC5jb20vIn0.UtEoP1-0l9smV_ePOxU780R_nd6YWAXMBDwa5sMGgaA","expiryDate":"2026-07-01T14:19:48.1289727Z","error":null,"status":"200","message":"Request processed successfully"}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"payment_method":"MTNUG","amount":1000.0,"created_date":"2026-07-01T17:14:25.967","confirmation_code":"41759889573","order_tracking_id":"b94522fd-403f-40bd-8545-da3275c7d860","payment_status_description":"Completed","description":null,"message":"Request processed successfully","payment_account":"2567xxx76206","call_back_url":"https://localhost/chama/payment_callback.php?donation_id=25&OrderTrackingId=b94522fd-403f-40bd-8545-da3275c7d860&OrderMerchantReference=CF_6a4520a5a7d42_1782915237","status_code":1,"merchant_reference":"CF_6a4520a5a7d42_1782915237","account_number":null,"payment_status_code":"","currency":"UGX","error":{"error_type":null,"code":null,"message":null},"status":"200"}
+
+=== 2026-07-02 11:31:33 ===
+URL: https://pay.pesapal.com/v3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3VzZXJkYXRhIjoiM2NiYzg0NDUtNzk1NS00OTA4LWIxNzYtZGRjNmI1YTk0NDhiIiwidWlkIjoidStuQWZJSVQveTB2dFpkd2Q0eXBNdW1kcFVVUG15WW0iLCJuYmYiOjE3ODI5ODQ2OTcsImV4cCI6MTc4Mjk4NDk5NywiaWF0IjoxNzgyOTg0Njk3LCJpc3MiOiJodHRwOi8vcGF5LnBlc2FwYWwuY29tLyIsImF1ZCI6Imh0dHA6Ly9wYXkucGVzYXBhbC5jb20vIn0.uKyYCvpUBgIbdz3YkIBWV1uHfCMYo0qaMPkEUxb0sqo","expiryDate":"2026-07-02T09:36:37.311653Z","error":null,"status":"200","message":"Request processed successfully"}
+
+=== 2026-07-02 11:31:37 ===
+URL: https://pay.pesapal.com/v3/api/Transactions/SubmitOrderRequest
+METHOD: POST
+TOKEN: eyJhbGciOi...
+BODY: {"id":"CF_6a462ff5d6fc1_1782984693","currency":"UGX","amount":1000,"description":"Donation to: Sedricks School Fees","callback_url":"https:\/\/localhost\/chama\/payment_callback.php?donation_id=26","billing_address":{"email_address":"ot.sedrick@gmail.com","phone_number":"0777676206","country_code":"UG","first_name":"Sedu Otolo","last_name":"","line_1":"N\/A","city":"Uganda","state":"","postal_code":""},"notification_id":"29251393-21c3-4b72-9403-da322310d3c8"}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"order_tracking_id":"fced5ac8-d040-4a8e-87f1-da316818637c","merchant_reference":"CF_6a462ff5d6fc1_1782984693","redirect_url":"https://pay.pesapal.com/iframe/PesapalIframe3/Index?OrderTrackingId=fced5ac8-d040-4a8e-87f1-da316818637c","error":null,"status":"200"}
+
+=== 2026-07-02 11:32:15 ===
+URL: https://pay.pesapal.com/v3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3VzZXJkYXRhIjoiM2NiYzg0NDUtNzk1NS00OTA4LWIxNzYtZGRjNmI1YTk0NDhiIiwidWlkIjoidStuQWZJSVQveTB2dFpkd2Q0eXBNdW1kcFVVUG15WW0iLCJuYmYiOjE3ODI5ODQ3MzYsImV4cCI6MTc4Mjk4NTAzNiwiaWF0IjoxNzgyOTg0NzM2LCJpc3MiOiJodHRwOi8vcGF5LnBlc2FwYWwuY29tLyIsImF1ZCI6Imh0dHA6Ly9wYXkucGVzYXBhbC5jb20vIn0.hRi-wEHJ-ha8hdHK-Lm9LlIIk1MwXcmUa5HzpxcY2rc","expiryDate":"2026-07-02T09:37:16.4101371Z","error":null,"status":"200","message":"Request processed successfully"}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"payment_method":"MTNUG","amount":1000.0,"created_date":"2026-07-02T12:32:02.127","confirmation_code":"41776989652","order_tracking_id":"fced5ac8-d040-4a8e-87f1-da316818637c","payment_status_description":"Completed","description":null,"message":"Request processed successfully","payment_account":"2567xxx76206","call_back_url":"https://localhost/chama/payment_callback.php?donation_id=26&OrderTrackingId=fced5ac8-d040-4a8e-87f1-da316818637c&OrderMerchantReference=CF_6a462ff5d6fc1_1782984693","status_code":1,"merchant_reference":"CF_6a462ff5d6fc1_1782984693","account_number":null,"payment_status_code":"","currency":"UGX","error":{"error_type":null,"code":null,"message":null},"status":"200"}
+
+=== 2026-07-03 13:47:53 ===
+URL: https://pay.pesapal.com/v3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3VzZXJkYXRhIjoiM2NiYzg0NDUtNzk1NS00OTA4LWIxNzYtZGRjNmI1YTk0NDhiIiwidWlkIjoidStuQWZJSVQveTB2dFpkd2Q0eXBNdW1kcFVVUG15WW0iLCJuYmYiOjE3ODMwODY0NzMsImV4cCI6MTc4MzA4Njc3MywiaWF0IjoxNzgzMDg2NDczLCJpc3MiOiJodHRwOi8vcGF5LnBlc2FwYWwuY29tLyIsImF1ZCI6Imh0dHA6Ly9wYXkucGVzYXBhbC5jb20vIn0.T4x82zYrlcufDoST743FxN4oPgZDO0Zcr4r9WfpEyhM","expiryDate":"2026-07-03T13:52:53.7410463Z","error":null,"status":"200","message":"Request processed successfully"}
+
+=== 2026-07-03 13:47:53 ===
+URL: https://pay.pesapal.com/v3/api/Transactions/SubmitOrderRequest
+METHOD: POST
+TOKEN: eyJhbGciOi...
+BODY: {"id":"CF_6a47bd89887c8_1783086473","currency":"UGX","amount":1000,"description":"Donation to: Sedricks School Fees","callback_url":"https:\/\/www.undpconnect.org\/chama\/payment_callback.php?donation_id=29","billing_address":{"email_address":"hanah.terisah256@gmail.com","phone_number":"0705977394","country_code":"UG","first_name":"Hanah","last_name":"","line_1":"N\/A","city":"Uganda","state":"","postal_code":""},"notification_id":"29251393-21c3-4b72-9403-da322310d3c8"}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"order_tracking_id":"d5d15f85-4c84-46c2-b9be-da30883a4584","merchant_reference":"CF_6a47bd89887c8_1783086473","redirect_url":"https://pay.pesapal.com/iframe/PesapalIframe3/Index?OrderTrackingId=d5d15f85-4c84-46c2-b9be-da30883a4584","error":null,"status":"200"}
+
+=== 2026-07-03 13:48:41 ===
+URL: https://pay.pesapal.com/v3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3VzZXJkYXRhIjoiM2NiYzg0NDUtNzk1NS00OTA4LWIxNzYtZGRjNmI1YTk0NDhiIiwidWlkIjoidStuQWZJSVQveTB2dFpkd2Q0eXBNdW1kcFVVUG15WW0iLCJuYmYiOjE3ODMwODY1MjEsImV4cCI6MTc4MzA4NjgyMSwiaWF0IjoxNzgzMDg2NTIxLCJpc3MiOiJodHRwOi8vcGF5LnBlc2FwYWwuY29tLyIsImF1ZCI6Imh0dHA6Ly9wYXkucGVzYXBhbC5jb20vIn0.sz5wDTAlV10RhHZffp7vZJaekzGKbZlLRpwCjIpNOxM","expiryDate":"2026-07-03T13:53:41.6402576Z","error":null,"status":"200","message":"Request processed successfully"}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"payment_method":"AirtelUG","amount":1000.0,"created_date":"2026-07-03T16:48:29.26","confirmation_code":"150880624272","order_tracking_id":"d5d15f85-4c84-46c2-b9be-da30883a4584","payment_status_description":"Completed","description":null,"message":"Request processed successfully","payment_account":"705977394","call_back_url":"https://www.undpconnect.org/chama/payment_callback.php?donation_id=29&OrderTrackingId=d5d15f85-4c84-46c2-b9be-da30883a4584&OrderMerchantReference=CF_6a47bd89887c8_1783086473","status_code":1,"merchant_reference":"CF_6a47bd89887c8_1783086473","account_number":null,"payment_status_code":"","currency":"UGX","error":{"error_type":null,"code":null,"message":null},"status":"200"}
+
+=== 2026-07-03 14:47:10 ===
+URL: https://pay.pesapal.com/v3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3VzZXJkYXRhIjoiM2NiYzg0NDUtNzk1NS00OTA4LWIxNzYtZGRjNmI1YTk0NDhiIiwidWlkIjoidStuQWZJSVQveTB2dFpkd2Q0eXBNdW1kcFVVUG15WW0iLCJuYmYiOjE3ODMwOTAwMzAsImV4cCI6MTc4MzA5MDMzMCwiaWF0IjoxNzgzMDkwMDMwLCJpc3MiOiJodHRwOi8vcGF5LnBlc2FwYWwuY29tLyIsImF1ZCI6Imh0dHA6Ly9wYXkucGVzYXBhbC5jb20vIn0.6ZZnOM2Z35O8I5WdA726nl_gF5SDJr3DlVY70BSdMus","expiryDate":"2026-07-03T14:52:10.267438Z","error":null,"status":"200","message":"Request processed successfully"}
+
+=== 2026-07-03 14:47:10 ===
+URL: https://pay.pesapal.com/v3/api/Transactions/SubmitOrderRequest
+METHOD: POST
+TOKEN: eyJhbGciOi...
+BODY: {"id":"CF_6a47cb6e12217_1783090030","currency":"UGX","amount":1000,"description":"Donation to: Family Medical Fund for Baby Grace","callback_url":"https:\/\/www.undpconnect.org\/chama\/payment_callback.php?donation_id=30","billing_address":{"email_address":"ot.sedrick@gmail.com","phone_number":"0791213543","country_code":"UG","first_name":"Sedu Otolo","last_name":"","line_1":"N\/A","city":"Uganda","state":"","postal_code":""},"notification_id":"29251393-21c3-4b72-9403-da322310d3c8"}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"order_tracking_id":"ed17143f-0489-46d1-a996-da306388e410","merchant_reference":"CF_6a47cb6e12217_1783090030","redirect_url":"https://pay.pesapal.com/iframe/PesapalIframe3/Index?OrderTrackingId=ed17143f-0489-46d1-a996-da306388e410","error":null,"status":"200"}
+
+=== 2026-07-03 14:48:05 ===
+URL: https://pay.pesapal.com/v3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3VzZXJkYXRhIjoiM2NiYzg0NDUtNzk1NS00OTA4LWIxNzYtZGRjNmI1YTk0NDhiIiwidWlkIjoidStuQWZJSVQveTB2dFpkd2Q0eXBNdW1kcFVVUG15WW0iLCJuYmYiOjE3ODMwOTAwODUsImV4cCI6MTc4MzA5MDM4NSwiaWF0IjoxNzgzMDkwMDg1LCJpc3MiOiJodHRwOi8vcGF5LnBlc2FwYWwuY29tLyIsImF1ZCI6Imh0dHA6Ly9wYXkucGVzYXBhbC5jb20vIn0.Z_n6u2cmhGbZO772oO9FQIFkNkq84uvi99mi3Y27Bm8","expiryDate":"2026-07-03T14:53:05.7239686Z","error":null,"status":"200","message":"Request processed successfully"}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"payment_method":"","amount":1000.00,"created_date":"2026-07-03T17:47:11.197","confirmation_code":"","order_tracking_id":"ed17143f-0489-46d1-a996-da306388e410","payment_status_description":"INVALID","description":null,"message":"Request processed successfully","payment_account":"","call_back_url":"https://www.undpconnect.org/chama/payment_callback.php?donation_id=30&OrderTrackingId=ed17143f-0489-46d1-a996-da306388e410&OrderMerchantReference=CF_6a47cb6e12217_1783090030","status_code":0,"merchant_reference":"CF_6a47cb6e12217_1783090030","account_number":null,"payment_status_code":"","currency":"UGX","error":{"error_type":"api_error","code":"payment_details_not_found","message":"Pending Payment","call_back_url":"https://www.undpconnect.org/chama/payment_callback.php?donation_id=30&OrderTrackingId=ed17143f-0489-46d1-a996-da306388e410&OrderMerchantReference=CF_6a47cb6e12217_1783090030"},"status":"500"}
+
+=== 2026-07-03 14:48:30 ===
+URL: https://pay.pesapal.com/v3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3VzZXJkYXRhIjoiM2NiYzg0NDUtNzk1NS00OTA4LWIxNzYtZGRjNmI1YTk0NDhiIiwidWlkIjoidStuQWZJSVQveTB2dFpkd2Q0eXBNdW1kcFVVUG15WW0iLCJuYmYiOjE3ODMwOTAxMTAsImV4cCI6MTc4MzA5MDQxMCwiaWF0IjoxNzgzMDkwMTEwLCJpc3MiOiJodHRwOi8vcGF5LnBlc2FwYWwuY29tLyIsImF1ZCI6Imh0dHA6Ly9wYXkucGVzYXBhbC5jb20vIn0.k-QLppOU-_frYxJBgDZ61jr_SFMDymrDIb1PEwYbyRM","expiryDate":"2026-07-03T14:53:30.5632113Z","error":null,"status":"200","message":"Request processed successfully"}
+
+=== 2026-07-03 14:48:30 ===
+URL: https://pay.pesapal.com/v3/api/Transactions/SubmitOrderRequest
+METHOD: POST
+TOKEN: eyJhbGciOi...
+BODY: {"id":"CF_6a47cbbe5da18_1783090110","currency":"UGX","amount":1000,"description":"Donation to: Family Medical Fund for Baby Grace","callback_url":"https:\/\/www.undpconnect.org\/chama\/payment_callback.php?donation_id=31","billing_address":{"email_address":"0743573637@donor.chamafunds.com","phone_number":"0743573637","country_code":"UG","first_name":"Ivan Obin","last_name":"","line_1":"N\/A","city":"Uganda","state":"","postal_code":""},"notification_id":"29251393-21c3-4b72-9403-da322310d3c8"}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"order_tracking_id":"e50c10bc-9121-40f2-8342-da3016c5f568","merchant_reference":"CF_6a47cbbe5da18_1783090110","redirect_url":"https://pay.pesapal.com/iframe/PesapalIframe3/Index?OrderTrackingId=e50c10bc-9121-40f2-8342-da3016c5f568","error":null,"status":"200"}
+
+=== 2026-07-03 14:49:08 ===
+URL: https://pay.pesapal.com/v3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3VzZXJkYXRhIjoiM2NiYzg0NDUtNzk1NS00OTA4LWIxNzYtZGRjNmI1YTk0NDhiIiwidWlkIjoidStuQWZJSVQveTB2dFpkd2Q0eXBNdW1kcFVVUG15WW0iLCJuYmYiOjE3ODMwOTAxNDgsImV4cCI6MTc4MzA5MDQ0OCwiaWF0IjoxNzgzMDkwMTQ4LCJpc3MiOiJodHRwOi8vcGF5LnBlc2FwYWwuY29tLyIsImF1ZCI6Imh0dHA6Ly9wYXkucGVzYXBhbC5jb20vIn0.cGmLzdvOSWNnPmv0j27wJhD0V3J-D4vjqmZJswCMkcE","expiryDate":"2026-07-03T14:54:08.304845Z","error":null,"status":"200","message":"Request processed successfully"}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"payment_method":"AirtelUG","amount":1000.0,"created_date":"2026-07-03T17:48:53.267","confirmation_code":"150884860300","order_tracking_id":"e50c10bc-9121-40f2-8342-da3016c5f568","payment_status_description":"Completed","description":null,"message":"Request processed successfully","payment_account":"743573637","call_back_url":"https://www.undpconnect.org/chama/payment_callback.php?donation_id=31&OrderTrackingId=e50c10bc-9121-40f2-8342-da3016c5f568&OrderMerchantReference=CF_6a47cbbe5da18_1783090110","status_code":1,"merchant_reference":"CF_6a47cbbe5da18_1783090110","account_number":null,"payment_status_code":"","currency":"UGX","error":{"error_type":null,"code":null,"message":null},"status":"200"}
+
+=== 2026-07-03 19:50:38 ===
+URL: https://pay.pesapal.com/v3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3VzZXJkYXRhIjoiM2NiYzg0NDUtNzk1NS00OTA4LWIxNzYtZGRjNmI1YTk0NDhiIiwidWlkIjoidStuQWZJSVQveTB2dFpkd2Q0eXBNdW1kcFVVUG15WW0iLCJuYmYiOjE3ODMxMDgyMzgsImV4cCI6MTc4MzEwODUzOCwiaWF0IjoxNzgzMTA4MjM4LCJpc3MiOiJodHRwOi8vcGF5LnBlc2FwYWwuY29tLyIsImF1ZCI6Imh0dHA6Ly9wYXkucGVzYXBhbC5jb20vIn0.O9RHXFqaL1laYygcedp_zqLMN95zKaIFz_fzH5jUoec","expiryDate":"2026-07-03T19:55:38.2054463Z","error":null,"status":"200","message":"Request processed successfully"}
+
+=== 2026-07-03 19:50:38 ===
+URL: https://pay.pesapal.com/v3/api/Transactions/SubmitOrderRequest
+METHOD: POST
+TOKEN: eyJhbGciOi...
+BODY: {"id":"CF_6a48128e0482c_1783108238","currency":"UGX","amount":1000,"description":"Donation to: Family Medical Fund for Baby Grace","callback_url":"https:\/\/undpconnect.org\/chama\/payment_callback.php?donation_id=32","billing_address":{"email_address":"0759526143@donor.chamafunds.com","phone_number":"0759526143","country_code":"UG","first_name":"Jojo","last_name":"","line_1":"N\/A","city":"Uganda","state":"","postal_code":""},"notification_id":"29251393-21c3-4b72-9403-da322310d3c8"}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"order_tracking_id":"7c321914-efb0-4075-9fc1-da309aacbcb9","merchant_reference":"CF_6a48128e0482c_1783108238","redirect_url":"https://pay.pesapal.com/iframe/PesapalIframe3/Index?OrderTrackingId=7c321914-efb0-4075-9fc1-da309aacbcb9","error":null,"status":"200"}
+
+=== 2026-07-03 19:51:22 ===
+URL: https://pay.pesapal.com/v3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3VzZXJkYXRhIjoiM2NiYzg0NDUtNzk1NS00OTA4LWIxNzYtZGRjNmI1YTk0NDhiIiwidWlkIjoidStuQWZJSVQveTB2dFpkd2Q0eXBNdW1kcFVVUG15WW0iLCJuYmYiOjE3ODMxMDgyODIsImV4cCI6MTc4MzEwODU4MiwiaWF0IjoxNzgzMTA4MjgyLCJpc3MiOiJodHRwOi8vcGF5LnBlc2FwYWwuY29tLyIsImF1ZCI6Imh0dHA6Ly9wYXkucGVzYXBhbC5jb20vIn0.7E2DnnZ31MSjOe-QGsRh_HarxSmLgcHd4r3o5YP5WeM","expiryDate":"2026-07-03T19:56:22.9045517Z","error":null,"status":"200","message":"Request processed successfully"}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"payment_method":"AirtelUG","amount":1000.0,"created_date":"2026-07-03T22:51:09.91","confirmation_code":"150913178937","order_tracking_id":"7c321914-efb0-4075-9fc1-da309aacbcb9","payment_status_description":"Completed","description":null,"message":"Request processed successfully","payment_account":"759526143","call_back_url":"https://undpconnect.org/chama/payment_callback.php?donation_id=32&OrderTrackingId=7c321914-efb0-4075-9fc1-da309aacbcb9&OrderMerchantReference=CF_6a48128e0482c_1783108238","status_code":1,"merchant_reference":"CF_6a48128e0482c_1783108238","account_number":null,"payment_status_code":"","currency":"UGX","error":{"error_type":null,"code":null,"message":null},"status":"200"}
+
+=== 2026-07-04 11:32:02 ===
+URL: https://pay.pesapal.com/v3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3VzZXJkYXRhIjoiM2NiYzg0NDUtNzk1NS00OTA4LWIxNzYtZGRjNmI1YTk0NDhiIiwidWlkIjoidStuQWZJSVQveTB2dFpkd2Q0eXBNdW1kcFVVUG15WW0iLCJuYmYiOjE3ODMxNTc1MjMsImV4cCI6MTc4MzE1NzgyMywiaWF0IjoxNzgzMTU3NTIzLCJpc3MiOiJodHRwOi8vcGF5LnBlc2FwYWwuY29tLyIsImF1ZCI6Imh0dHA6Ly9wYXkucGVzYXBhbC5jb20vIn0.6lYtI_HLO9luBiPdnnsmtFX9dQ4Q7SeQXu9c73zIwyw","expiryDate":"2026-07-04T09:37:03.3869634Z","error":null,"status":"200","message":"Request processed successfully"}
+
+=== 2026-07-04 11:32:02 ===
+URL: https://pay.pesapal.com/v3/api/Transactions/SubmitOrderRequest
+METHOD: POST
+TOKEN: eyJhbGciOi...
+BODY: {"id":"CF_6a48d3120b32a_1783157522","currency":"UGX","amount":1000,"description":"Donation to: Empower Rural Farmers with Modern Tools","callback_url":"https:\/\/localhost\/sedufunds\/chama\/payment_callback.php?donation_id=18","billing_address":{"email_address":"0791213543@donor.chamafunds.com","phone_number":"0791213543","country_code":"UG","first_name":"Opio Jonatan","last_name":"","line_1":"N\/A","city":"Uganda","state":"","postal_code":""},"notification_id":"29251393-21c3-4b72-9403-da322310d3c8"}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"order_tracking_id":"68b5dd1c-7be2-468e-86bf-da2fcb51bb5c","merchant_reference":"CF_6a48d3120b32a_1783157522","redirect_url":"https://pay.pesapal.com/iframe/PesapalIframe3/Index?OrderTrackingId=68b5dd1c-7be2-468e-86bf-da2fcb51bb5c","error":null,"status":"200"}
+
+=== 2026-07-12 03:56:36 ===
+URL: https://pay.pesapal.com/v3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3VzZXJkYXRhIjoiM2NiYzg0NDUtNzk1NS00OTA4LWIxNzYtZGRjNmI1YTk0NDhiIiwidWlkIjoidStuQWZJSVQveTB2dFpkd2Q0eXBNdW1kcFVVUG15WW0iLCJuYmYiOjE3ODM4Mjg1OTYsImV4cCI6MTc4MzgyODg5NiwiaWF0IjoxNzgzODI4NTk2LCJpc3MiOiJodHRwOi8vcGF5LnBlc2FwYWwuY29tLyIsImF1ZCI6Imh0dHA6Ly9wYXkucGVzYXBhbC5jb20vIn0.P_K72i4jkPXz-zdjy7Y5tm2P8u9_2zG-NqPLox1Q-Qk","expiryDate":"2026-07-12T04:01:36.4756029Z","error":null,"status":"200","message":"Request processed successfully"}
+
+=== 2026-07-12 03:56:36 ===
+URL: https://pay.pesapal.com/v3/api/Transactions/SubmitOrderRequest
+METHOD: POST
+TOKEN: eyJhbGciOi...
+BODY: {"id":"CF_6a5310743cb6a_1783828596","currency":"UGX","amount":100000,"description":"Donation to: Celebrating birthday with the vulnerable children","callback_url":"https:\/\/chamafunds.com\/payment_callback.php?donation_id=77","billing_address":{"email_address":"webxpertug@gmail.com","phone_number":"0759284503","country_code":"UG","first_name":"ORIO HERMAN","last_name":"","line_1":"N\/A","city":"Uganda","state":"","postal_code":""},"notification_id":"29251393-21c3-4b72-9403-da322310d3c8"}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"order_tracking_id":"3c3e7233-ab7e-4c95-9557-da274331ab0d","merchant_reference":"CF_6a5310743cb6a_1783828596","redirect_url":"https://pay.pesapal.com/iframe/PesapalIframe3/Index?OrderTrackingId=3c3e7233-ab7e-4c95-9557-da274331ab0d","error":null,"status":"200"}
+
+=== 2026-07-12 08:06:54 ===
+URL: https://pay.pesapal.com/v3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3VzZXJkYXRhIjoiM2NiYzg0NDUtNzk1NS00OTA4LWIxNzYtZGRjNmI1YTk0NDhiIiwidWlkIjoidStuQWZJSVQveTB2dFpkd2Q0eXBNdW1kcFVVUG15WW0iLCJuYmYiOjE3ODM4NDM2MTQsImV4cCI6MTc4Mzg0MzkxNCwiaWF0IjoxNzgzODQzNjE0LCJpc3MiOiJodHRwOi8vcGF5LnBlc2FwYWwuY29tLyIsImF1ZCI6Imh0dHA6Ly9wYXkucGVzYXBhbC5jb20vIn0.eeB9aroE-LnqcggeqdWJIdyWgqup8RVf2MCni64r5LI","expiryDate":"2026-07-12T08:11:54.412531Z","error":null,"status":"200","message":"Request processed successfully"}
+
+=== 2026-07-12 08:06:54 ===
+URL: https://pay.pesapal.com/v3/api/Transactions/SubmitOrderRequest
+METHOD: POST
+TOKEN: eyJhbGciOi...
+BODY: {"id":"CF_6a534b1e36a63_1783843614","currency":"UGX","amount":20000,"description":"Donation to: Celebrating birthday with the vulnerable children","callback_url":"https:\/\/chamafunds.com\/payment_callback.php?donation_id=78","billing_address":{"email_address":"256787771737@donor.chamafunds.com","phone_number":"256787771737","country_code":"UG","first_name":"Nancy Acen","last_name":"","line_1":"N\/A","city":"Uganda","state":"","postal_code":""},"notification_id":"29251393-21c3-4b72-9403-da322310d3c8"}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"order_tracking_id":"5d7d77d1-242c-4a1a-aa5a-da27a99d3c2b","merchant_reference":"CF_6a534b1e36a63_1783843614","redirect_url":"https://pay.pesapal.com/iframe/PesapalIframe3/Index?OrderTrackingId=5d7d77d1-242c-4a1a-aa5a-da27a99d3c2b","error":null,"status":"200"}
+
+=== 2026-07-13 06:02:10 ===
+URL: https://pay.pesapal.com/v3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3VzZXJkYXRhIjoiM2NiYzg0NDUtNzk1NS00OTA4LWIxNzYtZGRjNmI1YTk0NDhiIiwidWlkIjoidStuQWZJSVQveTB2dFpkd2Q0eXBNdW1kcFVVUG15WW0iLCJuYmYiOjE3ODM5MjI1MzAsImV4cCI6MTc4MzkyMjgzMCwiaWF0IjoxNzgzOTIyNTMwLCJpc3MiOiJodHRwOi8vcGF5LnBlc2FwYWwuY29tLyIsImF1ZCI6Imh0dHA6Ly9wYXkucGVzYXBhbC5jb20vIn0.8qxW_nD4O7-umSp9JO0mXZ0xxAVE9arcEMVd7NwnK94","expiryDate":"2026-07-13T06:07:10.8267906Z","error":null,"status":"200","message":"Request processed successfully"}
+
+=== 2026-07-13 06:02:10 ===
+URL: https://pay.pesapal.com/v3/api/Transactions/SubmitOrderRequest
+METHOD: POST
+TOKEN: eyJhbGciOi...
+BODY: {"id":"CF_6a547f6298c82_1783922530","currency":"UGX","amount":25000,"description":"Donation to: Celebrating birthday with the vulnerable children","callback_url":"https:\/\/chamafunds.com\/payment_callback.php?donation_id=79","billing_address":{"email_address":"judeanyaty@gmail.com","phone_number":"0761357717","country_code":"UG","first_name":"jude","last_name":"","line_1":"N\/A","city":"Uganda","state":"","postal_code":""},"notification_id":"29251393-21c3-4b72-9403-da322310d3c8"}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"order_tracking_id":"e26e5cea-2cf5-4acb-8d44-da26ec07ae29","merchant_reference":"CF_6a547f6298c82_1783922530","redirect_url":"https://pay.pesapal.com/iframe/PesapalIframe3/Index?OrderTrackingId=e26e5cea-2cf5-4acb-8d44-da26ec07ae29","error":null,"status":"200"}
+
+=== 2026-07-22 08:55:55 ===
+URL: https://pay.pesapal.com/v3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3VzZXJkYXRhIjoiM2NiYzg0NDUtNzk1NS00OTA4LWIxNzYtZGRjNmI1YTk0NDhiIiwidWlkIjoidStuQWZJSVQveTB2dFpkd2Q0eXBNdW1kcFVVUG15WW0iLCJuYmYiOjE3ODQ3MTA1NTYsImV4cCI6MTc4NDcxMDg1NiwiaWF0IjoxNzg0NzEwNTU2LCJpc3MiOiJodHRwOi8vcGF5LnBlc2FwYWwuY29tLyIsImF1ZCI6Imh0dHA6Ly9wYXkucGVzYXBhbC5jb20vIn0.JIvQakdzrUQew9lefzk5b4YXgikWUfwbYzUaT389qO8","expiryDate":"2026-07-22T09:00:56.5693219Z","error":null,"status":"200","message":"Request processed successfully"}
+
+=== 2026-07-22 08:55:56 ===
+URL: https://pay.pesapal.com/v3/api/Transactions/SubmitOrderRequest
+METHOD: POST
+TOKEN: eyJhbGciOi...
+BODY: {"id":"CF_6a60859be168a_1784710555","currency":"UGX","amount":1000,"description":"Donation to: Celebrating birthday with the vulnerable children","callback_url":"https:\/\/chamafunds.com\/payment_callback.php?donation_id=80","billing_address":{"email_address":"0777676206@donor.chamafunds.com","phone_number":"0777676206","country_code":"UG","first_name":"ACEN SARAH","last_name":"","line_1":"N\/A","city":"Uganda","state":"","postal_code":""},"notification_id":"29251393-21c3-4b72-9403-da322310d3c8"}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"order_tracking_id":"d0e098d1-b5bd-4fa4-8dce-da1d8fa37fe6","merchant_reference":"CF_6a60859be168a_1784710555","redirect_url":"https://pay.pesapal.com/iframe/PesapalIframe3/Index?OrderTrackingId=d0e098d1-b5bd-4fa4-8dce-da1d8fa37fe6","error":null,"status":"200"}
+
+=== 2026-07-22 08:56:37 ===
+URL: https://pay.pesapal.com/v3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3VzZXJkYXRhIjoiM2NiYzg0NDUtNzk1NS00OTA4LWIxNzYtZGRjNmI1YTk0NDhiIiwidWlkIjoidStuQWZJSVQveTB2dFpkd2Q0eXBNdW1kcFVVUG15WW0iLCJuYmYiOjE3ODQ3MTA1OTgsImV4cCI6MTc4NDcxMDg5OCwiaWF0IjoxNzg0NzEwNTk4LCJpc3MiOiJodHRwOi8vcGF5LnBlc2FwYWwuY29tLyIsImF1ZCI6Imh0dHA6Ly9wYXkucGVzYXBhbC5jb20vIn0.9LajUFrONKipaCRBC8pVim76Gr_0eKK_93iGlnudsyg","expiryDate":"2026-07-22T09:01:38.0886863Z","error":null,"status":"200","message":"Request processed successfully"}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"payment_method":"MTNUG","amount":1000.0,"created_date":"2026-07-22T11:56:15.867","confirmation_code":"42228077396","order_tracking_id":"d0e098d1-b5bd-4fa4-8dce-da1d8fa37fe6","payment_status_description":"Completed","description":null,"message":"Request processed successfully","payment_account":"2567xxx76206","call_back_url":"https://chamafunds.com/payment_callback.php?donation_id=80&OrderTrackingId=d0e098d1-b5bd-4fa4-8dce-da1d8fa37fe6&OrderMerchantReference=CF_6a60859be168a_1784710555","status_code":1,"merchant_reference":"CF_6a60859be168a_1784710555","account_number":null,"payment_status_code":"","currency":"UGX","error":{"error_type":null,"code":null,"message":null},"status":"200"}
+
+=== 2026-08-02 13:14:49 ===
+URL: https://pay.pesapal.com/v3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3VzZXJkYXRhIjoiM2NiYzg0NDUtNzk1NS00OTA4LWIxNzYtZGRjNmI1YTk0NDhiIiwidWlkIjoidStuQWZJSVQveTB2dFpkd2Q0eXBNdW1kcFVVUG15WW0iLCJuYmYiOjE3ODU2NzY0ODksImV4cCI6MTc4NTY3Njc4OSwiaWF0IjoxNzg1Njc2NDg5LCJpc3MiOiJodHRwOi8vcGF5LnBlc2FwYWwuY29tLyIsImF1ZCI6Imh0dHA6Ly9wYXkucGVzYXBhbC5jb20vIn0.yySNv3wXxEHL4AbGcZe85s-h5CtDviMCGrUyP4-leK0","expiryDate":"2026-08-02T13:19:49.7256878Z","error":null,"status":"200","message":"Request processed successfully"}
+
+=== 2026-08-02 13:14:49 ===
+URL: https://pay.pesapal.com/v3/api/Transactions/SubmitOrderRequest
+METHOD: POST
+TOKEN: eyJhbGciOi...
+BODY: {"id":"CF_6a6f42c97843f_1785676489","currency":"UGX","amount":1000,"description":"Donation to: Help Keep a Girl in School \u2013 Karamoja Menstrual Hygiene Outreach 2026","callback_url":"https:\/\/chamafunds.com\/payment_callback.php?donation_id=81","billing_address":{"email_address":"obinacademy@gmail.com","phone_number":"256775361998","country_code":"UG","first_name":"Anonymous","last_name":"","line_1":"N\/A","city":"Uganda","state":"","postal_code":""},"notification_id":"29251393-21c3-4b72-9403-da322310d3c8"}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"order_tracking_id":"607df34c-30bd-4585-8d01-da12c8e010f1","merchant_reference":"CF_6a6f42c97843f_1785676489","redirect_url":"https://pay.pesapal.com/iframe/PesapalIframe3/Index?OrderTrackingId=607df34c-30bd-4585-8d01-da12c8e010f1","error":null,"status":"200"}
+
+=== 2026-08-02 13:15:44 ===
+URL: https://pay.pesapal.com/v3/api/Auth/RequestToken
+METHOD: POST
+TOKEN: [none]
+BODY: {"consumer_key":"u+nAfIIT\/y0vtZdwd4ypMumdpUUPmyYm","consumer_secret":"r2hNkSEMzL9P4ByZiltITGsj\/3g="}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3VzZXJkYXRhIjoiM2NiYzg0NDUtNzk1NS00OTA4LWIxNzYtZGRjNmI1YTk0NDhiIiwidWlkIjoidStuQWZJSVQveTB2dFpkd2Q0eXBNdW1kcFVVUG15WW0iLCJuYmYiOjE3ODU2NzY1NDQsImV4cCI6MTc4NTY3Njg0NCwiaWF0IjoxNzg1Njc2NTQ0LCJpc3MiOiJodHRwOi8vcGF5LnBlc2FwYWwuY29tLyIsImF1ZCI6Imh0dHA6Ly9wYXkucGVzYXBhbC5jb20vIn0.8jP_5_FG0Edw56500W6dOfnpGMYCy69eCcQdlpf-Zbw","expiryDate":"2026-08-02T13:20:44.7474771Z","error":null,"status":"200","message":"Request processed successfully"}
+
+RESPONSE_CODE: 200
+RESPONSE_BODY: {"payment_method":"MTNUG","amount":1000.0,"created_date":"2026-08-02T16:15:30.2","confirmation_code":"42488020375","order_tracking_id":"607df34c-30bd-4585-8d01-da12c8e010f1","payment_status_description":"Completed","description":null,"message":"Request processed successfully","payment_account":"2567xxx61998","call_back_url":"https://chamafunds.com/payment_callback.php?donation_id=81&OrderTrackingId=607df34c-30bd-4585-8d01-da12c8e010f1&OrderMerchantReference=CF_6a6f42c97843f_1785676489","status_code":1,"merchant_reference":"CF_6a6f42c97843f_1785676489","account_number":null,"payment_status_code":"","currency":"UGX","error":{"error_type":null,"code":null,"message":null},"status":"200"}
+

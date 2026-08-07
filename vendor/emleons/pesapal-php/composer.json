@@ -1,0 +1,21 @@
+{
+    "name": "emleons/pesapal-php",
+    "description": "General-purpose Pesapal PHP integration library — Easily authenticate, create payment orders, handle IPNs, and check transaction status with minimal setup.",
+    "type": "library",
+    "require": {
+        "guzzlehttp/guzzle": "^7.9"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Emleons\\PesapalPhp\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "emleonstz",
+            "email": "emleons23@gmail.con"
+        }
+    ],
+    "minimum-stability": "stable"
+}

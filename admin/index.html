@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin · ChamaFunds</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+<!-- Mobile Top Bar -->
+<nav style="background:#fff;border-bottom:1px solid #e5e7eb;padding:14px 20px;display:none;align-items:center;justify-content:space-between;position:fixed;top:0;left:0;right:0;z-index:500;" id="mobileTopBar">
+  <div style="display:flex;align-items:center;gap:8px;"><div class="navbar-logo">CF</div><span style="font-weight:800;color:#1A2A6C;font-size:.9rem;">Admin</span></div>
+  <button id="mobileSidebarToggle" style="font-size:1.3rem;color:#6b7280;"><i class="fas fa-bars"></i></button>
+</nav>
+<div class="modal-overlay" id="sidebarOverlay" style="z-index:899;"></div>
+
+<div class="admin-layout">
+  <!-- SIDEBAR -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-brand" style="padding:16px 12px 24px;">
+      <div class="navbar-logo">CF</div>
+      <span style="font-weight:800;color:#1A2A6C;">Admin</span>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="tab-btn sidebar-link active" data-tab="tab-overview" style="width:100%;text-align:left;border:none;background:none;cursor:pointer;"><i class="fas fa-th-large" style="margin-right:12px;"></i>📊 Overview</button>
+      <button class="tab-btn sidebar-link" data-tab="tab-campaigns" style="width:100%;text-align:left;border:none;background:none;cursor:pointer;"><i class="fas fa-rocket" style="margin-right:12px;"></i>📋 Campaigns</button>
+      <button class="tab-btn sidebar-link" data-tab="tab-users" style="width:100%;text-align:left;border:none;background:none;cursor:pointer;"><i class="fas fa-users" style="margin-right:12px;"></i>👥 Users</button>
+      <button class="tab-btn sidebar-link" data-tab="tab-transactions" style="width:100%;text-align:left;border:none;background:none;cursor:pointer;"><i class="fas fa-credit-card" style="margin-right:12px;"></i>💳 Transactions</button>
+      <button class="tab-btn sidebar-link" data-tab="tab-withdrawals" style="width:100%;text-align:left;border:none;background:none;cursor:pointer;"><i class="fas fa-hand-holding-usd" style="margin-right:12px;"></i>💰 Withdrawals</button>
+      <button class="tab-btn sidebar-link" data-tab="tab-countries" style="width:100%;text-align:left;border:none;background:none;cursor:pointer;"><i class="fas fa-globe-africa" style="margin-right:12px;"></i>🌍 Countries</button>
+      <button class="tab-btn sidebar-link" data-tab="tab-settings" style="width:100%;text-align:left;border:none;background:none;cursor:pointer;"><i class="fas fa-cog" style="margin-right:12px;"></i>⚙️ Settings</button>
+      <button class="tab-btn sidebar-link" data-tab="tab-analytics" style="width:100%;text-align:left;border:none;background:none;cursor:pointer;"><i class="fas fa-chart-line" style="margin-right:12px;"></i>📊 Analytics</button>
+    </nav>
+    <div class="sidebar-footer"><a href="../index.html" class="sidebar-link logout-link"><i class="fas fa-sign-out-alt"></i>Logout</a></div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="admin-main">
+    <div class="page-header">
+      <h1>Good morning, Admin 👋</h1>
+      <p>Here's your platform overview for today — June 23, 2026.</p>
+    </div>
+
+    <!-- ═══ TAB: OVERVIEW ═══ -->
+    <div class="tab-panel active" id="tab-overview">
+      <div class="grid-4" style="margin-bottom:24px;">
+        <div class="stat-card"><p class="stat-label">Total Campaigns</p><p class="stat-value">247</p><p class="stat-sub" style="color:#10b981;"><i class="fas fa-arrow-up"></i> +12 this week</p></div>
+        <div class="stat-card"><p class="stat-label">Total Users</p><p class="stat-value">1,842</p><p class="stat-sub" style="color:#10b981;"><i class="fas fa-arrow-up"></i> +28 this week</p></div>
+        <div class="stat-card"><p class="stat-label">Total Revenue</p><p class="stat-value" style="color:#FF6B4A;">UGX 18.4M</p><p class="stat-sub" style="color:#10b981;"><i class="fas fa-arrow-up"></i> +7% this month</p></div>
+        <div class="stat-card"><p class="stat-label">Total Contributions</p><p class="stat-value">UGX 245M</p><p class="stat-sub" style="color:#9ca3af;">Across all campaigns</p></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
+        <div class="card" style="padding:24px;"><p style="font-weight:700;color:#1A2A6C;margin-bottom:16px;">Contributions (Last 7 Days)</p><canvas id="contributionsChart" height="180"></canvas></div>
+        <div class="card" style="padding:24px;"><p style="font-weight:700;color:#1A2A6C;margin-bottom:16px;">Campaigns by Category</p><canvas id="categoryChart" height="180"></canvas></div>
+      </div>
+      <!-- Recent Transactions -->
+      <div class="card" style="padding:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <h2 style="font-weight:800;color:#1A2A6C;font-size:1rem;">Recent Transactions</h2>
+          <a href="#" style="font-size:.75rem;color:#FF6B4A;font-weight:700;">View All</a>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Transaction ID</th><th>User</th><th>Campaign</th><th>Amount</th><th>Fee</th><th>Status</th><th>Date</th></tr></thead>
+            <tbody>
+              <tr><td style="font-family:monospace;font-size:.75rem;color:#9ca3af;">#TX-2026-001</td><td style="font-weight:600;color:#1A2A6C;">Sarah M.</td><td style="color:#6b7280;">Family Medical</td><td style="color:#10b981;font-weight:700;">UGX 25,000</td><td style="color:#FF6B4A;">UGX 1,875</td><td><span class="status-badge status-approved">Completed</span></td><td style="font-size:.75rem;color:#9ca3af;">2 hours ago</td></tr>
+              <tr><td style="font-family:monospace;font-size:.75rem;color:#9ca3af;">#TX-2026-002</td><td style="font-weight:600;color:#1A2A6C;">James M.</td><td style="color:#6b7280;">Borehole Project</td><td style="color:#10b981;font-weight:700;">UGX 50,000</td><td style="color:#FF6B4A;">UGX 3,750</td><td><span class="status-badge status-approved">Completed</span></td><td style="font-size:.75rem;color:#9ca3af;">5 hours ago</td></tr>
+              <tr><td style="font-family:monospace;font-size:.75rem;color:#9ca3af;">#TX-2026-003</td><td style="font-weight:600;color:#1A2A6C;">Grace A.</td><td style="color:#6b7280;">School Fees</td><td style="color:#10b981;font-weight:700;">UGX 10,000</td><td style="color:#FF6B4A;">UGX 750</td><td><span class="status-badge status-pending">Pending</span></td><td style="font-size:.75rem;color:#9ca3af;">Yesterday</td></tr>
+              <tr><td style="font-family:monospace;font-size:.75rem;color:#9ca3af;">#TX-2026-004</td><td style="font-weight:600;color:#1A2A6C;">David O.</td><td style="color:#6b7280;">Medical Fund</td><td style="color:#10b981;font-weight:700;">UGX 20,000</td><td style="color:#FF6B4A;">UGX 1,500</td><td><span class="status-badge status-approved">Completed</span></td><td style="font-size:.75rem;color:#9ca3af;">Yesterday</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TAB: CAMPAIGNS ═══ -->
+    <div class="tab-panel" id="tab-campaigns">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+        <h2 style="font-weight:800;color:#1A2A6C;">All Campaigns</h2>
+        <div class="filter-bar" style="margin:0;">
+          <div class="search-input-wrap" style="max-width:220px;"><i class="fas fa-search"></i><input type="text" class="form-input" placeholder="Search campaigns..." /></div>
+          <select class="form-input" style="max-width:140px;"><option>All Status</option><option>Active</option><option>Completed</option><option>Paused</option><option>Flagged</option></select>
+        </div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Title</th><th>Campaigner</th><th>Goal</th><th>Raised</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td style="font-size:.75rem;color:#9ca3af;">#C-001</td><td style="font-weight:600;color:#1A2A6C;">Family Medical Fund</td><td>Sarah M.</td><td>UGX 500K</td><td>UGX 375K</td><td><span class="status-badge status-active">Active</span></td><td style="font-size:.75rem;color:#9ca3af;">Jan 12, 2026</td><td><div style="display:flex;gap:8px;font-size:.8rem;"><a href="../campaign-detail.html" style="color:#1A2A6C;"><i class="fas fa-eye"></i></a><a href="#" style="color:#f59e0b;"><i class="fas fa-pause"></i></a><a href="#" style="color:#ef4444;"><i class="fas fa-trash"></i></a></div></td></tr>
+              <tr><td style="font-size:.75rem;color:#9ca3af;">#C-002</td><td style="font-weight:600;color:#1A2A6C;">Borehole Project</td><td>Peter O.</td><td>UGX 1.2M</td><td>UGX 1.2M</td><td><span class="status-badge status-completed">Completed</span></td><td style="font-size:.75rem;color:#9ca3af;">Jan 3, 2026</td><td><div style="display:flex;gap:8px;font-size:.8rem;"><a href="#" style="color:#1A2A6C;"><i class="fas fa-eye"></i></a><a href="#" style="color:#ef4444;"><i class="fas fa-trash"></i></a></div></td></tr>
+              <tr><td style="font-size:.75rem;color:#9ca3af;">#C-003</td><td style="font-weight:600;color:#1A2A6C;">School Fees Drive</td><td>Grace A.</td><td>UGX 800K</td><td>UGX 120K</td><td><span class="status-badge status-active">Active</span></td><td style="font-size:.75rem;color:#9ca3af;">Jan 20, 2026</td><td><div style="display:flex;gap:8px;font-size:.8rem;"><a href="#" style="color:#1A2A6C;"><i class="fas fa-eye"></i></a><a href="#" style="color:#f59e0b;"><i class="fas fa-pause"></i></a><a href="#" style="color:#ef4444;"><i class="fas fa-trash"></i></a></div></td></tr>
+              <tr><td style="font-size:.75rem;color:#9ca3af;">#C-004</td><td style="font-weight:600;color:#1A2A6C;">Flood Relief Fund</td><td>Moses B.</td><td>UGX 1M</td><td>UGX 300K</td><td><span class="status-badge status-flagged">Flagged</span></td><td style="font-size:.75rem;color:#9ca3af;">Jan 18, 2026</td><td><div style="display:flex;gap:8px;font-size:.8rem;"><a href="#" style="color:#1A2A6C;"><i class="fas fa-eye"></i></a><a href="#" style="color:#f59e0b;"><i class="fas fa-pause"></i></a><a href="#" style="color:#ef4444;"><i class="fas fa-trash"></i></a></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TAB: USERS ═══ -->
+    <div class="tab-panel" id="tab-users">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+        <h2 style="font-weight:800;color:#1A2A6C;">All Users</h2>
+        <div class="search-input-wrap" style="max-width:240px;"><i class="fas fa-search"></i><input type="text" class="form-input" placeholder="Search users..." /></div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td style="font-size:.75rem;color:#9ca3af;">#U-001</td><td style="font-weight:600;color:#1A2A6C;">Sarah Mwangi</td><td>sarah@example.com</td><td>256712345678</td><td><span style="font-size:.72rem;font-weight:700;color:#6d28d9;background:#ede9fe;padding:2px 8px;border-radius:99px;">Campaigner</span></td><td><span class="status-badge status-active">Active</span></td><td style="font-size:.75rem;color:#9ca3af;">Dec 1, 2025</td><td><div style="display:flex;gap:8px;font-size:.8rem;"><a href="#" style="color:#1A2A6C;"><i class="fas fa-eye"></i></a><a href="#" style="color:#f59e0b;"><i class="fas fa-ban"></i></a><a href="#" style="color:#ef4444;"><i class="fas fa-trash"></i></a></div></td></tr>
+              <tr><td style="font-size:.75rem;color:#9ca3af;">#U-002</td><td style="font-weight:600;color:#1A2A6C;">James Mutua</td><td>james@example.com</td><td>254712345678</td><td><span style="font-size:.72rem;font-weight:700;color:#065f46;background:#d1fae5;padding:2px 8px;border-radius:99px;">Contributor</span></td><td><span class="status-badge status-active">Active</span></td><td style="font-size:.75rem;color:#9ca3af;">Dec 5, 2025</td><td><div style="display:flex;gap:8px;font-size:.8rem;"><a href="#" style="color:#1A2A6C;"><i class="fas fa-eye"></i></a><a href="#" style="color:#f59e0b;"><i class="fas fa-ban"></i></a></div></td></tr>
+              <tr><td style="font-size:.75rem;color:#9ca3af;">#U-003</td><td style="font-weight:600;color:#1A2A6C;">Admin User</td><td>admin@chamafunds.com</td><td>—</td><td><span style="font-size:.72rem;font-weight:700;color:#1e40af;background:#dbeafe;padding:2px 8px;border-radius:99px;">Admin</span></td><td><span class="status-badge status-active">Active</span></td><td style="font-size:.75rem;color:#9ca3af;">Nov 1, 2025</td><td><div style="display:flex;gap:8px;font-size:.8rem;"><a href="#" style="color:#1A2A6C;"><i class="fas fa-eye"></i></a></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TAB: TRANSACTIONS ═══ -->
+    <div class="tab-panel" id="tab-transactions">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+        <h2 style="font-weight:800;color:#1A2A6C;">All Transactions</h2>
+        <div class="search-input-wrap" style="max-width:260px;"><i class="fas fa-search"></i><input type="text" class="form-input" placeholder="Search by ID or user..." /></div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Campaign</th><th>User</th><th>Amount</th><th>Fee</th><th>Net</th><th>Status</th><th>Date</th></tr></thead>
+            <tbody>
+              <tr><td style="font-family:monospace;font-size:.72rem;color:#9ca3af;">#TX-2026-001</td><td style="color:#6b7280;">Family Medical</td><td style="font-weight:600;color:#1A2A6C;">Sarah M.</td><td style="color:#10b981;font-weight:700;">UGX 25,000</td><td style="color:#FF6B4A;">UGX 1,875</td><td style="font-weight:600;">UGX 23,125</td><td><span class="status-badge status-approved">Completed</span></td><td style="font-size:.75rem;color:#9ca3af;">2h ago</td></tr>
+              <tr><td style="font-family:monospace;font-size:.72rem;color:#9ca3af;">#TX-2026-002</td><td style="color:#6b7280;">Borehole</td><td style="font-weight:600;color:#1A2A6C;">James M.</td><td style="color:#10b981;font-weight:700;">UGX 50,000</td><td style="color:#FF6B4A;">UGX 3,750</td><td style="font-weight:600;">UGX 46,250</td><td><span class="status-badge status-approved">Completed</span></td><td style="font-size:.75rem;color:#9ca3af;">5h ago</td></tr>
+              <tr><td style="font-family:monospace;font-size:.72rem;color:#9ca3af;">#TX-2026-003</td><td style="color:#6b7280;">School Fees</td><td style="font-weight:600;color:#1A2A6C;">Grace A.</td><td style="color:#10b981;font-weight:700;">UGX 10,000</td><td style="color:#FF6B4A;">UGX 750</td><td style="font-weight:600;">UGX 9,250</td><td><span class="status-badge status-pending">Pending</span></td><td style="font-size:.75rem;color:#9ca3af;">Yesterday</td></tr>
+              <tr><td style="font-family:monospace;font-size:.72rem;color:#9ca3af;">#TX-2026-004</td><td style="color:#6b7280;">Medical</td><td style="font-weight:600;color:#1A2A6C;">David O.</td><td style="color:#10b981;font-weight:700;">UGX 20,000</td><td style="color:#FF6B4A;">UGX 1,500</td><td style="font-weight:600;">UGX 18,500</td><td><span class="status-badge status-approved">Completed</span></td><td style="font-size:.75rem;color:#9ca3af;">Yesterday</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TAB: WITHDRAWALS ═══ -->
+    <div class="tab-panel" id="tab-withdrawals">
+      <h2 style="font-weight:800;color:#1A2A6C;margin-bottom:20px;">Withdrawal Requests</h2>
+      <div class="card" style="padding:0;overflow:hidden;margin-bottom:24px;">
+        <div style="padding:16px 20px;border-bottom:1px solid #e5e7eb;font-weight:700;color:#1A2A6C;font-size:.9rem;">⏳ Pending Approvals (3)</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Campaigner</th><th>Amount</th><th>Fee</th><th>Net</th><th>Mobile Money</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td style="font-size:.75rem;color:#9ca3af;">#W-001</td><td style="font-weight:600;color:#1A2A6C;">Sarah M.</td><td>UGX 200K</td><td style="color:#FF6B4A;">UGX 15K</td><td style="color:#10b981;font-weight:700;">UGX 185K</td><td>256712345678</td><td style="font-size:.75rem;color:#9ca3af;">Today</td><td><div style="display:flex;gap:8px;"><button class="btn btn-sm" style="background:#d1fae5;color:#065f46;font-size:.75rem;">Approve</button><button class="btn btn-sm" style="background:#fee2e2;color:#991b1b;font-size:.75rem;">Reject</button></div></td></tr>
+              <tr><td style="font-size:.75rem;color:#9ca3af;">#W-002</td><td style="font-weight:600;color:#1A2A6C;">Peter O.</td><td>UGX 350K</td><td style="color:#FF6B4A;">UGX 26.25K</td><td style="color:#10b981;font-weight:700;">UGX 323.75K</td><td>256701234567</td><td style="font-size:.75rem;color:#9ca3af;">Today</td><td><div style="display:flex;gap:8px;"><button class="btn btn-sm" style="background:#d1fae5;color:#065f46;font-size:.75rem;">Approve</button><button class="btn btn-sm" style="background:#fee2e2;color:#991b1b;font-size:.75rem;">Reject</button></div></td></tr>
+              <tr><td style="font-size:.75rem;color:#9ca3af;">#W-003</td><td style="font-weight:600;color:#1A2A6C;">Grace A.</td><td>UGX 100K</td><td style="color:#FF6B4A;">UGX 7.5K</td><td style="color:#10b981;font-weight:700;">UGX 92.5K</td><td>256789012345</td><td style="font-size:.75rem;color:#9ca3af;">Yesterday</td><td><div style="display:flex;gap:8px;"><button class="btn btn-sm" style="background:#d1fae5;color:#065f46;font-size:.75rem;">Approve</button><button class="btn btn-sm" style="background:#fee2e2;color:#991b1b;font-size:.75rem;">Reject</button></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TAB: COUNTRIES ═══ -->
+    <div class="tab-panel" id="tab-countries">
+      <h2 style="font-weight:800;color:#1A2A6C;margin-bottom:20px;">Supported Countries</h2>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Country</th><th>Currency</th><th>Payment Partner</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td style="font-weight:600;color:#1A2A6C;">🇺🇬 Uganda</td><td>UGX</td><td>PawaPay</td><td><span class="status-badge status-active">Active</span></td><td><button class="btn btn-sm" style="background:#fee2e2;color:#991b1b;font-size:.72rem;">Disable</button></td></tr>
+              <tr><td style="font-weight:600;color:#1A2A6C;">🇰🇪 Kenya</td><td>KES</td><td>PawaPay</td><td><span class="status-badge status-active">Active</span></td><td><button class="btn btn-sm" style="background:#fee2e2;color:#991b1b;font-size:.72rem;">Disable</button></td></tr>
+              <tr><td style="font-weight:600;color:#1A2A6C;">🇷🇼 Rwanda</td><td>RWF</td><td>PawaPay</td><td><span class="status-badge status-active">Active</span></td><td><button class="btn btn-sm" style="background:#fee2e2;color:#991b1b;font-size:.72rem;">Disable</button></td></tr>
+              <tr><td style="font-weight:600;color:#1A2A6C;">🇳🇬 Nigeria</td><td>NGN</td><td>Flutterwave</td><td><span class="status-badge status-active">Active</span></td><td><button class="btn btn-sm" style="background:#fee2e2;color:#991b1b;font-size:.72rem;">Disable</button></td></tr>
+              <tr><td style="font-weight:600;color:#1A2A6C;">🇿🇲 Zambia</td><td>ZMW</td><td>PawaPay</td><td><span class="status-badge status-active">Active</span></td><td><button class="btn btn-sm" style="background:#fee2e2;color:#991b1b;font-size:.72rem;">Disable</button></td></tr>
+              <tr><td style="font-weight:600;color:#1A2A6C;">🇸🇳 Senegal</td><td>XOF</td><td>Wave</td><td><span class="status-badge status-paused">Inactive</span></td><td><button class="btn btn-sm" style="background:#d1fae5;color:#065f46;font-size:.72rem;">Enable</button></td></tr>
+              <tr><td style="font-weight:600;color:#1A2A6C;">🇨🇩 DR Congo</td><td>CDF</td><td>—</td><td><span class="status-badge status-paused">Inactive</span></td><td><button class="btn btn-sm" style="background:#d1fae5;color:#065f46;font-size:.72rem;">Enable</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card" style="padding:24px;margin-top:20px;max-width:400px;">
+        <h3 style="font-weight:700;color:#1A2A6C;margin-bottom:16px;font-size:.95rem;">Add New Country</h3>
+        <div class="form-group"><label class="form-label">Country Name</label><input type="text" class="form-input" placeholder="e.g. Ghana" /></div>
+        <div class="form-group"><label class="form-label">Currency Code</label><input type="text" class="form-input" placeholder="e.g. GHS" /></div>
+        <div class="form-group"><label class="form-label">Payment Partner</label><select class="form-input"><option>PawaPay</option><option>Flutterwave</option><option>Wave</option><option>Other</option></select></div>
+        <button class="btn btn-primary btn-sm">Add Country</button>
+      </div>
+    </div>
+
+    <!-- ═══ TAB: SETTINGS ═══ -->
+    <div class="tab-panel" id="tab-settings">
+      <h2 style="font-weight:800;color:#1A2A6C;margin-bottom:24px;">Platform Settings</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:860px;">
+        <div class="card" style="padding:28px;">
+          <h3 style="font-weight:700;color:#1A2A6C;margin-bottom:20px;">Fee Configuration</h3>
+          <div class="form-group">
+            <label class="form-label">Transaction Fee (%)</label>
+            <input type="number" class="form-input" value="7.5" min="0" max="20" step="0.5" />
+            <p style="font-size:.75rem;color:#9ca3af;margin-top:6px;">Current: 7.5% per contribution</p>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Minimum Withdrawal (UGX)</label>
+            <input type="number" class="form-input" value="5000" />
+          </div>
+          <button class="btn btn-primary btn-sm">Save Fee Config</button>
+        </div>
+        <div class="card" style="padding:28px;">
+          <h3 style="font-weight:700;color:#1A2A6C;margin-bottom:20px;">Payment Partner (PawaPay)</h3>
+          <div class="form-group"><label class="form-label">API Key</label><input type="password" class="form-input" value="sk_live_••••••••••••••" /></div>
+          <div class="form-group"><label class="form-label">Webhook Secret</label><input type="password" class="form-input" value="wh_••••••••••••" /></div>
+          <div class="form-group"><label class="form-label">Environment</label><select class="form-input"><option>Production</option><option>Sandbox</option></select></div>
+          <button class="btn btn-primary btn-sm">Save API Config</button>
+        </div>
+        <div class="card" style="padding:28px;grid-column:span 2;">
+          <h3 style="font-weight:700;color:#1A2A6C;margin-bottom:20px;">System Settings</h3>
+          <div style="display:flex;flex-direction:column;gap:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:14px;background:#f9fafb;border-radius:12px;">
+              <div><p style="font-weight:600;color:#1A2A6C;font-size:.9rem;">Maintenance Mode</p><p style="font-size:.78rem;color:#9ca3af;">Disable public access while making changes</p></div>
+              <label style="position:relative;display:inline-block;width:44px;height:24px;"><input type="checkbox" style="display:none;" /><span style="position:absolute;inset:0;background:#d1d5db;border-radius:99px;cursor:pointer;transition:.3s;"></span></label>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:14px;background:#f9fafb;border-radius:12px;">
+              <div><p style="font-weight:600;color:#1A2A6C;font-size:.9rem;">Email Notifications</p><p style="font-size:.78rem;color:#9ca3af;">Send email alerts for withdrawals and flagged campaigns</p></div>
+              <label style="position:relative;display:inline-block;width:44px;height:24px;"><input type="checkbox" checked style="display:none;" /><span style="position:absolute;inset:0;background:#FF6B4A;border-radius:99px;cursor:pointer;transition:.3s;"></span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TAB: ANALYTICS ═══ -->
+    <div class="tab-panel" id="tab-analytics">
+      <h2 style="font-weight:800;color:#1A2A6C;margin-bottom:24px;">Advanced Analytics</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div class="card" style="padding:24px;"><p style="font-weight:700;color:#1A2A6C;margin-bottom:16px;">Revenue Over Time (2026)</p><canvas id="revenueChart" height="200"></canvas></div>
+        <div class="card" style="padding:24px;"><p style="font-weight:700;color:#1A2A6C;margin-bottom:16px;">User Growth (Last 6 Months)</p><canvas id="userGrowthChart" height="200"></canvas></div>
+        <div class="card" style="padding:24px;"><p style="font-weight:700;color:#1A2A6C;margin-bottom:16px;">Campaign Success Rate</p><canvas id="successRateChart" height="200"></canvas></div>
+        <div class="card" style="padding:24px;"><p style="font-weight:700;color:#1A2A6C;margin-bottom:16px;">Top 10 Campaigns by Amount Raised</p><canvas id="topCampaignsChart" height="200"></canvas></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<style>
+@media(max-width:1023px){
+  .admin-sidebar{display:none;}
+  .admin-sidebar.mobile-open{display:flex;position:fixed;left:0;top:0;bottom:0;z-index:900;}
+  #mobileTopBar{display:flex!important;}
+  .admin-layout{padding-top:60px;}
+  div[style*="grid-template-columns:1fr 1fr"]{display:block!important;}
+  div[style*="grid-template-columns:1fr 1fr"] > .card{margin-bottom:16px;}
+}
+.tab-btn.sidebar-link{ font-weight:600; font-size:.85rem; }
+.tab-btn.sidebar-link.active { background:#1A2A6C; color:#fff; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="../js/main.js"></script>
+<script>
+  document.querySelector('.admin-layout').style.paddingTop = window.innerWidth < 1024 ? '60px' : '0';
+</script>
+</body>
+</html>
