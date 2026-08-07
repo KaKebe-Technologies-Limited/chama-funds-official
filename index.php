@@ -58,11 +58,6 @@ $featured = $conn->query(
      LIMIT 4"
 );
 
-// Platform stats
-$totalRaised      = $conn->query("SELECT COALESCE(SUM(amount),0) FROM donations WHERE status='completed'")->fetch_row()[0];
-$activeCampaigns  = $conn->query("SELECT COUNT(*) FROM campaigns WHERE status='active'")->fetch_row()[0];
-$totalContributors= $conn->query("SELECT COUNT(DISTINCT donor_phone) FROM donations WHERE status='completed'")->fetch_row()[0];
-
 include __DIR__ . '/includes/header.php';
 ?>
 
@@ -89,43 +84,6 @@ include __DIR__ . '/includes/header.php';
           <span><i class="fas fa-check-circle" style="color:#6ee7b7;margin-right:6px;"></i>Live tracking</span>
         </div>
       </div>
-      <!-- Hero impact panel (hidden on small mobile) -->
-      <!-- <div class="hero-panel">
-        <p class="hero-panel-label">Platform Impact</p>
-        <div class="hero-stat-grid">
-          <div class="hero-stat-tile">
-            <span class="hero-stat-icon" style="background:rgba(250,204,21,.15);color:#facc15;"><i class="fas fa-hand-holding-heart"></i></span>
-            <div>
-              <p class="hero-stat-value">UGX <?= number_format($totalRaised) ?></p>
-              <p class="hero-stat-label">Total Raised</p>
-            </div>
-          </div>
-          <div class="hero-stat-tile">
-            <span class="hero-stat-icon" style="background:rgba(110,231,183,.15);color:#6ee7b7;"><i class="fas fa-rocket"></i></span>
-            <div>
-              <p class="hero-stat-value"><?= number_format($activeCampaigns) ?></p>
-              <p class="hero-stat-label">Active Campaigns</p>
-            </div>
-          </div>
-          <div class="hero-stat-tile">
-            <span class="hero-stat-icon" style="background:rgba(147,197,253,.15);color:#93c5fd;"><i class="fas fa-users"></i></span>
-            <div>
-              <p class="hero-stat-value"><?= number_format($totalContributors) ?></p>
-              <p class="hero-stat-label">Contributors</p>
-            </div>
-          </div>
-          <div class="hero-stat-tile">
-            <span class="hero-stat-icon" style="background:rgba(255,107,74,.15);color:#FF6B4A;"><i class="fas fa-mobile-alt"></i></span>
-            <div>
-              <p class="hero-stat-value">100%</p>
-              <p class="hero-stat-label">Mobile Money</p>
-            </div>
-          </div>
-        </div>
-        <a href="<?= BASE ?>/campaign-drives.php" class="hero-panel-link">
-          <i class="fas fa-th-large"></i> Browse All Campaigns <i class="fas fa-arrow-right"></i>
-        </a>
-      </div> -->
     </div>
   </div>
 </section>

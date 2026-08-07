@@ -333,54 +333,25 @@ textarea.form-input { resize: vertical; min-height: 120px; }
   padding: 6px 16px; border-radius: 99px; font-size: .82rem; font-weight: 600;
   margin-bottom: 20px;
 }
-/* Two-col hero grid */
+/* Single centered hero column */
 .hero-inner {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 48px;
-  align-items: center;
+  display: flex;
+  justify-content: center;
 }
+.hero-copy {
+  max-width: 640px;
+  text-align: center;
+}
+.hero-copy h1, .hero-copy p { margin-left: auto; margin-right: auto; }
 .hero-cta-row {
   display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 32px;
+  justify-content: center;
 }
 .hero-trust-row {
   display: flex; flex-wrap: wrap; gap: 20px;
   font-size: .85rem; color: rgba(255,255,255,.7);
+  justify-content: center;
 }
-/* Impact panel */
-.hero-panel {
-  background: rgba(255,255,255,.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,.18);
-  border-radius: 24px;
-  padding: 28px;
-}
-.hero-panel-label {
-  font-size: .72rem; font-weight: 700; letter-spacing: .12em;
-  text-transform: uppercase; color: rgba(255,255,255,.55); margin-bottom: 16px;
-}
-.hero-stat-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
-}
-.hero-stat-tile {
-  display: flex; align-items: center; gap: 10px;
-  background: rgba(255,255,255,.08); border-radius: 14px;
-  padding: 12px; border: 1px solid rgba(255,255,255,.12);
-}
-.hero-stat-icon {
-  width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center; font-size: .95rem;
-}
-.hero-stat-value { font-size: .88rem; font-weight: 800; color: #fff; line-height: 1.2; word-break: break-all; }
-.hero-stat-label { font-size: .68rem; color: rgba(255,255,255,.6); margin-top: 2px; }
-.hero-panel-link {
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  margin-top: 16px; padding: 11px; background: rgba(255,255,255,.1);
-  border-radius: 12px; color: #fff; font-size: .84rem; font-weight: 600;
-  border: 1px solid rgba(255,255,255,.15); transition: background .2s;
-}
-.hero-panel-link:hover { background: rgba(255,255,255,.2); }
-
 /* ── Home Campaigns Grid ────────────────────────────────────── */
 .home-campaigns-grid {
   display: grid;
@@ -692,8 +663,6 @@ a.campaign-card .btn {
   .sidebar.mobile-open, .admin-sidebar.mobile-open { display: flex; position: fixed; left: 0; top: 0; bottom: 0; z-index: 900; }
   .admin-main, .main-content { padding: 16px; }
   .grid-4 { grid-template-columns: repeat(2, 1fr); }
-  .hero-inner { grid-template-columns: 1fr; gap: 32px; }
-  .hero-panel { max-width: 480px; margin: 0 auto; width: 100%; }
 }
 @media (max-width: 767px) {
   .section { padding: 56px 0; }
@@ -707,7 +676,6 @@ a.campaign-card .btn {
   .fee-calc-result { grid-template-columns: 1fr; }
   .filter-bar .form-input { max-width: 100%; }
   .auth-card { padding: 28px 20px; }
-  .hero-panel { display: none; }  /* hide panel on small phones — copy alone is clean */
   .hero-trust-row { gap: 12px; }
 
   /* ── Hero CTA buttons — stack vertically, full width, comfortable tap targets ── */
