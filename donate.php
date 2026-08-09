@@ -98,7 +98,7 @@ include __DIR__ . '/includes/header.php';
           <div class="progress-wrap"><div class="progress-fill" data-width="<?= $pct ?>%"></div></div>
           <div class="campaign-footer">
             <span class="contributors-count"><i class="fas fa-users" style="margin-right:4px;"></i><?= $c['contributor_count'] ?></span>
-            <span class="btn btn-primary btn-sm">Donate Now</span>
+            <span class="btn btn-primary btn-sm"><i class="fas fa-heart" style="margin-right:5px;"></i>Donate Now</span>
           </div>
         </div>
       </a>

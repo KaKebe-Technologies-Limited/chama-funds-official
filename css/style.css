@@ -94,6 +94,17 @@ input, select, textarea { font-family: inherit; }
 }
 .btn-primary   { background: var(--coral); color: var(--white); }
 .btn-primary:hover { background: var(--coral-dark); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(255,107,74,.35); }
+
+/* Campaign card "Donate" CTA — navy blue to match the site's primary color */
+.campaign-footer .btn-primary {
+  background: var(--navy);
+  box-shadow: 0 2px 8px rgba(26,42,108,.22);
+}
+.campaign-footer .btn-primary:hover {
+  background: var(--navy-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(26,42,108,.32);
+}
 .btn-secondary { background: var(--navy); color: var(--white); }
 .btn-secondary:hover { background: var(--navy-dark); transform: translateY(-1px); }
 .btn-outline   { border: 2px solid var(--navy); color: var(--navy); background: transparent; }
@@ -345,7 +356,7 @@ textarea.form-input { resize: vertical; min-height: 120px; }
 }
 .hero-bg-overlay {
   position: absolute; inset: 0; z-index: 1;
-  background: linear-gradient(135deg, rgba(26,42,108,.92) 0%, rgba(42,63,138,.85) 50%, rgba(255,107,74,.88) 100%);
+  background: linear-gradient(135deg, rgba(26,42,108,.62) 0%, rgba(42,63,138,.52) 50%, rgba(255,107,74,.58) 100%);
 }
 .hero-bg-dots {
   position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%);
@@ -587,6 +598,27 @@ input[type="range"] { accent-color: var(--coral); width: 100%; cursor: pointer; 
   padding: 40px; width: 100%; max-width: 440px;
   box-shadow: var(--shadow-lg);
 }
+/* ── Donation Success / Processing / Failed page ─────────────── */
+.ds-card { text-align: center; max-width: 460px; }
+.ds-brand {
+  display: inline-flex; align-items: center; gap: 10px;
+  text-decoration: none; margin-bottom: 24px;
+}
+.ds-brand span { font-weight: 800; color: var(--navy); font-size: 1.1rem; }
+.ds-icon {
+  width: 84px; height: 84px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.2rem; margin: 0 auto 20px;
+}
+.ds-icon-pending { background: #fef3c7; color: #d97706; }
+.ds-icon-pending i { animation: dsPulse 1.4s ease-in-out infinite; }
+.ds-icon-failed  { background: #fee2e2; color: #dc2626; }
+@keyframes dsPulse { 0%,100% { opacity: 1; } 50% { opacity: .45; } }
+.ds-title { font-weight: 800; color: var(--navy); font-size: 1.4rem; margin-bottom: 8px; }
+.ds-sub  { color: var(--gray-600); font-size: .92rem; line-height: 1.6; margin-bottom: 8px; }
+.ds-note { color: var(--gray-400); font-size: .82rem; line-height: 1.6; margin-bottom: 24px; }
+.ds-actions { display: flex; flex-direction: column; gap: 10px; }
+
 .auth-divider { text-align: center; position: relative; margin: 20px 0; }
 .auth-divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: var(--gray-200); }
 .auth-divider span { background: var(--white); padding: 0 12px; font-size: .82rem; color: var(--gray-400); position: relative; }

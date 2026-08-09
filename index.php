@@ -89,11 +89,11 @@ include __DIR__ . '/includes/header.php';
     <div class="hero-inner">
       <div class="hero-copy">
         <div class="hero-badge"><i class="fas fa-bolt" style="color:#facc15"></i> Built for African Causes</div>
-        <h1 style="font-size:clamp(1.8rem,5vw,3.4rem);font-weight:800;line-height:1.15;color:#fff;margin-bottom:20px;">
+        <h1 style="font-size:clamp(1.5rem,4vw,2.7rem);font-weight:800;line-height:1.15;color:#fff;margin-bottom:18px;text-shadow:0 2px 12px rgba(0,0,0,.35);">
           Pool Money Together for<br>
           <span style="color:#facc15;">What Matters Most</span>
         </h1>
-        <p style="font-size:1.05rem;color:rgba(255,255,255,.82);max-width:480px;line-height:1.7;margin-bottom:32px;">
+        <p style="font-size:.92rem;color:rgba(255,255,255,.85);max-width:440px;line-height:1.65;margin-bottom:28px;text-shadow:0 1px 6px rgba(0,0,0,.3);">
           Launch a campaign or donate to causes you care about. Transparent, secure, and built for mobile money.
         </p>
         <div class="hero-cta-row">
@@ -193,7 +193,7 @@ include __DIR__ . '/includes/header.php';
               <div class="progress-wrap"><div class="progress-fill" data-width="<?= $pct ?>%"></div></div>
               <div class="campaign-footer">
                 <span class="contributors-count"><i class="fas fa-users" style="margin-right:4px;"></i><?= $c['contributor_count'] ?></span>
-                <span class="btn btn-primary btn-sm">Donate</span>
+                <span class="btn btn-primary btn-sm"><i class="fas fa-heart" style="margin-right:5px;"></i>Donate</span>
               </div>
             </div>
           </a>

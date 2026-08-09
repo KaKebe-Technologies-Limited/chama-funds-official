@@ -4,6 +4,7 @@
  */
 
 require_once __DIR__ . '/iotec_config.php';
+require_once __DIR__ . '/notifications.php';
 
 class IotecApiClient
 {
@@ -87,6 +88,12 @@ class IotecApiClient
         return $this->request('POST', IOTEC_BASE_URL . '/api/collections/collect', $payload, $token);
     }
 
+    public function collectCard($payload)
+    {
+        $token = $this->getToken();
+        return $this->request('POST', IOTEC_BASE_URL . '/api/collections/collect/card', $payload, $token);
+    }
+
     public function getCollectionStatus($requestId)
     {
         $token = $this->getToken();
@@ -147,12 +154,17 @@ function initiateDonationPayment($conn, $campaign_id, $donor_data, $amount, $cur
         return ['error' => 'Campaign not found'];
     }
     $campaign = $result->fetch_assoc();
+    $isCard   = (($donor_data['mobile_money_network'] ?? '') === 'Card Payment');
+
+    if ($isCard && empty(trim($donor_data['donor_email'] ?? ''))) {
+        return ['error' => 'Email is required for card payments.'];
+    }
 
     $orderId    = generateOrderId();
     $nameEsc    = $conn->real_escape_string($donor_data['donor_name'] ?? '');
     $emailEsc   = $conn->real_escape_string($donor_data['donor_email'] ?? '');
     $phoneEsc   = $conn->real_escape_string($donor_data['donor_phone']);
-    $networkEsc = $conn->real_escape_string($donor_data['mobile_money_network'] ?? 'MTN Mobile Money');
+    $networkEsc = $conn->real_escape_string($donor_data['mobile_money_network'] ?? 'Mobile Money');
     $isAnon     = !empty($donor_data['is_anonymous']) ? 1 : 0;
     $donorIdSql = isset($donor_data['donor_id']) && is_numeric($donor_data['donor_id'])
                     ? (int)$donor_data['donor_id'] : 'NULL';
@@ -174,26 +186,39 @@ function initiateDonationPayment($conn, $campaign_id, $donor_data, $amount, $cur
     }
     $donation_id = $conn->insert_id;
 
-    $payer = normalizeUgPhone($donor_data['donor_phone']);
-
-    $payload = [
-        'category'    => 'MobileMoney',
-        'currency'    => $currency,
-        'walletId'    => IOTEC_WALLET_ID,
-        'externalId'  => (string)$donation_id,
-        'payer'       => $payer,
-        'payerName'   => substr($donor_data['donor_name'] ?? 'Donor', 0, 150),
-        'payerNote'   => substr('Donation to ' . $campaign['title'], 0, 100),
-        'amount'      => floatval($amount),
-        'payeeNote'   => 'ChamaFunds donation #' . $donation_id,
-    ];
+    if ($isCard) {
+        $payload = [
+            'category'    => 'Card',
+            'currency'    => $currency,
+            'walletId'    => IOTEC_WALLET_ID,
+            'externalId'  => (string)$donation_id,
+            'payer'       => trim($donor_data['donor_email']),
+            'payerName'   => substr($donor_data['donor_name'] ?? 'Donor', 0, 150),
+            'payerNote'   => substr('Donation to ' . $campaign['title'], 0, 100),
+            'amount'      => floatval($amount),
+            'payeeNote'   => 'ChamaFunds donation #' . $donation_id,
+            'redirectUrl' => BASE . '/payment_callback.php?donation_id=' . $donation_id,
+        ];
+    } else {
+        $payload = [
+            'category'    => 'MobileMoney',
+            'currency'    => $currency,
+            'walletId'    => IOTEC_WALLET_ID,
+            'externalId'  => (string)$donation_id,
+            'payer'       => normalizeUgPhone($donor_data['donor_phone']),
+            'payerName'   => substr($donor_data['donor_name'] ?? 'Donor', 0, 150),
+            'payerNote'   => substr('Donation to ' . $campaign['title'], 0, 100),
+            'amount'      => floatval($amount),
+            'payeeNote'   => 'ChamaFunds donation #' . $donation_id,
+        ];
+    }
 
     try {
         $iotec    = initializeIotec();
-        $response = $iotec->collect($payload);
+        $response = $isCard ? $iotec->collectCard($payload) : $iotec->collect($payload);
 
         $transactionId = $response->id ?? null;
-        $status         = $response->status ?? 'Pending';
+        $status        = $response->status ?? 'Pending';
 
         if (empty($transactionId)) {
             $errMsg = $response->message ?? json_encode($response);
@@ -205,6 +230,20 @@ function initiateDonationPayment($conn, $campaign_id, $donor_data, $amount, $cur
         $conn->query(
             "UPDATE donations SET iotec_transaction_id = '$txIdEsc' WHERE donation_id = $donation_id"
         );
+
+        if ($isCard) {
+            $cardRedirectUrl = $response->cardRedirectUrl ?? null;
+            if (empty($cardRedirectUrl)) {
+                $conn->query("UPDATE donations SET status = 'failed' WHERE donation_id = $donation_id");
+                return ['error' => 'ioTec Pay did not return a card payment link.'];
+            }
+            return [
+                'success'      => true,
+                'donation_id'  => $donation_id,
+                'status'       => 'pending',
+                'redirect_url' => $cardRedirectUrl,
+            ];
+        }
 
         if ($status === 'Success') {
             markDonationCompleted($conn, $donation_id);
@@ -270,6 +309,17 @@ function markDonationCompleted($conn, $donation_id) {
                      '$notifMsgEsc', '$notifLink')"
         );
     }
+
+    sendDonationThankYouEmail([
+        'donor_name'             => $donRow['donor_name'],
+        'donor_email'            => $donRow['donor_email'],
+        'amount'                 => $amt,
+        'currency'               => $donRow['currency'] ?? 'UGX',
+        'campaign_title'         => $campRow['title'] ?? '',
+        'campaign_id'            => $campaign_id,
+        'transaction_reference'  => $donRow['transaction_reference'],
+    ]);
+
     return true;
 }
 

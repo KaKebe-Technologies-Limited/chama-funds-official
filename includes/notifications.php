@@ -105,6 +105,79 @@ function buildEmailBody($campaign_data) {
     ";
 }
 
+// ── Donor Thank-You Email ───────────────────────────────────
+function sendDonationThankYouEmail($donation_data) {
+    if (empty($donation_data['donor_email'])) {
+        return false; // No email on file (common for mobile money donors) — nothing to send.
+    }
+
+    $mail = new PHPMailer(true);
+
+    try {
+        $mail->isSMTP();
+        $mail->Host       = SMTP_HOST;
+        $mail->SMTPAuth   = true;
+        $mail->Username   = SMTP_USER;
+        $mail->Password   = SMTP_PASS;
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = SMTP_PORT;
+
+        $mail->setFrom(SMTP_USER, 'ChamaFunds');
+        $mail->addAddress($donation_data['donor_email'], $donation_data['donor_name'] ?? 'Donor');
+
+        $mail->isHTML(true);
+        $mail->Subject = 'Thank you for your donation to ' . $donation_data['campaign_title'] . '! 🎉';
+        $mail->Body    = buildDonationThankYouEmailBody($donation_data);
+        $mail->AltBody = strip_tags($mail->Body);
+
+        $mail->send();
+        error_log('✅ Donation thank-you email sent to ' . $donation_data['donor_email']);
+        return true;
+    } catch (Exception $e) {
+        error_log('❌ Donation thank-you email failed: ' . $mail->ErrorInfo);
+        return false;
+    }
+}
+
+function buildDonationThankYouEmailBody($d) {
+    $name   = htmlspecialchars($d['donor_name'] ?? 'Friend');
+    $title  = htmlspecialchars($d['campaign_title']);
+    $amount = htmlspecialchars($d['currency'] ?? 'UGX') . ' ' . number_format($d['amount']);
+    $ref    = htmlspecialchars($d['transaction_reference'] ?? '');
+    $link   = BASE . '/campaign-detail.php?id=' . (int)$d['campaign_id'];
+
+    return "
+    <html>
+    <head><style>
+        body { font-family: Arial, sans-serif; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #1A2A6C; color: white; padding: 24px; text-align: center; border-radius: 10px 10px 0 0; }
+        .content { background: #f8fafc; padding: 30px; border: 1px solid #e2e8f0; border-radius: 0 0 10px 10px; }
+        .detail { margin: 15px 0; padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #FF6B4A; }
+        .label { font-weight: bold; color: #1A2A6C; }
+        .btn { display: inline-block; padding: 12px 24px; background: #FF6B4A; color: white; text-decoration: none; border-radius: 8px; }
+        .footer { text-align: center; padding: 20px; color: #94a3b8; font-size: 12px; }
+    </style></head>
+    <body>
+        <div class='container'>
+            <div class='header'><h2>🎉 Thank You, $name!</h2></div>
+            <div class='content'>
+                <p>Your generosity just made a real difference. Here's a receipt for your records:</p>
+                <div class='detail'>
+                    <p><span class='label'>Campaign:</span> $title</p>
+                    <p><span class='label'>Amount:</span> $amount</p>
+                    " . ($ref ? "<p><span class='label'>Reference:</span> $ref</p>" : '') . "
+                </div>
+                <p style='text-align: center;'><a href='$link' class='btn'>View Campaign</a></p>
+                <p style='margin-top:24px;color:#64748b;font-size:13px;'>Thank you for being part of the ChamaFunds community.</p>
+            </div>
+            <div class='footer'><p>&copy; 2026 ChamaFunds. All rights reserved.</p></div>
+        </div>
+    </body>
+    </html>
+    ";
+}
+
 // ── In-App Notification ─────────────────────────────────────
 function saveInAppNotification($conn, $campaign_data) {
     $title = 'New Campaign: ' . $campaign_data['title'];

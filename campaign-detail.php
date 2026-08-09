@@ -36,32 +36,27 @@ $c   = $result->fetch_assoc();
 $cid = $c['campaign_id'];
 $conn->query("UPDATE campaigns SET view_count = view_count + 1 WHERE campaign_id = $cid");
 
-// ── Category hero images — African people, African context ──
+// ── Category hero images — cycled from our own uploaded photos ──
+$heroPhotoSet = [
+    BASE . '/img/slider/pexels-illustrate-digital-ug-924569584-28100858.jpg',
+    BASE . '/img/slider/pexels-lagosfoodbank-9823017.jpg',
+    BASE . '/img/slider/pexels-lbk-studio-2149333232-35094475.jpg',
+    BASE . '/img/slider/pexels-matazumultimedia-32154741.jpg',
+    BASE . '/img/slider/pexels-illustrate-digital-ug-924569584-28101466.jpg',
+];
 $categoryHeros = [
-    // African nurse with patient in clinic
-    'Medical'    => 'https://images.unsplash.com/photo-1666214280557-f1b5022eb634?w=1600&q=80',
-    // African children studying in classroom
-    'Education'  => 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1600&q=80',
-    // African community gathered together
-    'Community'  => 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1600&q=80',
-    // African mother and children
-    'Family'     => 'https://images.unsplash.com/photo-1602928321679-560bb453f190?w=1600&q=80',
-    // African entrepreneurs in meeting
-    'Business'   => 'https://images.unsplash.com/photo-1556761175-b413da4baf72?w=1600&q=80',
-    // Humanitarian aid / relief Africa
-    'Emergency'  => 'https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=1600&q=80',
-    // African wedding celebration
-    'Marriage'   => 'https://images.unsplash.com/photo-1607462109225-6b64ae2dd3cb?w=1600&q=80',
-    // Candles / memorial — dignified
-    'Funeral'    => 'https://images.unsplash.com/photo-1501436513145-30f24e19fcc8?w=1600&q=80',
-    // African farmer in field
-    'Agriculture'=> 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=1600&q=80',
-    // African church / praise worship
-    'Religion'   => 'https://images.unsplash.com/photo-1438232992991-995b671e4b8a?w=1600&q=80',
-    // African athletes running
-    'Sports'     => 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=1600&q=80',
-    // African hands joined together
-    'Other'      => 'https://images.unsplash.com/photo-1504439468489-c8920d796a29?w=1600&q=80',
+    'Medical'     => $heroPhotoSet[0],
+    'Education'   => $heroPhotoSet[1],
+    'Community'   => $heroPhotoSet[2],
+    'Family'      => $heroPhotoSet[3],
+    'Business'    => $heroPhotoSet[4],
+    'Emergency'   => $heroPhotoSet[0],
+    'Marriage'    => $heroPhotoSet[1],
+    'Funeral'     => $heroPhotoSet[2],
+    'Agriculture' => $heroPhotoSet[3],
+    'Religion'    => $heroPhotoSet[4],
+    'Sports'      => $heroPhotoSet[0],
+    'Other'       => $heroPhotoSet[1],
 ];
 $heroImg = $categoryHeros[$c['category']] ?? $categoryHeros['Other'];
 
@@ -110,7 +105,7 @@ $totalDonorsAll = (int)$conn->query(
 
 // ── Last 5 donations preview (shown below story) ─────────────
 $recentDons = $conn->query(
-    "SELECT donor_name, is_anonymous, amount, payment_date,
+    "SELECT donor_name, is_anonymous, amount, payment_date, mobile_money_network,
             TIMESTAMPDIFF(SECOND, payment_date, NOW()) AS seconds_ago
      FROM donations WHERE campaign_id=$cid AND status='completed'
      ORDER BY payment_date DESC LIMIT 5"
@@ -435,6 +430,13 @@ include __DIR__ . '/includes/header.php';
                 if ($diff < 604800)       return floor($diff/86400) . 'd ago';
                 return date('M j', strtotime($datetime));
             }
+            // ── Payment method badge ──────────────────────────
+            function paymentMethodBadge($network) {
+                $isCard = ($network === 'Card Payment');
+                $icon   = $isCard ? 'fa-credit-card' : 'fa-mobile-alt';
+                $label  = $isCard ? 'Card' : 'Mobile Money';
+                return '<span class="cd-pay-badge' . ($isCard ? ' cd-pay-badge-card' : '') . '"><i class="fas ' . $icon . '"></i>' . $label . '</span>';
+            }
           ?>
           <!-- ── Recent Supporters (after story) ─────────────── -->
           <div class="cd-section cd-recent-supporters cd-order-4">
@@ -470,7 +472,7 @@ include __DIR__ . '/includes/header.php';
                 </div>
                 <div class="cd-recent-body">
                   <div class="cd-recent-name"><?= $name ?></div>
-                  <div class="cd-recent-meta"><?= timeAgo($rd['seconds_ago'], $rd['payment_date']) ?></div>
+                  <div class="cd-recent-meta"><?= timeAgo($rd['seconds_ago'], $rd['payment_date']) ?> · <?= paymentMethodBadge($rd['mobile_money_network']) ?></div>
                 </div>
                 <div class="cd-recent-amt">
                   +<?= $c['currency'] ?> <?= number_format($rd['amount']) ?>
@@ -563,7 +565,7 @@ include __DIR__ . '/includes/header.php';
                     <span class="cd-don-amt">+<?= $c['currency'] ?> <?= number_format($d['amount']) ?></span>
                   </div>
                   <div class="cd-don-meta-row">
-                    <?= timeAgo($d['seconds_ago'], $d['payment_date']) ?>
+                    <?= timeAgo($d['seconds_ago'], $d['payment_date']) ?> · <?= paymentMethodBadge($d['mobile_money_network']) ?>
                   </div>
                 </div>
               </div>
@@ -674,18 +676,15 @@ include __DIR__ . '/includes/header.php';
             </div>
 
             <div class="cd-field">
-              <label class="cd-label">Network</label>
+              <label class="cd-label">Payment Method</label>
               <select id="momoNetwork" class="cd-input">
-                <option>MTN Mobile Money</option>
-                <option>Airtel Money</option>
-                <option>Orange Money</option>
-                <option>Safaricom M-PESA</option>
+                <option>Mobile Money</option>
                 <option>Card Payment</option>
               </select>
             </div>
 
             <div class="cd-field">
-              <label class="cd-label">Email <em>(optional)</em></label>
+              <label class="cd-label">Email <em id="donorEmailHint">(optional)</em></label>
               <input type="email" id="donorEmail" class="cd-input" placeholder="you@email.com" />
             </div>
 
@@ -757,20 +756,6 @@ include __DIR__ . '/includes/header.php';
 </div><!-- /cd-page -->
 
 <!-- ══ MODALS ══ -->
-<div class="modal-overlay" id="donationModal">
-  <div class="modal" style="max-width:400px;">
-    <div class="modal-body" style="text-align:center;padding:48px 28px;">
-      <div style="font-size:3.5rem;margin-bottom:14px;animation:pop .4s ease;">✅</div>
-      <h3 style="font-weight:800;color:#0f172a;font-size:1.2rem;margin-bottom:6px;">Thank You!</h3>
-      <p style="color:#6b7280;margin-bottom:6px;">Your contribution of</p>
-      <p style="font-size:1.9rem;font-weight:800;color:#FF6B4A;margin-bottom:12px;" id="modalAmount"></p>
-      <p style="color:#9ca3af;font-size:.78rem;margin-bottom:6px;">Ref: <code id="modalTxRef" style="background:#f3f4f6;padding:2px 8px;border-radius:6px;"></code></p>
-      <p style="color:#9ca3af;font-size:.78rem;margin-bottom:28px;">SMS confirmation sent to your phone shortly.</p>
-      <button data-close-modal="donationModal" class="cd-donate-btn cd-donate-btn-full">Done</button>
-    </div>
-  </div>
-</div>
-
 <div class="modal-overlay" id="ussdModal">
   <div class="modal" style="max-width:400px;">
     <div class="modal-header" style="border-bottom:1px solid #f1f5f9;padding-bottom:14px;">
@@ -1355,7 +1340,15 @@ include __DIR__ . '/includes/header.php';
 }
 .cd-don-name { font-weight:700; color:#0f172a; font-size:.88rem; }
 .cd-don-amt  { font-weight:800; color:#10b981; font-size:.88rem; white-space:nowrap; }
-.cd-don-meta-row { font-size:.74rem; color:#94a3b8; margin-top:2px; }
+.cd-don-meta-row { font-size:.74rem; color:#94a3b8; margin-top:2px; display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
+.cd-pay-badge {
+  display:inline-flex; align-items:center; gap:4px;
+  font-size:.7rem; font-weight:700; color:#64748b;
+  background:#f1f5f9; padding:2px 8px; border-radius:99px;
+}
+.cd-pay-badge i { font-size:.68rem; }
+.cd-pay-badge-card { color:#7c3aed; background:#f3e8ff; }
+.cd-recent-meta { display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
 .cd-more-note { text-align:center; font-size:.76rem; color:#94a3b8; padding:12px 0; }
 .cd-empty { text-align:center; padding:32px 0; color:#94a3b8; }  display:flex; align-items:center; justify-content:center;
   font-weight:700; font-size:.85rem; color:#fff;
@@ -1496,14 +1489,14 @@ include __DIR__ . '/includes/header.php';
 /* Donate button */
 .cd-donate-btn {
   display:inline-flex; align-items:center; justify-content:center; gap:8px;
-  background:linear-gradient(135deg,#FF6B4A,#e85a3a);
+  background:linear-gradient(135deg,#1A2A6C,#111d4e);
   color:#fff; border:none; cursor:pointer;
   padding:13px 24px; border-radius:12px;
   font-size:.94rem; font-weight:800;
-  transition:all .22s; box-shadow:0 4px 14px rgba(255,107,74,.35);
+  transition:all .22s; box-shadow:0 4px 14px rgba(26,42,108,.35);
   text-decoration:none; font-family:inherit;
 }
-.cd-donate-btn:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(255,107,74,.45); }
+.cd-donate-btn:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(26,42,108,.45); }
 .cd-donate-btn:disabled { opacity:.65; cursor:not-allowed; transform:none; }
 .cd-donate-btn-full { width:100%; justify-content:center; margin-bottom:14px; }
 
@@ -1642,31 +1635,6 @@ document.addEventListener('DOMContentLoaded', function() {
     var w = el.style.width; el.style.width = '0';
     setTimeout(function(){ el.style.width = w; }, 200);
   });
-
-  // ── NEW: Auto‑show modal on return from Pesapal ────────────
-  const urlParams = new URLSearchParams(window.location.search);
-  const paymentStatus = urlParams.get('payment');
-  const donationId = urlParams.get('donation_id'); // optional, if passed
-
-  // Clean the URL (remove payment & donation_id params) to avoid re‑trigger on refresh
-  if (paymentStatus || donationId) {
-    let cleanUrl = window.location.pathname + '?id=' + '<?= $cid ?>';
-    if (window.history && window.history.replaceState) {
-      window.history.replaceState({}, document.title, cleanUrl);
-    }
-  }
-
-  if (paymentStatus === 'success') {
-    // Show the success modal
-    const modal = document.getElementById('donationModal');
-    if (modal) {
-      // You could optionally set the modal amount here if you stored it in session/URL
-      // For now, we just show the generic "Thank you" – the IPN will update the DB.
-      modal.classList.add('open');
-    }
-  } else if (paymentStatus === 'cancelled') {
-    alert('Payment was cancelled. You can try donating again anytime.');
-  }
 });
 
 // ── Photo gallery switcher ─────────────────────────────────
@@ -1767,6 +1735,19 @@ function trackShare() {
   .catch(function() {});
 }
 
+// ── Card payments need an email; flag it on the label ───────────
+document.getElementById('momoNetwork')?.addEventListener('change', function() {
+  var hint = document.getElementById('donorEmailHint');
+  if (!hint) return;
+  if (this.value === 'Card Payment') {
+    hint.textContent = '(required for card)';
+    hint.style.color = '#FF6B4A';
+  } else {
+    hint.textContent = '(optional)';
+    hint.style.color = '';
+  }
+});
+
 // ── Donate button → ioTec Pay mobile money collection ──────────
 document.getElementById('donateBtn')?.addEventListener('click', async function() {
   var errDiv  = document.getElementById('donationError');
@@ -1792,11 +1773,17 @@ document.getElementById('donateBtn')?.addEventListener('click', async function()
     errDiv.textContent = 'Enter your name or choose "Remain anonymous".';
     errDiv.style.display = 'block'; return;
   }
+  if (network === 'Card Payment' && !email) {
+    errDiv.textContent = 'Enter your email — required for card payments.';
+    errDiv.style.display = 'block'; return;
+  }
 
   // ── Show loading state ─────────────────────────────────────
   var btn = this;
   btn.disabled = true;
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending payment request…';
+  btn.innerHTML = network === 'Card Payment'
+    ? '<i class="fas fa-spinner fa-spin"></i> Redirecting to secure payment…'
+    : '<i class="fas fa-spinner fa-spin"></i> Sending payment request…';
 
   var fd = new FormData();
   fd.append('action',                'submit');
@@ -1815,11 +1802,16 @@ document.getElementById('donateBtn')?.addEventListener('click', async function()
     try { data = JSON.parse(text); } catch (e) { data = { message: text }; }
 
     if (res.ok && data.success && data.donation_id) {
-      // ioTec Pay sends a USSD/app prompt straight to the payer's phone —
-      // there's no hosted checkout page to redirect to. Send them to the
-      // "waiting for confirmation" page, which polls until it resolves.
-      var status = data.status === 'completed' ? '' : '&status=pending';
-      window.location.href = '<?= BASE ?>/donation_success.php?donation_id=' + data.donation_id + status;
+      if (data.redirect_url) {
+        // Card payment — send the browser to PegPay's hosted payment page.
+        window.location.href = data.redirect_url;
+      } else {
+        // Mobile money — ioTec Pay sends a USSD/app prompt straight to the
+        // payer's phone, no hosted checkout to redirect to. Send them to the
+        // "waiting for confirmation" page, which polls until it resolves.
+        var status = data.status === 'completed' ? '' : '&status=pending';
+        window.location.href = '<?= BASE ?>/donation_success.php?donation_id=' + data.donation_id + status;
+      }
     } else {
       errDiv.textContent   = data.message || 'Payment initiation failed. Please try again.';
       errDiv.style.display = 'block';

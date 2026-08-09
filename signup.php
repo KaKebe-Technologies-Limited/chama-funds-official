@@ -38,7 +38,7 @@ if (!empty($_SESSION['user_id'])) { header('Location: ' . BASE . '/dashboard.php
     .signup-left-bg {
       position: absolute;
       inset: 0;
-      background-image: url('https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1200&q=80');
+      background-image: url('<?= BASE ?>/img/slider/pexels-lbk-studio-2149333232-35094475.jpg');
       background-size: cover;
       background-position: center;
       background-attachment: fixed;

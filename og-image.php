@@ -5,7 +5,9 @@
 // ============================================================
 
 if (!extension_loaded('gd')) {
-    header('Location: https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1200&h=630&fit=crop&q=85');
+    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $fallback = $scheme . '://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['SCRIPT_NAME']) . '/img/slider/pexels-illustrate-digital-ug-924569584-28100858.jpg';
+    header('Location: ' . $fallback);
     exit;
 }
 

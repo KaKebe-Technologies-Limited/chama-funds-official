@@ -20,7 +20,7 @@ if ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $donorName  = trim($_POST['donor_name']  ?? '');
     $donorEmail = trim($_POST['donor_email'] ?? '');
     $isAnon     = !empty($_POST['is_anonymous']) ? 1 : 0;
-    $network    = trim($_POST['mobile_money_network'] ?? 'MTN Mobile Money');
+    $network    = trim($_POST['mobile_money_network'] ?? 'Mobile Money');
 
     // ── Validation ────────────────────────────────────────────
     if ($campaignId <= 0 || $amount < 1000 || empty($donorPhone)) {
@@ -34,6 +34,13 @@ if ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode([
             'success' => false,
             'message' => 'Enter your name or choose "Remain anonymous".'
+        ]);
+        exit;
+    }
+    if ($network === 'Card Payment' && empty($donorEmail)) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Email is required for card payments.'
         ]);
         exit;
     }
@@ -77,11 +84,13 @@ if ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Payer gets a USSD/app prompt on their phone — no hosted checkout URL to redirect to.
+    // Mobile money: payer gets a USSD/app prompt on their phone, no redirect.
+    // Card: redirect_url sends the browser to PegPay's hosted payment page.
     echo json_encode([
-        'success'     => true,
-        'donation_id' => $result['donation_id'],
-        'status'      => $result['status'],
+        'success'      => true,
+        'donation_id'  => $result['donation_id'],
+        'status'       => $result['status'],
+        'redirect_url' => $result['redirect_url'] ?? null,
     ]);
     exit;
 }
