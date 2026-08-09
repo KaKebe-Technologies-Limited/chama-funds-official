@@ -73,7 +73,7 @@ if ($msg === 'unauthorized')  $errMsg  = 'You need to log in to access that page
 
     <!-- Demo credentials hint -->
     <div style="margin-top:16px;padding:12px;background:#f9fafb;border-radius:10px;font-size:.78rem;color:#6b7280;text-align:center;">
-      <strong>Demo:</strong> ot.sedrick@gmail.com / S3izE316
+      <!-- <strong>Demo:</strong> ot.sedrick@gmail.com / S3izE316 -->
     </div>
 
     <p style="text-align:center;font-size:.88rem;color:#6b7280;margin-top:20px;">
