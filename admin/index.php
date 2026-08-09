@@ -132,7 +132,7 @@ if (!$adminLogs) $adminLogs = false;
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   
   <!-- ✅ CSS PATH - WORKS ON LOCAL AND LIVE -->
-  <link rel="stylesheet" href="<?= BASE ?>/css/style.css" />
+  <link rel="stylesheet" href="<?= BASE ?>/css/style.css?v=<?= @filemtime(__DIR__ . '/../css/style.css') ?: time() ?>" />
 </head>
 <body>
 <!-- Mobile Top Bar -->

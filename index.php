@@ -62,8 +62,30 @@ include __DIR__ . '/includes/header.php';
 ?>
 
 <!-- ═══════════════════════════ HERO ═══════════════════════════ -->
-<section class="hero-gradient hero-section" style="overflow:hidden;margin-top:64px;">
-  <div class="container">
+<section class="hero-gradient hero-section" id="heroSlider" style="overflow:hidden;margin-top:64px;">
+
+  <!-- Background photo slider -->
+  <div class="hero-bg-slider">
+    <?php
+      $sliderImages = [
+        ['src' => 'img/slider/pexels-illustrate-digital-ug-924569584-28100858.jpg', 'alt' => 'Community members gathered together, supported by ChamaFunds campaigns'],
+        ['src' => 'img/slider/pexels-illustrate-digital-ug-924569584-28101466.jpg', 'alt' => 'Children accessing clean water from a community borehole'],
+        ['src' => 'img/slider/pexels-lagosfoodbank-9823017.jpg', 'alt' => 'Food bank distribution reaching families in need'],
+        ['src' => 'img/slider/pexels-lbk-studio-2149333232-35094475.jpg', 'alt' => 'Community members gathered at a water point'],
+        ['src' => 'img/slider/pexels-matazumultimedia-32154741.jpg', 'alt' => 'Children at a community water pump'],
+      ];
+    ?>
+    <?php foreach ($sliderImages as $i => $img): ?>
+    <div class="hero-bg-slide <?= $i === 0 ? 'active' : '' ?>">
+      <img src="<?= BASE . '/' . $img['src'] ?>"
+           alt="<?= htmlspecialchars($img['alt']) ?>"
+           <?= $i === 0 ? 'loading="eager" fetchpriority="high"' : 'loading="eager"' ?> />
+    </div>
+    <?php endforeach; ?>
+  </div>
+  <div class="hero-bg-overlay"></div>
+
+  <div class="container" style="position:relative;z-index:2;">
     <div class="hero-inner">
       <div class="hero-copy">
         <div class="hero-badge"><i class="fas fa-bolt" style="color:#facc15"></i> Built for African Causes</div>
@@ -85,6 +107,13 @@ include __DIR__ . '/includes/header.php';
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- Slide indicators -->
+  <div class="hero-bg-dots">
+    <?php foreach ($sliderImages as $i => $img): ?>
+    <button class="hero-bg-dot <?= $i === 0 ? 'active' : '' ?>" data-slide="<?= $i ?>" aria-label="Go to photo <?= $i + 1 ?>"></button>
+    <?php endforeach; ?>
   </div>
 </section>
 
@@ -226,4 +255,55 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 });
+
+// ── Hero background photo slider ───────────────────────────────
+(function() {
+  var hero = document.getElementById('heroSlider');
+  if (!hero) return;
+
+  var slides  = hero.querySelectorAll('.hero-bg-slide');
+  var dots    = hero.querySelectorAll('.hero-bg-dot');
+  var current = 0;
+  var timer   = null;
+  var AUTO_MS = 5000;
+
+  if (slides.length < 2) return;
+
+  function goTo(index) {
+    slides[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    current = (index + slides.length) % slides.length;
+    slides[current].classList.add('active');
+    dots[current].classList.add('active');
+  }
+
+  function next() { goTo(current + 1); }
+  function prev() { goTo(current - 1); }
+
+  function startAuto() {
+    stopAuto();
+    timer = setInterval(next, AUTO_MS);
+  }
+  function stopAuto() {
+    if (timer) clearInterval(timer);
+  }
+
+  dots.forEach(function(dot, i) {
+    dot.addEventListener('click', function() { goTo(i); startAuto(); });
+  });
+
+  // Touch swipe support (mobile)
+  var touchStartX = 0;
+  hero.addEventListener('touchstart', function(e) {
+    touchStartX = e.changedTouches[0].screenX;
+    stopAuto();
+  }, { passive: true });
+  hero.addEventListener('touchend', function(e) {
+    var delta = e.changedTouches[0].screenX - touchStartX;
+    if (Math.abs(delta) > 40) { delta < 0 ? next() : prev(); }
+    startAuto();
+  }, { passive: true });
+
+  startAuto();
+})();
 </script>
