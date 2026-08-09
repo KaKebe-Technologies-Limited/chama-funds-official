@@ -74,17 +74,17 @@ include __DIR__ . '/includes/header.php';
 ?>
 
 <!-- ═══════════════════════════ HERO ═══════════════════════════ -->
-<section class="hero-gradient hero-section" style="overflow:hidden;margin-top:64px;">
+<section class="hero-light hero-section" style="overflow:hidden;margin-top:64px;">
   <div class="container" style="position:relative;z-index:2;">
     <div class="hero-inner">
       <div class="hero-copy">
-        <div class="hero-badge"><i class="fas fa-bolt" style="color:#facc15"></i> Built for African Causes</div>
-        <h1 style="font-size:clamp(1.6rem,4.2vw,2.9rem);font-weight:800;line-height:1.15;color:#fff;margin-bottom:16px;">
+        <div class="hero-badge"><i class="fas fa-bolt" style="color:#f59e0b"></i> Built for African Causes</div>
+        <h1 style="font-size:clamp(1.6rem,4.2vw,2.9rem);font-weight:800;line-height:1.15;color:#1A2A6C;margin-bottom:16px;">
           Pool Money Together for<br>
-          <span style="color:#facc15;">What Matters Most</span>
+          <span style="color:#FF6B4A;">What Matters Most</span>
         </h1>
         <div class="hero-cta-row" style="margin-top:14px;">
-          <a href="<?= BASE ?>/donate.php" class="btn btn-outline-white btn-sm">Donate</a>
+          <a href="<?= BASE ?>/donate.php" class="btn btn-outline btn-sm">Donate</a>
           <a href="<?= BASE ?>/create-campaign.php" class="btn btn-primary btn-sm">Start a Campaign</a>
         </div>
       </div>
@@ -106,11 +106,11 @@ include __DIR__ . '/includes/header.php';
     </div>
     <?php endif; ?>
 
-    <div class="hero-trust-row">
-      <span><i class="fas fa-check-circle" style="color:#6ee7b7;margin-right:6px;"></i>Free to start</span>
-      <span><i class="fas fa-check-circle" style="color:#6ee7b7;margin-right:6px;"></i>Payout within 48hrs</span>
-      <span><i class="fas fa-check-circle" style="color:#6ee7b7;margin-right:6px;"></i>Live tracking</span>
-    </div>
+    <!-- <div class="hero-trust-row">
+      <span><i class="fas fa-check-circle" style="color:#10b981;margin-right:6px;"></i>Free to start</span>
+      <span><i class="fas fa-check-circle" style="color:#10b981;margin-right:6px;"></i>Payout within 48hrs</span>
+      <span><i class="fas fa-check-circle" style="color:#10b981;margin-right:6px;"></i>Live tracking</span>
+    </div> -->
   </div>
 </section>
 
@@ -121,10 +121,10 @@ include __DIR__ . '/includes/header.php';
       Launch a campaign or donate to causes you care about. Transparent, secure, and built for mobile money.
     </p>
     <div class="trust-bar-inner">
-      <span class="trust-badge"><i class="fas fa-check-circle" style="color:#10b981;"></i>Licensed Payment Partner</span>
-      <span class="trust-badge"><i class="fas fa-globe-africa" style="color:#1A2A6C;"></i>Any Country</span>
+      <span class="trust-badge"><i class="fas fa-check-circle" style="color:#10b981;"></i>Licensed Partners</span>
+      <!-- <span class="trust-badge"><i class="fas fa-globe-africa" style="color:#1A2A6C;"></i>Any Country</span> -->
       <!-- <span class="trust-badge"><i class="fas fa-mobile-alt" style="color:#FF6B4A;"></i>100% Mobile Money</span> -->
-      <span class="trust-badge"><i class="fas fa-chart-line" style="color:#3b82f6;"></i>Live Tracking</span>
+      <!-- <span class="trust-badge"><i class="fas fa-chart-line" style="color:#3b82f6;"></i>Live Tracking</span> -->
       <span class="trust-badge"><i class="fas fa-shield-alt" style="color:#10b981;"></i>Mobile Money & Visa Cards</span>
     </div>
   </div>
@@ -319,7 +319,7 @@ document.addEventListener('DOMContentLoaded', function() {
     grabCursor: true,
     centeredSlides: true,
     loop: true,
-    initialSlide: 3,
+    initialSlide: 1,
     slidesPerView: 'auto',
     coverflowEffect: {
       rotate: 40,
