@@ -41,12 +41,22 @@ $extraCss = <<<HTML
   <meta name="keywords"                content="crowdfunding Uganda, mobile money fundraising, MTN mobile money, chama funds, campaign donations Africa"/>
   <meta name="robots"                  content="index, follow"/>
   <link rel="canonical"                href="{$siteUrl}/"/>
+  <!-- ══ Swiper (hero photo carousel) ══ -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@14.0.1/swiper-bundle.min.css"/>
 HTML;
 
 // DB connection status for popup
 $dbConnected = ($conn && !$conn->connect_error);
 
-// Fetch top 4 most recent active campaigns for home grid
+// Hero photo slider — managed from the admin dashboard
+$heroSlidesResult = $conn->query(
+    "SELECT image_url, alt_text FROM hero_slides WHERE is_active = 1 ORDER BY sort_order ASC, slide_id ASC"
+);
+$heroSlides = [];
+while ($hs = $heroSlidesResult->fetch_assoc()) $heroSlides[] = $hs;
+
+// Fetch top 5 most recent active campaigns for home grid
+// (1 featured + up to 4 more — bento layout kicks in at 3+)
 $featured = $conn->query(
     "SELECT c.*, u.full_name AS campaigner_name,
             ROUND((c.raised_amount / c.goal_amount) * 100, 1) AS pct,
@@ -55,77 +65,67 @@ $featured = $conn->query(
      JOIN users u ON c.campaigner_id = u.user_id
      WHERE c.status = 'active'
      ORDER BY c.created_at DESC
-     LIMIT 4"
+     LIMIT 5"
 );
+$featuredArr = [];
+while ($fc = $featured->fetch_assoc()) $featuredArr[] = $fc;
 
 include __DIR__ . '/includes/header.php';
 ?>
 
 <!-- ═══════════════════════════ HERO ═══════════════════════════ -->
-<section class="hero-gradient hero-section" id="heroSlider" style="overflow:hidden;margin-top:64px;">
-
-  <!-- Background photo slider -->
-  <div class="hero-bg-slider">
-    <?php
-      $sliderImages = [
-        ['src' => 'img/slider/pexels-illustrate-digital-ug-924569584-28100858.jpg', 'alt' => 'Community members gathered together, supported by ChamaFunds campaigns'],
-        ['src' => 'img/slider/pexels-illustrate-digital-ug-924569584-28101466.jpg', 'alt' => 'Children accessing clean water from a community borehole'],
-        ['src' => 'img/slider/pexels-lagosfoodbank-9823017.jpg', 'alt' => 'Food bank distribution reaching families in need'],
-        ['src' => 'img/slider/pexels-lbk-studio-2149333232-35094475.jpg', 'alt' => 'Community members gathered at a water point'],
-        ['src' => 'img/slider/pexels-matazumultimedia-32154741.jpg', 'alt' => 'Children at a community water pump'],
-      ];
-    ?>
-    <?php foreach ($sliderImages as $i => $img): ?>
-    <div class="hero-bg-slide <?= $i === 0 ? 'active' : '' ?>">
-      <img src="<?= BASE . '/' . $img['src'] ?>"
-           alt="<?= htmlspecialchars($img['alt']) ?>"
-           <?= $i === 0 ? 'loading="eager" fetchpriority="high"' : 'loading="eager"' ?> />
-    </div>
-    <?php endforeach; ?>
-  </div>
-  <div class="hero-bg-overlay"></div>
-
+<section class="hero-gradient hero-section" style="overflow:hidden;margin-top:64px;">
   <div class="container" style="position:relative;z-index:2;">
     <div class="hero-inner">
       <div class="hero-copy">
         <div class="hero-badge"><i class="fas fa-bolt" style="color:#facc15"></i> Built for African Causes</div>
-        <h1 style="font-size:clamp(1.5rem,4vw,2.7rem);font-weight:800;line-height:1.15;color:#fff;margin-bottom:18px;text-shadow:0 2px 12px rgba(0,0,0,.35);">
+        <h1 style="font-size:clamp(1.6rem,4.2vw,2.9rem);font-weight:800;line-height:1.15;color:#fff;margin-bottom:16px;">
           Pool Money Together for<br>
           <span style="color:#facc15;">What Matters Most</span>
         </h1>
-        <p style="font-size:.92rem;color:rgba(255,255,255,.85);max-width:440px;line-height:1.65;margin-bottom:28px;text-shadow:0 1px 6px rgba(0,0,0,.3);">
-          Launch a campaign or donate to causes you care about. Transparent, secure, and built for mobile money.
-        </p>
-        <div class="hero-cta-row">
-          <a href="<?= BASE ?>/create-campaign.php" class="btn btn-primary btn-lg">Start a Campaign</a>
-          <a href="<?= BASE ?>/donate.php" class="btn btn-outline-white btn-lg">Donate Now</a>
-        </div>
-        <div class="hero-trust-row">
-          <span><i class="fas fa-check-circle" style="color:#6ee7b7;margin-right:6px;"></i>Free to start</span>
-          <span><i class="fas fa-check-circle" style="color:#6ee7b7;margin-right:6px;"></i>Payout within 48hrs</span>
-          <span><i class="fas fa-check-circle" style="color:#6ee7b7;margin-right:6px;"></i>Live tracking</span>
+        <div class="hero-cta-row" style="margin-top:14px;">
+          <a href="<?= BASE ?>/donate.php" class="btn btn-outline-white btn-sm">Donate</a>
+          <a href="<?= BASE ?>/create-campaign.php" class="btn btn-primary btn-sm">Start a Campaign</a>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Slide indicators -->
-  <div class="hero-bg-dots">
-    <?php foreach ($sliderImages as $i => $img): ?>
-    <button class="hero-bg-dot <?= $i === 0 ? 'active' : '' ?>" data-slide="<?= $i ?>" aria-label="Go to photo <?= $i + 1 ?>"></button>
-    <?php endforeach; ?>
+    <!-- Coverflow photo showcase — managed from the admin dashboard -->
+    <?php if (!empty($heroSlides)): ?>
+    <div class="swiper hero-swiper">
+      <div class="swiper-wrapper">
+        <?php foreach ($heroSlides as $i => $slide): ?>
+        <div class="swiper-slide">
+          <img src="<?= htmlspecialchars(imgUrl($slide['image_url'])) ?>"
+               alt="<?= htmlspecialchars($slide['alt_text']) ?>"
+               <?= $i === 0 ? 'loading="eager" fetchpriority="high"' : 'loading="lazy"' ?> />
+        </div>
+        <?php endforeach; ?>
+      </div>
+      <div class="swiper-pagination"></div>
+    </div>
+    <?php endif; ?>
+
+    <div class="hero-trust-row">
+      <span><i class="fas fa-check-circle" style="color:#6ee7b7;margin-right:6px;"></i>Free to start</span>
+      <span><i class="fas fa-check-circle" style="color:#6ee7b7;margin-right:6px;"></i>Payout within 48hrs</span>
+      <span><i class="fas fa-check-circle" style="color:#6ee7b7;margin-right:6px;"></i>Live tracking</span>
+    </div>
   </div>
 </section>
 
 <!-- TRUST BAR -->
 <div class="trust-bar">
   <div class="container">
+    <p style="text-align:center;color:#6b7280;font-size:.88rem;margin-bottom:16px;">
+      Launch a campaign or donate to causes you care about. Transparent, secure, and built for mobile money.
+    </p>
     <div class="trust-bar-inner">
       <span class="trust-badge"><i class="fas fa-check-circle" style="color:#10b981;"></i>Licensed Payment Partner</span>
-      <span class="trust-badge"><i class="fas fa-globe-africa" style="color:#1A2A6C;"></i>12 Countries Live</span>
-      <span class="trust-badge"><i class="fas fa-mobile-alt" style="color:#FF6B4A;"></i>100% Mobile Money</span>
+      <span class="trust-badge"><i class="fas fa-globe-africa" style="color:#1A2A6C;"></i>Any Country</span>
+      <!-- <span class="trust-badge"><i class="fas fa-mobile-alt" style="color:#FF6B4A;"></i>100% Mobile Money</span> -->
       <span class="trust-badge"><i class="fas fa-chart-line" style="color:#3b82f6;"></i>Live Tracking</span>
-      <span class="trust-badge"><i class="fas fa-shield-alt" style="color:#10b981;"></i>MTN · Airtel · Orange</span>
+      <span class="trust-badge"><i class="fas fa-shield-alt" style="color:#10b981;"></i>Mobile Money & Visa Cards</span>
     </div>
   </div>
 </div>
@@ -161,6 +161,19 @@ include __DIR__ . '/includes/header.php';
 </section>
 
 <!-- LIVE CAMPAIGNS -->
+<?php
+  function campaignCalc($c) {
+    $daysLeft = (int)$c['days_left'];
+    return [
+      'pct'      => min(100, (float)$c['pct']),
+      'daysLeft' => $daysLeft,
+      'daysStr'  => $daysLeft > 0 ? "$daysLeft days left" : ($daysLeft === 0 ? 'Ends today' : 'Ended'),
+      'catClass' => 'badge-' . strtolower($c['category']),
+      'image'    => imgUrl($c['image_url'] ?: ''),
+    ];
+  }
+  $featuredCount = count($featuredArr);
+?>
 <section class="section" style="background:#fff;">
   <div class="container">
     <div class="section-header">
@@ -168,43 +181,84 @@ include __DIR__ . '/includes/header.php';
       <h2 class="section-title">Active Campaign Drives</h2>
       <p class="section-sub">Real campaigns, real people, real impact.</p>
     </div>
-    <div class="home-campaigns-grid">
-      <?php if ($featured && $featured->num_rows > 0): ?>
-        <?php while ($c = $featured->fetch_assoc()): ?>
-          <?php
-            $pct      = min(100, (float)$c['pct']);
-            $daysLeft = (int)$c['days_left'];
-            $daysStr  = $daysLeft > 0 ? "$daysLeft days left" : ($daysLeft === 0 ? 'Ends today' : 'Ended');
-            $catClass = 'badge-' . strtolower($c['category']);
-            $image    = imgUrl($c['image_url'] ?: '');
-          ?>
-          <a href="<?= BASE ?>/campaign-detail.php?id=<?= $c['campaign_id'] ?>" class="card campaign-card" style="text-decoration:none;color:inherit;">
-            <img class="card-img" src="<?= htmlspecialchars($image) ?>" alt="<?= htmlspecialchars($c['title']) ?>" loading="lazy" />
-            <div class="card-body">
-              <div class="campaign-meta">
-                <span class="category-badge <?= $catClass ?>"><?= htmlspecialchars($c['category']) ?></span>
-                <span class="days-left" <?= $daysLeft <= 3 ? 'style="color:#ef4444;"' : '' ?>><?= htmlspecialchars($daysStr) ?></span>
-              </div>
-              <p class="campaign-title"><?= htmlspecialchars($c['title']) ?></p>
-              <div class="campaign-stats">
-                <span><?= $c['currency'] ?> <?= number_format($c['raised_amount']) ?> raised</span>
-                <span style="font-weight:700;color:#1A2A6C;"><?= $pct ?>%</span>
-              </div>
-              <div class="progress-wrap"><div class="progress-fill" data-width="<?= $pct ?>%"></div></div>
-              <div class="campaign-footer">
-                <span class="contributors-count"><i class="fas fa-users" style="margin-right:4px;"></i><?= $c['contributor_count'] ?></span>
-                <span class="btn btn-primary btn-sm"><i class="fas fa-heart" style="margin-right:5px;"></i>Donate</span>
-              </div>
+
+    <?php if ($featuredCount === 0): ?>
+      <div style="text-align:center;padding:60px 0;color:#9ca3af;">
+        <i class="fas fa-rocket" style="font-size:3rem;margin-bottom:16px;display:block;"></i>
+        No active campaigns yet. <a href="<?= BASE ?>/create-campaign.php" style="color:#FF6B4A;font-weight:700;">Be the first!</a>
+      </div>
+
+    <?php elseif ($featuredCount >= 3): ?>
+      <!-- Bento layout: one featured campaign + a grid of smaller ones -->
+      <?php
+        $largeCard  = $featuredArr[0];
+        $smallCards = array_slice($featuredArr, 1, 4);
+        $lg = campaignCalc($largeCard);
+      ?>
+      <div class="bento-grid">
+        <a href="<?= BASE ?>/campaign-detail.php?id=<?= $largeCard['campaign_id'] ?>" class="bento-large">
+          <div class="bento-large-img-wrap">
+            <img src="<?= htmlspecialchars($lg['image']) ?>" alt="<?= htmlspecialchars($largeCard['title']) ?>" loading="lazy" />
+            <span class="bento-stat-pill"><i class="fas fa-users" style="margin-right:5px;"></i><?= $largeCard['contributor_count'] ?> supporters</span>
+          </div>
+          <div class="bento-info">
+            <div class="campaign-meta">
+              <span class="category-badge <?= $lg['catClass'] ?>"><?= htmlspecialchars($largeCard['category']) ?></span>
+              <span class="days-left" <?= $lg['daysLeft'] <= 3 ? 'style="color:#ef4444;"' : '' ?>><?= htmlspecialchars($lg['daysStr']) ?></span>
+            </div>
+            <p class="bento-large-title"><?= htmlspecialchars($largeCard['title']) ?></p>
+            <div class="progress-wrap"><div class="progress-fill" data-width="<?= $lg['pct'] ?>%"></div></div>
+            <div class="campaign-stats">
+              <span><?= $largeCard['currency'] ?> <?= number_format($largeCard['raised_amount']) ?> raised</span>
+              <span style="font-weight:700;color:#1A2A6C;"><?= $lg['pct'] ?>%</span>
+            </div>
+          </div>
+        </a>
+
+        <div class="bento-small-grid">
+          <?php foreach ($smallCards as $c): $sm = campaignCalc($c); ?>
+          <a href="<?= BASE ?>/campaign-detail.php?id=<?= $c['campaign_id'] ?>" class="bento-small">
+            <div class="bento-small-img-wrap">
+              <img src="<?= htmlspecialchars($sm['image']) ?>" alt="<?= htmlspecialchars($c['title']) ?>" loading="lazy" />
+              <span class="bento-stat-pill"><i class="fas fa-users" style="margin-right:4px;"></i><?= $c['contributor_count'] ?></span>
+            </div>
+            <div class="bento-info">
+              <p class="bento-small-title"><?= htmlspecialchars($c['title']) ?></p>
+              <div class="progress-wrap"><div class="progress-fill" data-width="<?= $sm['pct'] ?>%"></div></div>
+              <span class="bento-small-amount"><?= $c['currency'] ?> <?= number_format($c['raised_amount']) ?> raised</span>
             </div>
           </a>
-        <?php endwhile; ?>
-      <?php else: ?>
-        <div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#9ca3af;">
-          <i class="fas fa-rocket" style="font-size:3rem;margin-bottom:16px;display:block;"></i>
-          No active campaigns yet. <a href="<?= BASE ?>/create-campaign.php" style="color:#FF6B4A;font-weight:700;">Be the first!</a>
+          <?php endforeach; ?>
         </div>
-      <?php endif; ?>
-    </div>
+      </div>
+
+    <?php else: ?>
+      <!-- Fewer than 3 campaigns — simple grid -->
+      <div class="home-campaigns-grid">
+        <?php foreach ($featuredArr as $c): $cc = campaignCalc($c); ?>
+        <a href="<?= BASE ?>/campaign-detail.php?id=<?= $c['campaign_id'] ?>" class="card campaign-card" style="text-decoration:none;color:inherit;">
+          <img class="card-img" src="<?= htmlspecialchars($cc['image']) ?>" alt="<?= htmlspecialchars($c['title']) ?>" loading="lazy" />
+          <div class="card-body">
+            <div class="campaign-meta">
+              <span class="category-badge <?= $cc['catClass'] ?>"><?= htmlspecialchars($c['category']) ?></span>
+              <span class="days-left" <?= $cc['daysLeft'] <= 3 ? 'style="color:#ef4444;"' : '' ?>><?= htmlspecialchars($cc['daysStr']) ?></span>
+            </div>
+            <p class="campaign-title"><?= htmlspecialchars($c['title']) ?></p>
+            <div class="campaign-stats">
+              <span><?= $c['currency'] ?> <?= number_format($c['raised_amount']) ?> raised</span>
+              <span style="font-weight:700;color:#1A2A6C;"><?= $cc['pct'] ?>%</span>
+            </div>
+            <div class="progress-wrap"><div class="progress-fill" data-width="<?= $cc['pct'] ?>%"></div></div>
+            <div class="campaign-footer">
+              <span class="contributors-count"><i class="fas fa-users" style="margin-right:4px;"></i><?= $c['contributor_count'] ?></span>
+              <span class="btn btn-primary btn-sm"><i class="fas fa-heart" style="margin-right:5px;"></i>Donate</span>
+            </div>
+          </div>
+        </a>
+        <?php endforeach; ?>
+      </div>
+    <?php endif; ?>
+
     <div style="text-align:center;margin-top:36px;">
       <a href="<?= BASE ?>/campaign-drives.php" class="btn btn-outline">More Campaigns <i class="fas fa-arrow-right" style="margin-left:6px;"></i></a>
     </div>
@@ -241,6 +295,7 @@ include __DIR__ . '/includes/header.php';
 
 <?php include __DIR__ . '/includes/footer.php'; ?>
 
+<script src="https://cdn.jsdelivr.net/npm/swiper@14.0.1/swiper-bundle.min.js"></script>
 <script>
 // ── DB Connection popup on page load ─────────────────────────
 document.addEventListener('DOMContentLoaded', function() {
@@ -256,54 +311,29 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// ── Hero background photo slider ───────────────────────────────
+// ── Hero coverflow photo showcase (Swiper) ──────────────────────
 (function() {
-  var hero = document.getElementById('heroSlider');
-  if (!hero) return;
-
-  var slides  = hero.querySelectorAll('.hero-bg-slide');
-  var dots    = hero.querySelectorAll('.hero-bg-dot');
-  var current = 0;
-  var timer   = null;
-  var AUTO_MS = 5000;
-
-  if (slides.length < 2) return;
-
-  function goTo(index) {
-    slides[current].classList.remove('active');
-    dots[current].classList.remove('active');
-    current = (index + slides.length) % slides.length;
-    slides[current].classList.add('active');
-    dots[current].classList.add('active');
-  }
-
-  function next() { goTo(current + 1); }
-  function prev() { goTo(current - 1); }
-
-  function startAuto() {
-    stopAuto();
-    timer = setInterval(next, AUTO_MS);
-  }
-  function stopAuto() {
-    if (timer) clearInterval(timer);
-  }
-
-  dots.forEach(function(dot, i) {
-    dot.addEventListener('click', function() { goTo(i); startAuto(); });
+  if (!document.querySelector('.hero-swiper') || typeof Swiper === 'undefined') return;
+  new Swiper('.hero-swiper', {
+    effect: 'coverflow',
+    grabCursor: true,
+    centeredSlides: true,
+    loop: true,
+    initialSlide: 3,
+    slidesPerView: 'auto',
+    coverflowEffect: {
+      rotate: 40,
+      stretch: 0,
+      depth: 140,
+      modifier: 1,
+      slideShadows: true,
+    },
+    autoplay: {
+      delay: 2600,
+      disableOnInteraction: false,
+      pauseOnMouseEnter: true,
+    },
+    pagination: { el: '.hero-swiper .swiper-pagination', clickable: true },
   });
-
-  // Touch swipe support (mobile)
-  var touchStartX = 0;
-  hero.addEventListener('touchstart', function(e) {
-    touchStartX = e.changedTouches[0].screenX;
-    stopAuto();
-  }, { passive: true });
-  hero.addEventListener('touchend', function(e) {
-    var delta = e.changedTouches[0].screenX - touchStartX;
-    if (Math.abs(delta) > 40) { delta < 0 ? next() : prev(); }
-    startAuto();
-  }, { passive: true });
-
-  startAuto();
 })();
 </script>

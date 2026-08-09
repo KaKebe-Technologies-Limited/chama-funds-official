@@ -834,7 +834,9 @@ include __DIR__ . '/includes/header.php';
         $sPct      = min(100, (float)$sc['pct']);
         $sDaysLeft = (int)$sc['days_left'];
         $sDaysStr  = $sDaysLeft > 0 ? "$sDaysLeft days left" : ($sDaysLeft === 0 ? 'Ends today' : 'Ended');
-        $sImg      = !empty($sc['image_url']) ? htmlspecialchars($sc['image_url']) : 'https://picsum.photos/seed/' . $sc['campaign_id'] . '/400/220';
+        $sImg      = !empty($sc['image_url'])
+                        ? htmlspecialchars(imgUrl($sc['image_url']))
+                        : htmlspecialchars($categoryHeros[$sc['category']] ?? $categoryHeros['Other']);
       ?>
       <a href="<?= BASE ?>/campaign-detail.php?id=<?= $sc['campaign_id'] ?>" class="cd-sim-card">
         <div class="cd-sim-img">

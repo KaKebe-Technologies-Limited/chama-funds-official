@@ -102,6 +102,10 @@ if (!$pendingWithdrawals) $pendingWithdrawals = false;
 $countries = $conn->query("SELECT * FROM countries ORDER BY country_name");
 if (!$countries) $countries = false;
 
+// Hero slider images
+$heroSlidesAdmin = $conn->query("SELECT * FROM hero_slides ORDER BY sort_order ASC, slide_id ASC");
+if (!$heroSlidesAdmin) $heroSlidesAdmin = false;
+
 // Settings
 $settings = [];
 $sRows = $conn->query("SELECT setting_key, setting_value FROM platform_settings");
@@ -156,6 +160,7 @@ if (!$adminLogs) $adminLogs = false;
       <button class="tab-btn sidebar-link" data-tab="tab-transactions"><i class="fas fa-credit-card" style="margin-right:10px;"></i>Transactions</button>
       <button class="tab-btn sidebar-link" data-tab="tab-withdrawals"><i class="fas fa-hand-holding-usd" style="margin-right:10px;"></i>Withdrawals <?php if ($pendingWd > 0): ?><span style="background:#FF6B4A;color:#fff;font-size:.65rem;padding:1px 6px;border-radius:99px;margin-left:4px;"><?= $pendingWd ?></span><?php endif; ?></button>
       <button class="tab-btn sidebar-link" data-tab="tab-countries"><i class="fas fa-globe-africa" style="margin-right:10px;"></i>Countries</button>
+      <button class="tab-btn sidebar-link" data-tab="tab-hero"><i class="fas fa-images" style="margin-right:10px;"></i>Hero Slider</button>
       <button class="tab-btn sidebar-link" data-tab="tab-settings"><i class="fas fa-cog" style="margin-right:10px;"></i>Settings</button>
       <button class="tab-btn sidebar-link" data-tab="tab-logs"><i class="fas fa-list" style="margin-right:10px;"></i>Audit Logs</button>
       <button class="tab-btn sidebar-link" data-tab="tab-analytics"><i class="fas fa-chart-line" style="margin-right:10px;"></i>Analytics</button>
@@ -447,6 +452,56 @@ if (!$adminLogs) $adminLogs = false;
       </div>
     </div>
 
+    <!-- ══════════════ TAB: HERO SLIDER ══════════════ -->
+    <div class="tab-panel" id="tab-hero">
+      <h2 style="font-weight:800;color:#1A2A6C;margin-bottom:8px;">Homepage Hero Slider</h2>
+      <p style="color:#9ca3af;font-size:.85rem;margin-bottom:20px;">These photos rotate on the homepage hero. Add, reorder, or disable them here — no code changes needed.</p>
+
+      <div class="card" style="padding:24px;margin-bottom:24px;">
+        <h3 style="font-weight:700;color:#1A2A6C;margin-bottom:14px;font-size:.95rem;">Add a Photo</h3>
+        <div id="heroUploadMsg" style="display:none;padding:10px;border-radius:8px;font-size:.84rem;margin-bottom:12px;"></div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Image (JPG, PNG or WEBP — max 5MB)</label>
+            <input type="file" id="heroImageInput" class="form-input" accept="image/jpeg,image/png,image/webp" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Alt Text <em>(for accessibility / SEO)</em></label>
+            <input type="text" id="heroAltInput" class="form-input" placeholder="e.g. Girls receiving school supplies in Karamoja" />
+          </div>
+        </div>
+        <button onclick="uploadHeroSlide()" id="heroUploadBtn" class="btn btn-primary btn-sm">
+          <i class="fas fa-upload" style="margin-right:6px;"></i>Upload
+        </button>
+      </div>
+
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Preview</th><th>Alt Text</th><th>Order</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="heroSlidesTable">
+              <?php if ($heroSlidesAdmin): while ($hs = $heroSlidesAdmin->fetch_assoc()): ?>
+              <tr data-slide-id="<?= $hs['slide_id'] ?>">
+                <td><img src="<?= htmlspecialchars(imgUrl($hs['image_url'])) ?>" style="width:70px;height:52px;object-fit:cover;border-radius:8px;" /></td>
+                <td style="font-size:.82rem;max-width:220px;"><?= htmlspecialchars($hs['alt_text']) ?></td>
+                <td style="font-size:.82rem;color:#9ca3af;"><?= (int)$hs['sort_order'] ?></td>
+                <td><span class="status-badge <?= $hs['is_active'] ? 'status-active' : 'status-paused' ?>"><?= $hs['is_active'] ? 'Active' : 'Hidden' ?></span></td>
+                <td>
+                  <div style="display:flex;gap:8px;font-size:.85rem;">
+                    <button onclick="moveHeroSlide(<?= $hs['slide_id'] ?>,'up')" title="Move up" style="color:#1A2A6C;background:none;border:none;cursor:pointer;"><i class="fas fa-arrow-up"></i></button>
+                    <button onclick="moveHeroSlide(<?= $hs['slide_id'] ?>,'down')" title="Move down" style="color:#1A2A6C;background:none;border:none;cursor:pointer;"><i class="fas fa-arrow-down"></i></button>
+                    <button onclick="toggleHeroSlide(<?= $hs['slide_id'] ?>)" title="<?= $hs['is_active'] ? 'Hide' : 'Show' ?>" style="color:#f59e0b;background:none;border:none;cursor:pointer;"><i class="fas fa-eye<?= $hs['is_active'] ? '-slash' : '' ?>"></i></button>
+                    <button onclick="deleteHeroSlide(<?= $hs['slide_id'] ?>)" title="Delete" style="color:#ef4444;background:none;border:none;cursor:pointer;"><i class="fas fa-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+              <?php endwhile; endif; ?>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
     <!-- ══════════════ TAB: SETTINGS ══════════════ -->
     <div class="tab-panel" id="tab-settings">
       <h2 style="font-weight:800;color:#1A2A6C;margin-bottom:24px;">Platform Settings</h2>
@@ -620,6 +675,49 @@ async function addCountry() {
   msg.style.cssText = 'display:block;padding:10px;border-radius:8px;font-size:.84rem;margin-bottom:12px;background:'
     + (d.success ? '#d1fae5;color:#065f46;' : '#fee2e2;color:#991b1b;');
   if (d.success) setTimeout(function(){ location.reload(); }, 1500);
+}
+
+// ── Hero slider actions ─────────────────────────────────────
+async function uploadHeroSlide() {
+  var fileInput = document.getElementById('heroImageInput');
+  var msg = document.getElementById('heroUploadMsg');
+  if (!fileInput.files[0]) {
+    msg.textContent = 'Please choose an image.';
+    msg.style.cssText = 'display:block;padding:10px;border-radius:8px;font-size:.84rem;margin-bottom:12px;background:#fee2e2;color:#991b1b;';
+    return;
+  }
+  var btn = document.getElementById('heroUploadBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:6px;"></i>Uploading…';
+
+  var d = await apiPost('<?= BASE ?>/api/hero_slides.php?action=upload', {
+    image: fileInput.files[0],
+    alt_text: document.getElementById('heroAltInput').value,
+  });
+
+  msg.textContent = d.message || (d.success ? 'Photo added!' : 'Upload failed.');
+  msg.style.cssText = 'display:block;padding:10px;border-radius:8px;font-size:.84rem;margin-bottom:12px;background:'
+    + (d.success ? '#d1fae5;color:#065f46;' : '#fee2e2;color:#991b1b;');
+  btn.disabled = false;
+  btn.innerHTML = '<i class="fas fa-upload" style="margin-right:6px;"></i>Upload';
+  if (d.success) setTimeout(function(){ location.reload(); }, 1000);
+}
+
+async function moveHeroSlide(id, direction) {
+  var d = await apiPost('<?= BASE ?>/api/hero_slides.php?action=move', {slide_id: id, direction: direction});
+  if (d.success) location.reload();
+}
+
+async function toggleHeroSlide(id) {
+  var d = await apiPost('<?= BASE ?>/api/hero_slides.php?action=toggle', {slide_id: id});
+  if (d.success) location.reload();
+}
+
+async function deleteHeroSlide(id) {
+  if (!confirm('Remove this photo from the hero slider?')) return;
+  var d = await apiPost('<?= BASE ?>/api/hero_slides.php?action=delete', {slide_id: id});
+  adminAlert(d.message || (d.success ? 'Photo removed.' : 'Failed to remove.'), d.success);
+  if (d.success) setTimeout(function(){ location.reload(); }, 800);
 }
 
 // ── Settings forms ───────────────────────────────────────────

@@ -337,37 +337,31 @@ textarea.form-input { resize: vertical; min-height: 120px; }
   background: linear-gradient(135deg, var(--navy) 0%, #2a3f8a 50%, var(--coral) 100%);
   color: var(--white);
 }
-.hero-section { padding: 110px 0 72px; position: relative; }
+.hero-section { padding: 92px 0 40px; position: relative; }
 
-/* ── Hero background photo slider ─────────────────────────────
-   Photos crossfade behind the hero copy; the gradient overlay
-   keeps brand colors + text contrast regardless of which photo
-   is showing. */
-.hero-bg-slider { position: absolute; inset: 0; z-index: 0; }
-.hero-bg-slide {
-  position: absolute; inset: 0;
-  opacity: 0; transition: opacity 1.4s ease;
+/* ── Hero coverflow photo showcase (Swiper) ──────────────────── */
+.hero-swiper {
+  width: 100%;
+  padding: 24px 0 40px;
+  margin-bottom: 4px;
 }
-.hero-bg-slide.active { opacity: 1; }
-.hero-bg-slide img {
-  width: 100%; height: 100%;
-  object-fit: cover; object-position: center;
-  display: block;
+.hero-swiper .swiper-slide {
+  width: 240px;
+  aspect-ratio: 3 / 4;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 4px solid rgba(255,255,255,.92);
+  box-shadow: 0 14px 32px rgba(0,0,0,.32);
 }
-.hero-bg-overlay {
-  position: absolute; inset: 0; z-index: 1;
-  background: linear-gradient(135deg, rgba(26,42,108,.62) 0%, rgba(42,63,138,.52) 50%, rgba(255,107,74,.58) 100%);
+.hero-swiper .swiper-slide img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
 }
-.hero-bg-dots {
-  position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%);
-  display: flex; gap: 8px; z-index: 2;
+.hero-swiper .swiper-pagination-bullet {
+  background: rgba(255,255,255,.5);
+  opacity: 1;
 }
-.hero-bg-dot {
-  width: 8px; height: 8px; border-radius: 50%;
-  background: rgba(255,255,255,.4); border: none; padding: 0;
-  cursor: pointer; transition: background .2s, transform .2s;
-}
-.hero-bg-dot.active { background: #facc15; transform: scale(1.3); }
+.hero-swiper .swiper-pagination-bullet-active { background: #facc15; }
+
 .hero-badge {
   display: inline-flex; align-items: center; gap: 8px;
   background: rgba(255,255,255,.18); backdrop-filter: blur(4px);
@@ -398,6 +392,63 @@ textarea.form-input { resize: vertical; min-height: 120px; }
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
+}
+
+/* ── Bento campaign grid (3+ active campaigns) ─────────────────
+   One featured campaign + a grid of smaller ones alongside it. */
+.bento-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 20px;
+  align-items: stretch;
+}
+.bento-large, .bento-small {
+  display: flex; flex-direction: column;
+  text-decoration: none; color: inherit;
+}
+.bento-large-img-wrap, .bento-small-img-wrap {
+  position: relative; border-radius: 16px; overflow: hidden;
+  background: var(--gray-100);
+}
+.bento-large-img-wrap { flex: 1; min-height: 340px; }
+.bento-small-img-wrap { aspect-ratio: 4 / 3; }
+.bento-large-img-wrap img, .bento-small-img-wrap img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: transform .35s ease;
+}
+.bento-large:hover img, .bento-small:hover img { transform: scale(1.04); }
+.bento-stat-pill {
+  position: absolute; left: 12px; bottom: 12px;
+  background: rgba(15,23,42,.65); backdrop-filter: blur(4px);
+  color: #fff; font-size: .72rem; font-weight: 700;
+  padding: 5px 12px; border-radius: 99px;
+}
+.bento-info { padding-top: 14px; }
+.bento-large-title {
+  font-weight: 800; color: var(--navy); font-size: 1.15rem;
+  line-height: 1.35; margin: 10px 0 12px;
+}
+.bento-small-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-rows: 1fr;
+  gap: 20px;
+}
+.bento-small-title {
+  font-weight: 700; color: var(--navy); font-size: .85rem;
+  line-height: 1.35; margin: 10px 0 8px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.bento-small-amount { font-size: .76rem; color: var(--gray-500); }
+
+@media (max-width: 1023px) {
+  .bento-grid { grid-template-columns: 1fr; }
+  .bento-large-img-wrap { min-height: 280px; }
+}
+@media (max-width: 767px) {
+  .bento-small-grid { grid-template-columns: 1fr 1fr; gap: 14px; }
+  .bento-large-title { font-size: 1.02rem; }
 }
 
 /* ── Trust Badge Bar ────────────────────────────────────────── */
@@ -728,7 +779,7 @@ a.campaign-card .btn {
 }
 @media (max-width: 767px) {
   .section { padding: 56px 0; }
-  .hero-section { padding: 88px 0 56px; }
+  .hero-section { padding: 76px 0 40px; }
   .section-title { font-size: 1.5rem; }
   .campaigns-grid { grid-template-columns: 1fr; }
   .home-campaigns-grid { grid-template-columns: 1fr; }
@@ -738,20 +789,11 @@ a.campaign-card .btn {
   .fee-calc-result { grid-template-columns: 1fr; }
   .filter-bar .form-input { max-width: 100%; }
   .auth-card { padding: 28px 20px; }
-  .hero-trust-row { gap: 12px; }
+  .hero-trust-row { gap: 10px 16px; }
 
-  /* ── Hero CTA buttons — stack vertically, full width, comfortable tap targets ── */
-  .hero-cta-row {
-    flex-direction: column;
-    gap: 12px;
-    margin-bottom: 28px;
-  }
-  .hero-cta-row .btn {
-    width: 100%;
-    justify-content: center;
-    padding: 15px 24px;
-    font-size: 1rem;
-  }
+  /* ── Hero coverflow — smaller slides so it never overflows ──── */
+  .hero-swiper { padding: 20px 0 36px; }
+  .hero-swiper .swiper-slide { width: 170px; }
 }
 
 /* ── Print ──────────────────────────────────────────────────── */
