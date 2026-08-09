@@ -1,0 +1,13 @@
+# ============================================================
+# ChamaFunds – .htaccess
+# Serve top-level pages without the .php extension
+# (e.g. /donate works the same as /donate.php)
+# Existing links with .php keep working exactly as before —
+# nothing else on the site changes.
+# ============================================================
+RewriteEngine On
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^([^/]+)$ $1.php [L]
