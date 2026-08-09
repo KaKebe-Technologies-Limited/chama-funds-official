@@ -99,7 +99,8 @@ if (!empty($c['image_url']) && strpos($c['image_url'], 'http') !== 0) {
 
 // ── Donations ────────────────────────────────────────────────
 $dons = $conn->query(
-    "SELECT donor_name, is_anonymous, amount, mobile_money_network, payment_date
+    "SELECT donor_name, is_anonymous, amount, mobile_money_network, payment_date,
+            TIMESTAMPDIFF(SECOND, payment_date, NOW()) AS seconds_ago
      FROM donations WHERE campaign_id=$cid AND status='completed'
      ORDER BY payment_date DESC LIMIT 20"
 );
@@ -109,7 +110,8 @@ $totalDonorsAll = (int)$conn->query(
 
 // ── Last 5 donations preview (shown below story) ─────────────
 $recentDons = $conn->query(
-    "SELECT donor_name, is_anonymous, amount, payment_date
+    "SELECT donor_name, is_anonymous, amount, payment_date,
+            TIMESTAMPDIFF(SECOND, payment_date, NOW()) AS seconds_ago
      FROM donations WHERE campaign_id=$cid AND status='completed'
      ORDER BY payment_date DESC LIMIT 5"
 );
@@ -422,8 +424,11 @@ include __DIR__ . '/includes/header.php';
 
           <?php if (!empty($recentDonsArr)):
             // ── Time-ago helper ───────────────────────────────
-            function timeAgo($datetime) {
-                $diff = time() - strtotime($datetime);
+            // $secondsAgo is computed by MySQL itself (TIMESTAMPDIFF against
+            // its own NOW()), so this never drifts from the DB's clock even
+            // if PHP's and MySQL's configured timezones don't match.
+            function timeAgo($secondsAgo, $datetime) {
+                $diff = max(0, (int)$secondsAgo);
                 if ($diff < 60)           return $diff . 's ago';
                 if ($diff < 3600)         return floor($diff/60) . 'm ago';
                 if ($diff < 86400)        return floor($diff/3600) . 'h ago';
@@ -465,7 +470,7 @@ include __DIR__ . '/includes/header.php';
                 </div>
                 <div class="cd-recent-body">
                   <div class="cd-recent-name"><?= $name ?></div>
-                  <div class="cd-recent-meta"><?= timeAgo($rd['payment_date']) ?></div>
+                  <div class="cd-recent-meta"><?= timeAgo($rd['seconds_ago'], $rd['payment_date']) ?></div>
                 </div>
                 <div class="cd-recent-amt">
                   +<?= $c['currency'] ?> <?= number_format($rd['amount']) ?>
@@ -558,7 +563,7 @@ include __DIR__ . '/includes/header.php';
                     <span class="cd-don-amt">+<?= $c['currency'] ?> <?= number_format($d['amount']) ?></span>
                   </div>
                   <div class="cd-don-meta-row">
-                    <?= timeAgo($d['payment_date']) ?>
+                    <?= timeAgo($d['seconds_ago'], $d['payment_date']) ?>
                   </div>
                 </div>
               </div>
@@ -586,7 +591,7 @@ include __DIR__ . '/includes/header.php';
               <?php
               $steps = [
                 ['Enter your amount', 'Choose any amount — minimum '.$c['currency'].' 1,000.'],
-                ['Secure checkout', 'You are redirected to Pesapal\'s secure payment page. Enter your mobile money details there.'],
+                ['Secure checkout', 'Enter your mobile money details — no redirect, everything happens right here.'],
                 ['Confirm on your phone', 'A payment prompt is sent to your phone. Enter your mobile money PIN to complete.'],
                 ['Campaigner withdraws', 'After admin review (48 hrs max), funds are paid out to mobile money same day.'],
               ];
@@ -604,7 +609,7 @@ include __DIR__ . '/includes/header.php';
             <div class="cd-faq-list">
               <?php
               $faqs = [
-                ['Is my donation secure?', 'Yes. All payments are processed through Pesapal — a licensed payment provider. Your PIN never leaves your phone, encrypted with 256-bit SSL.'],
+                ['Is my donation secure?', 'Yes. All payments are processed through ioTec Pay — a licensed payment provider regulated by the Bank of Uganda. Your PIN never leaves your phone, encrypted with 256-bit SSL.'],
                 ['Can I donate anonymously?', 'Yes — toggle "Remain anonymous" in the donation form. Your name will appear as "Anonymous" on the public contributions list.'],
                 ['Which networks are supported?', 'MTN Mobile Money, Airtel Money, Orange Money, and Safaricom M-Pesa across Uganda, Kenya, Rwanda, Tanzania and more.'],
                 ['How do I know funds reached the right person?', 'Every contribution is logged on the live public ledger on this page. All campaigns are verified before going live.'],
