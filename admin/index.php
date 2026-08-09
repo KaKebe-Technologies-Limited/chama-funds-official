@@ -257,6 +257,7 @@ if (!$adminLogs) $adminLogs = false;
                 <td>
                   <div style="display:flex;gap:8px;font-size:.85rem;">
                     <a href="<?= BASE ?>/campaign-detail.php?id=<?= $c['campaign_id'] ?>" title="View" style="color:#1A2A6C;"><i class="fas fa-eye"></i></a>
+                    <a href="<?= BASE ?>/edit-campaign.php?id=<?= $c['campaign_id'] ?>" title="Edit" style="color:#3b82f6;"><i class="fas fa-edit"></i></a>
                     <?php if ($c['status'] === 'active'): ?>
                     <button onclick="adminCampAction(<?= $c['campaign_id'] ?>,'paused')" title="Pause" style="color:#f59e0b;background:none;border:none;cursor:pointer;font-size:.85rem;"><i class="fas fa-pause"></i></button>
                     <?php elseif ($c['status'] === 'draft'): ?>
