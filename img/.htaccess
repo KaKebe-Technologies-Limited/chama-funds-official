@@ -1,0 +1,8 @@
+# Allow direct access to all images in this folder and subfolders.
+# Override any inherited deny rules so images always load.
+<FilesMatch "\.(jpg|jpeg|png|gif|webp|svg|ico|bmp)$">
+    Require all granted
+</FilesMatch>
+
+# Disable any directory indexing (optional, security)
+Options -Indexes
