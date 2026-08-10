@@ -49,11 +49,17 @@ HTML;
 $dbConnected = ($conn && !$conn->connect_error);
 
 // Hero photo slider — managed from the admin dashboard
+// Gracefully handle missing table (table may not exist on fresh installs)
+$heroSlides = [];
+// Temporarily suppress strict SQL exceptions for this optional query
+$prevReport = mysqli_report(MYSQLI_REPORT_OFF);
 $heroSlidesResult = $conn->query(
     "SELECT image_url, alt_text FROM hero_slides WHERE is_active = 1 ORDER BY sort_order ASC, slide_id ASC"
 );
-$heroSlides = [];
-while ($hs = $heroSlidesResult->fetch_assoc()) $heroSlides[] = $hs;
+mysqli_report($prevReport);
+if ($heroSlidesResult) {
+    while ($hs = $heroSlidesResult->fetch_assoc()) $heroSlides[] = $hs;
+}
 
 // Fetch top 5 most recent active campaigns for home grid
 // (1 featured + up to 4 more — bento layout kicks in at 3+)

@@ -302,6 +302,34 @@ $pageDescription = 'Launch your crowdfunding campaign in Uganda. Free to create,
             </p>
           </div>
 
+          <!-- ── SECTION 2b: Supporting Documents (optional) ── -->
+          <div class="cc-section">
+            <div class="cc-section-title">
+              <div class="cc-section-title-icon" style="background:rgba(59,130,246,.1);color:#3b82f6;">
+                <i class="fas fa-file-alt"></i>
+              </div>
+              Supporting Documents
+              <span style="font-size:.75rem;font-weight:400;color:#9ca3af;margin-left:6px;">Optional · PDF, DOC, DOCX · Max 10 MB each</span>
+            </div>
+            <p style="font-size:.82rem;color:#6b7280;margin-bottom:14px;">
+              Upload any supporting documents (e.g. medical reports, letters, ID) to help build trust with donors. <strong>This is not required.</strong>
+            </p>
+
+            <div class="cc-dropzone" id="docDropzone" style="border-color:#3b82f633;">
+              <input type="file" id="docInput" name="documents[]"
+                     accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                     multiple style="display:none;" />
+              <div id="docDropzoneInner">
+                <i class="fas fa-file-upload" style="font-size:2rem;color:#d1d5db;margin-bottom:10px;display:block;"></i>
+                <p style="font-weight:700;color:#4b5563;font-size:.9rem;margin-bottom:4px;">
+                  Drop documents here or <span style="color:#3b82f6;cursor:pointer;" onclick="document.getElementById('docInput').click()">browse</span>
+                </p>
+                <p style="font-size:.75rem;color:#9ca3af;">PDF, DOC, DOCX · Max 10 MB each · Up to 5 files</p>
+              </div>
+            </div>
+            <div id="docList" style="margin-top:10px;display:flex;flex-direction:column;gap:6px;"></div>
+          </div>
+
           <!-- ── SECTION 3: Goal & Payment ── -->
           <div class="cc-section">
             <div class="cc-section-title">
@@ -440,6 +468,70 @@ function renderPreviews(){
   }
 }
 
+// ── Document upload ─────────────────────────────────────────
+var docFiles    = [];
+var MAX_DOCS    = 5;
+var docDropzone = document.getElementById('docDropzone');
+var docInput    = document.getElementById('docInput');
+var docList     = document.getElementById('docList');
+
+docDropzone.addEventListener('click', function(e){
+  if (!e.target.closest('.doc-remove-btn')) docInput.click();
+});
+docDropzone.addEventListener('dragover',  function(e){ e.preventDefault(); docDropzone.classList.add('drag-over'); });
+docDropzone.addEventListener('dragleave', function(){ docDropzone.classList.remove('drag-over'); });
+docDropzone.addEventListener('drop', function(e){
+  e.preventDefault(); docDropzone.classList.remove('drag-over');
+  addDocFiles(Array.from(e.dataTransfer.files));
+});
+docInput.addEventListener('change', function(){
+  addDocFiles(Array.from(this.files)); this.value='';
+});
+
+function addDocFiles(files){
+  var allowed = ['application/pdf','application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+  files.forEach(function(f){
+    if (docFiles.length >= MAX_DOCS){ window.showToast('Max 5 documents allowed','error'); return; }
+    if (!allowed.includes(f.type) && !/\.(pdf|doc|docx)$/i.test(f.name)){
+      window.showToast(f.name+': Only PDF/DOC/DOCX allowed','error'); return;
+    }
+    if (f.size > 10*1024*1024){ window.showToast(f.name+': exceeds 10 MB','error'); return; }
+    docFiles.push(f);
+  });
+  renderDocList();
+}
+
+function renderDocList(){
+  docList.innerHTML='';
+  var icons = {pdf:'fa-file-pdf', doc:'fa-file-word', docx:'fa-file-word'};
+  docFiles.forEach(function(f, idx){
+    var ext = f.name.split('.').pop().toLowerCase();
+    var icon = icons[ext] || 'fa-file-alt';
+    var color = ext==='pdf' ? '#ef4444' : '#3b82f6';
+    var sizeKb = (f.size/1024).toFixed(0);
+    var item = document.createElement('div');
+    item.style.cssText='display:flex;align-items:center;gap:10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px 14px;font-size:.83rem;';
+    item.innerHTML='<i class="fas '+icon+'" style="color:'+color+';font-size:1.1rem;flex-shrink:0;"></i>'
+      +'<span style="flex:1;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+f.name+'</span>'
+      +'<span style="color:#9ca3af;white-space:nowrap;margin-right:6px;">'+sizeKb+' KB</span>'
+      +'<button type="button" class="doc-remove-btn" data-idx="'+idx+'" '
+      +'style="background:none;border:none;color:#9ca3af;cursor:pointer;font-size:.85rem;padding:2px 4px;" '
+      +'title="Remove"><i class="fas fa-times"></i></button>';
+    item.querySelector('.doc-remove-btn').addEventListener('click', function(e){
+      e.stopPropagation();
+      docFiles.splice(parseInt(this.dataset.idx),1); renderDocList();
+    });
+    docList.appendChild(item);
+  });
+  var inner = document.getElementById('docDropzoneInner');
+  if (docFiles.length > 0){
+    docDropzone.classList.add('has-files'); inner.style.display='none';
+  } else {
+    docDropzone.classList.remove('has-files'); inner.style.display='block';
+  }
+}
+
 // ── Submit ──────────────────────────────────────────────────
 document.getElementById('launchBtn').addEventListener('click', async function(){
   var btn=this, icon=document.getElementById('launchIcon'), text=document.getElementById('launchText');
@@ -462,6 +554,13 @@ document.getElementById('launchBtn').addEventListener('click', async function(){
   var dt=new DataTransfer();
   miFiles.forEach(function(f){ dt.items.add(f); });
   fileInput.files=dt.files;
+
+  // Inject documents into the doc input so FormData picks them up
+  if (docFiles.length > 0) {
+    var dtd=new DataTransfer();
+    docFiles.forEach(function(f){ dtd.items.add(f); });
+    docInput.files=dtd.files;
+  }
 
   var fd=new FormData(document.getElementById('campaignForm'));
   fd.append('action','create');

@@ -203,6 +203,41 @@ if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     } catch (Exception $e) { /* table may not exist yet — non-fatal */ }
 
+    // ── Handle optional document uploads ──────────────────────
+    if (!empty($_FILES['documents']['tmp_name'])) {
+        $docUploadDir  = __DIR__ . '/../uploads/campaign_docs/';
+        if (!is_dir($docUploadDir)) mkdir($docUploadDir, 0755, true);
+        $allowedDocExt = ['pdf', 'doc', 'docx'];
+        $maxDocBytes   = 10 * 1024 * 1024; // 10 MB
+
+        $tmpNames  = is_array($_FILES['documents']['tmp_name']) ? $_FILES['documents']['tmp_name'] : [$_FILES['documents']['tmp_name']];
+        $origNames = is_array($_FILES['documents']['name'])     ? $_FILES['documents']['name']     : [$_FILES['documents']['name']];
+        $sizes     = is_array($_FILES['documents']['size'])     ? $_FILES['documents']['size']     : [$_FILES['documents']['size']];
+
+        $docCount = 0;
+        foreach ($tmpNames as $i => $tmp) {
+            if ($docCount >= 5) break;
+            if (empty($tmp) || !is_uploaded_file($tmp)) continue;
+            $ext = strtolower(pathinfo($origNames[$i], PATHINFO_EXTENSION));
+            if (!in_array($ext, $allowedDocExt) || $sizes[$i] > $maxDocBytes) continue;
+
+            $safeName = 'doc_' . $newId . '_' . $uid . '_' . time() . '_' . $i . '.' . $ext;
+            if (move_uploaded_file($tmp, $docUploadDir . $safeName)) {
+                $docUrl  = '/uploads/campaign_docs/' . $safeName;
+                $docEsc  = $conn->real_escape_string($docUrl);
+                $nameEsc = $conn->real_escape_string(pathinfo($origNames[$i], PATHINFO_FILENAME));
+                // Save to campaign_documents table if it exists, fail silently otherwise
+                try {
+                    $conn->query(
+                        "INSERT INTO campaign_documents (campaign_id, document_url, file_name, uploaded_at)
+                         VALUES ($newId, '$docEsc', '$nameEsc', NOW())"
+                    );
+                } catch (Exception $e) { /* table may not exist yet — non-fatal */ }
+                $docCount++;
+            }
+        }
+    }
+
     // ── Send email notification to admin ──────────────────────
     $campaign_data = [
         'campaign_id'      => $newId,
