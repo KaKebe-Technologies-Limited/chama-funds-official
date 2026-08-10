@@ -174,6 +174,7 @@ if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!in_array($ext, $allowed) || $f['size'] > $maxBytes) continue;
         $filename = 'camp_' . $uid . '_' . time() . '_' . count($imageUrls) . '.' . $ext;
         if (move_uploaded_file($f['tmp'], $uploadDir . $filename)) {
+            @chmod($uploadDir . $filename, 0644); // ensure world-readable so images load on mobile
             $imageUrls[] = '/uploads/campaigns/' . $filename; // relative — works on any domain
         }
     }

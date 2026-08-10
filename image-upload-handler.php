@@ -69,6 +69,7 @@ if ($action === 'upload' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!move_uploaded_file($tmpName, $uploadDir . $filename)) {
             $errors[] = $origNames[$i].': upload failed'; continue;
         }
+        @chmod($uploadDir . $filename, 0644); // ensure world-readable so images load on mobile
         $url = '/uploads/campaigns/' . $filename;
         $urlEsc   = $conn->real_escape_string($url);
         $sortOrd  = $maxOrd + $i + 1;
