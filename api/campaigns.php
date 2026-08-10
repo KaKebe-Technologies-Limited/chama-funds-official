@@ -311,6 +311,140 @@ if ($action === 'update' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
+// ── ADD PHOTOS to a campaign's gallery (campaigner owns it, or admin) ──
+if ($action === 'add_images' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!isset($_SESSION['user_id'])) {
+        echo json_encode(['success' => false, 'message' => 'Not authenticated.']);
+        exit;
+    }
+    $id   = (int)($_POST['campaign_id'] ?? 0);
+    $uid  = (int)$_SESSION['user_id'];
+    $role = $_SESSION['role'];
+
+    $check = $conn->query("SELECT campaigner_id, image_url FROM campaigns WHERE campaign_id = $id LIMIT 1");
+    if (!$check || $check->num_rows === 0) {
+        echo json_encode(['success' => false, 'message' => 'Campaign not found.']);
+        exit;
+    }
+    $camp = $check->fetch_assoc();
+    if ($role !== 'admin' && $camp['campaigner_id'] != $uid) {
+        echo json_encode(['success' => false, 'message' => 'Access denied.']);
+        exit;
+    }
+
+    if (empty($_FILES['images']['tmp_name'])) {
+        echo json_encode(['success' => false, 'message' => 'No photos were selected.']);
+        exit;
+    }
+
+    $uploadDir = __DIR__ . '/../uploads/campaigns/';
+    if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+    $allowed  = ['jpg','jpeg','png','webp'];
+    $maxBytes = 5 * 1024 * 1024;
+
+    $tmpNames  = is_array($_FILES['images']['tmp_name']) ? $_FILES['images']['tmp_name'] : [$_FILES['images']['tmp_name']];
+    $origNames = is_array($_FILES['images']['name'])     ? $_FILES['images']['name']     : [$_FILES['images']['name']];
+    $sizes     = is_array($_FILES['images']['size'])     ? $_FILES['images']['size']     : [$_FILES['images']['size']];
+
+    $maxSortRow = $conn->query("SELECT COALESCE(MAX(sort_order), -1) AS m FROM campaign_images WHERE campaign_id = $id")->fetch_assoc();
+    $nextSort   = (int)$maxSortRow['m'] + 1;
+    $hasCover   = !empty($camp['image_url']);
+
+    $added = [];
+    foreach ($tmpNames as $i => $tmp) {
+        if (empty($tmp) || !is_uploaded_file($tmp)) continue;
+        $ext = strtolower(pathinfo($origNames[$i], PATHINFO_EXTENSION));
+        if (!in_array($ext, $allowed) || $sizes[$i] > $maxBytes) continue;
+
+        $filename = 'camp_' . $id . '_' . time() . '_' . $nextSort . '.' . $ext;
+        if (!move_uploaded_file($tmp, $uploadDir . $filename)) continue;
+        @chmod($uploadDir . $filename, 0644);
+
+        $url    = '/uploads/campaigns/' . $filename;
+        $urlEsc = $conn->real_escape_string($url);
+        $isCover = (!$hasCover && empty($added)) ? 1 : 0;
+
+        $conn->query(
+            "INSERT INTO campaign_images (campaign_id, image_url, is_cover, sort_order)
+             VALUES ($id, '$urlEsc', $isCover, $nextSort)"
+        );
+        $imageId = $conn->insert_id;
+
+        if ($isCover) {
+            $conn->query("UPDATE campaigns SET image_url = '$urlEsc' WHERE campaign_id = $id");
+        }
+
+        $added[] = ['image_id' => $imageId, 'image_url' => imgUrl($url), 'is_cover' => $isCover];
+        $nextSort++;
+    }
+
+    if (empty($added)) {
+        echo json_encode(['success' => false, 'message' => 'No valid photos were uploaded (JPG/PNG/WEBP, max 5MB each).']);
+        exit;
+    }
+
+    echo json_encode(['success' => true, 'images' => $added]);
+    exit;
+}
+
+// ── DELETE a single photo from a campaign's gallery ────────────
+if ($action === 'delete_image' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!isset($_SESSION['user_id'])) {
+        echo json_encode(['success' => false, 'message' => 'Not authenticated.']);
+        exit;
+    }
+    $imageId = (int)($_POST['image_id'] ?? 0);
+    $uid     = (int)$_SESSION['user_id'];
+    $role    = $_SESSION['role'];
+
+    $result = $conn->query(
+        "SELECT ci.image_id, ci.campaign_id, ci.image_url, ci.is_cover, c.campaigner_id
+         FROM campaign_images ci
+         JOIN campaigns c ON ci.campaign_id = c.campaign_id
+         WHERE ci.image_id = $imageId LIMIT 1"
+    );
+    if (!$result || $result->num_rows === 0) {
+        echo json_encode(['success' => false, 'message' => 'Photo not found.']);
+        exit;
+    }
+    $img = $result->fetch_assoc();
+    if ($role !== 'admin' && $img['campaigner_id'] != $uid) {
+        echo json_encode(['success' => false, 'message' => 'Access denied.']);
+        exit;
+    }
+
+    $campaignId = (int)$img['campaign_id'];
+
+    // Remove the file from disk (only if it's a local upload, not an external URL)
+    if (strpos($img['image_url'], '/uploads/') === 0) {
+        $filePath = __DIR__ . '/..' . $img['image_url'];
+        if (file_exists($filePath)) @unlink($filePath);
+    }
+
+    $conn->query("DELETE FROM campaign_images WHERE image_id = $imageId");
+
+    $newCover = null;
+    if ($img['is_cover']) {
+        // Promote the next remaining photo (if any) to cover
+        $next = $conn->query(
+            "SELECT image_id, image_url FROM campaign_images
+             WHERE campaign_id = $campaignId ORDER BY sort_order ASC LIMIT 1"
+        );
+        if ($next && $next->num_rows > 0) {
+            $row      = $next->fetch_assoc();
+            $urlEsc   = $conn->real_escape_string($row['image_url']);
+            $conn->query("UPDATE campaign_images SET is_cover = 1 WHERE image_id = " . (int)$row['image_id']);
+            $conn->query("UPDATE campaigns SET image_url = '$urlEsc' WHERE campaign_id = $campaignId");
+            $newCover = ['image_id' => (int)$row['image_id'], 'image_url' => imgUrl($row['image_url'])];
+        } else {
+            $conn->query("UPDATE campaigns SET image_url = '' WHERE campaign_id = $campaignId");
+        }
+    }
+
+    echo json_encode(['success' => true, 'new_cover' => $newCover]);
+    exit;
+}
+
 // ── DELETE campaign (admin only) ──────────────────────────────
 if ($action === 'delete' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if (($_SESSION['role'] ?? '') !== 'admin') {

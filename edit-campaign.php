@@ -55,54 +55,50 @@ if (!isset($permError) && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $descEsc   = $conn->real_escape_string($desc);
         $catEsc    = $conn->real_escape_string($category);
         $endSql    = $endDate ? "'" . $conn->real_escape_string($endDate) . "'" : 'NULL';
-        $imageUrl  = $c['image_url']; // keep existing by default
 
-        // Handle new image upload
-        if (!empty($_FILES['image']['tmp_name'])) {
-            $uploadDir = __DIR__ . '/uploads/campaigns/';
-            if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
-            $ext     = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
-            $allowed = ['jpg','jpeg','png','webp'];
-            if (in_array($ext, $allowed) && $_FILES['image']['size'] < 5 * 1024 * 1024) {
-                $filename = 'camp_' . $cid . '_' . time() . '.' . $ext;
-                if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $filename)) {
-                    // Delete old uploaded image if it was a local one (stored as /uploads/... relative)
-                    if ($c['image_url'] && (strpos($c['image_url'], '/chama/uploads/') === 0 || strpos($c['image_url'], '/uploads/') === 0)) {
-                        // Strip any /chama prefix to get the path relative to project root
-                        $relPath = preg_replace('#^/chama#', '', $c['image_url']);
-                        $oldPath = __DIR__ . $relPath;
-                        if (file_exists($oldPath)) @unlink($oldPath);
-                    }
-                    $imageUrl = '/uploads/campaigns/' . $filename;
-                }
-            } else {
-                $errorMsg = 'Image must be JPG, PNG or WEBP and under 5MB.';
-            }
-        }
+        // Photos are managed separately (see the gallery manager below) —
+        // this form only ever touches the campaign's text/details fields.
+        $conn->query(
+            "UPDATE campaigns SET
+                title                = '$titleEsc',
+                description          = '$descEsc',
+                category             = '$catEsc',
+                goal_amount          = $goal,
+                currency             = '$currency',
+                mobile_money_number  = '$momoNum',
+                mobile_money_network = '$momoNet',
+                country              = '$country',
+                end_date             = $endSql,
+                updated_at           = NOW()
+             WHERE campaign_id = $cid"
+        );
 
-        if (!$errorMsg) {
-            $imgEsc = $conn->real_escape_string($imageUrl);
-            $conn->query(
-                "UPDATE campaigns SET
-                    title                = '$titleEsc',
-                    description          = '$descEsc',
-                    category             = '$catEsc',
-                    goal_amount          = $goal,
-                    currency             = '$currency',
-                    mobile_money_number  = '$momoNum',
-                    mobile_money_network = '$momoNet',
-                    country              = '$country',
-                    image_url            = '$imgEsc',
-                    end_date             = $endSql,
-                    updated_at           = NOW()
-                 WHERE campaign_id = $cid"
-            );
-
-            // Refresh campaign data for the form
-            $c = $conn->query("SELECT * FROM campaigns WHERE campaign_id = $cid LIMIT 1")->fetch_assoc();
-            $successMsg = '✅ Campaign updated successfully!';
-        }
+        // Refresh campaign data for the form
+        $c = $conn->query("SELECT * FROM campaigns WHERE campaign_id = $cid LIMIT 1")->fetch_assoc();
+        $successMsg = '✅ Campaign updated successfully!';
     }
+}
+
+// ── Gallery photos ────────────────────────────────────────────
+// Backfill: older campaigns saved before the gallery table existed
+// only have campaigns.image_url set, with no campaign_images row.
+if (!isset($permError)) {
+    $galleryCount = (int)$conn->query(
+        "SELECT COUNT(*) FROM campaign_images WHERE campaign_id = $cid"
+    )->fetch_row()[0];
+    if ($galleryCount === 0 && !empty($c['image_url'])) {
+        $legacyUrlEsc = $conn->real_escape_string($c['image_url']);
+        $conn->query(
+            "INSERT INTO campaign_images (campaign_id, image_url, is_cover, sort_order)
+             VALUES ($cid, '$legacyUrlEsc', 1, 0)"
+        );
+    }
+    $galleryResult = $conn->query(
+        "SELECT image_id, image_url, is_cover FROM campaign_images
+         WHERE campaign_id = $cid ORDER BY sort_order ASC, image_id ASC"
+    );
+    $galleryImages = [];
+    while ($gi = $galleryResult->fetch_assoc()) $galleryImages[] = $gi;
 }
 ?>
 <!DOCTYPE html>
