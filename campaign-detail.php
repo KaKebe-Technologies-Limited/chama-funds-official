@@ -207,7 +207,7 @@ function wordLimit($text, $limit) {
 
 $goal_fmt   = number_format($c['goal_amount']);
 $descPlain  = descriptionToPlainText($c['description']);
-$desc50     = wordLimit($descPlain, 50);
+$desc50     = wordLimit($descPlain, 40);
 
 // Fallback to dynamic branded campaign card
 if (empty($ogImage)) {
