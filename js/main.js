@@ -2,7 +2,77 @@
    ChamaFunds – main.js
    ============================================================ */
 
+/* ── Quill → semantic HTML (shared by create/edit campaign forms) ──
+   Quill 2 renders lists as <ol><li data-list="bullet|ordered">, and can put
+   adjacent bullet + numbered runs inside the SAME <ol>, distinguishing item
+   type per-<li> rather than per-list. Our server-side sanitizer strips all
+   attributes for security, so without this conversion lists would collapse
+   incorrectly on save. This groups consecutive same-type <li> runs into
+   proper separate <ul>/<ol> blocks before it's ever sent to the server. */
+function quillHtmlToSemantic(html) {
+  var tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  tmp.querySelectorAll('.ql-ui').forEach(function (el) { el.remove(); });
+
+  tmp.querySelectorAll('ol').forEach(function (ol) {
+    var items = Array.prototype.filter.call(ol.children, function (el) { return el.tagName === 'LI'; });
+    if (!items.length) return;
+
+    var groups = [];
+    items.forEach(function (li) {
+      var type = li.getAttribute('data-list') === 'bullet' ? 'ul' : 'ol';
+      li.removeAttribute('data-list');
+      var last = groups[groups.length - 1];
+      if (last && last.type === type) {
+        last.items.push(li);
+      } else {
+        groups.push({ type: type, items: [li] });
+      }
+    });
+
+    var frag = document.createDocumentFragment();
+    groups.forEach(function (g) {
+      var listEl = document.createElement(g.type);
+      g.items.forEach(function (li) { listEl.appendChild(li); });
+      frag.appendChild(listEl);
+    });
+    ol.replaceWith(frag);
+  });
+
+  return tmp.innerHTML;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+
+  /* ── 0. AUTO-SLIDING CARD IMAGES ───────────────────────────── */
+  // Group by parent element rather than a fixed wrapper class, so this
+  // works whether the images sit in the generic .card-slider div or
+  // directly inside another already-positioned container (bento layout).
+  const sliderParents = new Set();
+  document.querySelectorAll('.card-slider-img').forEach((img) => sliderParents.add(img.parentElement));
+  sliderParents.forEach((slider) => {
+    const imgs = slider.querySelectorAll('.card-slider-img');
+    if (imgs.length < 2) return;
+    let idx = 0;
+    let timer = null;
+    function next() {
+      imgs[idx].classList.remove('active');
+      idx = (idx + 1) % imgs.length;
+      imgs[idx].classList.add('active');
+    }
+    function start() { if (!timer) timer = setInterval(next, 2800); }
+    function stop()  { clearInterval(timer); timer = null; }
+
+    if ('IntersectionObserver' in window) {
+      // Only animate while the card is actually visible — avoids dozens of
+      // simultaneous timers running for cards scrolled off-screen.
+      new IntersectionObserver((entries) => {
+        entries.forEach((entry) => (entry.isIntersecting ? start() : stop()));
+      }, { threshold: 0.2 }).observe(slider);
+    } else {
+      start();
+    }
+  });
 
   /* ── 1. MOBILE MENU TOGGLE ─────────────────────────────────── */
   const hamburger   = document.getElementById('hamburger');

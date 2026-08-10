@@ -289,7 +289,7 @@ $availableBalance = $totalRaised - $withdrawnTotal;
   </main>
 </div>
 
-<script src="<?= BASE ?>/js/main.js"></script>
+<script src="<?= BASE ?>/js/main.js?v=<?= @filemtime(__DIR__ . '/js/main.js') ?: time() ?>"></script>
 <script>
   var mobileBar = document.getElementById('mobileTopBar');
   function checkMobile() { mobileBar.style.display = window.innerWidth < 1024 ? 'flex' : 'none'; }

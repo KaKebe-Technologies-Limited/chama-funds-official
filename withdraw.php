@@ -188,7 +188,7 @@ $totalAvailable = $conn->query(
 @media(max-width:767px){ div[style*="grid-template-columns:1fr 1fr"]{display:block!important;} }
 @media(max-width:1023px){ .sidebar{display:none;} .sidebar.mobile-open{display:flex;position:fixed;left:0;top:0;bottom:0;z-index:900;} }
 </style>
-<script src="<?= BASE ?>/js/main.js"></script>
+<script src="<?= BASE ?>/js/main.js?v=<?= @filemtime(__DIR__ . '/js/main.js') ?: time() ?>"></script>
 <script>
 var mobileBar = document.getElementById('mobileTopBar');
 function checkMobile(){ mobileBar.style.display = window.innerWidth < 1024 ? 'flex' : 'none'; }

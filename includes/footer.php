@@ -84,13 +84,13 @@
   justify-content: center;
   font-size: 1.7rem;
   color: #fff;
-  box-shadow: 0 6px 20px rgba(37,211,102,.45);
+  box-shadow: 0 3px 10px rgba(37,211,102,.28);
   text-decoration: none;
   transition: transform .2s ease, box-shadow .2s ease;
 }
 .cf-whatsapp-float:hover {
-  transform: scale(1.1);
-  box-shadow: 0 10px 28px rgba(37,211,102,.55);
+  transform: scale(1.06);
+  box-shadow: 0 5px 16px rgba(37,211,102,.4);
 }
 .cf-wa-tooltip {
   position: absolute;
@@ -114,7 +114,7 @@
 }
 </style>
 
-<script src="<?= BASE ?>/js/main.js"></script>
+<script src="<?= BASE ?>/js/main.js?v=<?= @filemtime(dirname(__DIR__) . '/js/main.js') ?: time() ?>"></script>
 <?php if (!empty($extraJs)) echo $extraJs; ?>
 </body>
 </html>

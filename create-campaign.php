@@ -32,6 +32,7 @@ $pageDescription = 'Launch your crowdfunding campaign in Uganda. Free to create,
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link rel="stylesheet" href="<?= BASE ?>/css/style.css?v=<?= @filemtime(__DIR__ . '/css/style.css') ?: time() ?>" />
+  <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
 <style>
 /* ── Page layout ──────────────────────────────────────────── */
 .cc-page {
@@ -177,6 +178,25 @@ $pageDescription = 'Launch your crowdfunding campaign in Uganda. Free to create,
   .cc-card-body { padding: 24px 18px; }
   .cc-preview-grid { grid-template-columns: repeat(2,1fr); }
 }
+
+/* ── Campaign story rich-text editor ─────────────────────────── */
+.story-editor-wrap .ql-toolbar.ql-snow {
+  border: 1.5px solid var(--gray-200); border-bottom: none;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  background: var(--gray-50);
+}
+.story-editor-wrap .ql-container.ql-snow {
+  border: 1.5px solid var(--gray-200);
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  font-family: 'Inter', sans-serif; font-size: .95rem;
+}
+.story-editor-wrap .ql-editor {
+  min-height: 260px;
+  line-height: 1.7;
+}
+.story-editor-wrap .ql-editor.ql-blank::before {
+  color: var(--gray-400); font-style: normal; font-size: .95rem;
+}
 </style>
 </head>
 <body>
@@ -264,9 +284,11 @@ $pageDescription = 'Launch your crowdfunding campaign in Uganda. Free to create,
 
             <div class="form-group">
               <label class="form-label">Campaign Story <span class="required">*</span></label>
-              <textarea name="description" id="campaignStory" class="form-input" rows="5"
-                        placeholder="Tell your story — why are you raising funds? Be specific and personal." required></textarea>
-              <p style="font-size:.74rem;color:#9ca3af;margin-top:4px;">A detailed story increases donations by up to 3×.</p>
+              <div class="story-editor-wrap">
+                <div id="storyEditor"></div>
+              </div>
+              <textarea name="description" id="campaignStory" style="display:none;"></textarea>
+              <p style="font-size:.74rem;color:#9ca3af;margin-top:4px;">A detailed story increases donations by up to 3×. Use <b>bold</b> and bullet points to make it easy to read.</p>
             </div>
 
             <div class="form-group">
@@ -401,8 +423,25 @@ $pageDescription = 'Launch your crowdfunding campaign in Uganda. Free to create,
   </div>
 </div><!-- /.cc-page -->
 
-<script src="<?= BASE ?>/js/main.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+<script src="<?= BASE ?>/js/main.js?v=<?= @filemtime(__DIR__ . '/js/main.js') ?: time() ?>"></script>
 <script>
+// ── Campaign story rich-text editor ─────────────────────────
+var storyQuill = new Quill('#storyEditor', {
+  theme: 'snow',
+  placeholder: 'Tell your story — why are you raising funds? Be specific and personal.',
+  modules: {
+    toolbar: [
+      ['bold', 'italic'],
+      [{ list: 'bullet' }, { list: 'ordered' }],
+    ],
+  },
+});
+var storyHidden = document.getElementById('campaignStory');
+storyQuill.on('text-change', function() {
+  storyHidden.value = storyQuill.getText().trim() ? quillHtmlToSemantic(storyQuill.root.innerHTML) : '';
+});
+
 // ── Multi-image upload ──────────────────────────────────────
 var miFiles   = [];
 var MAX_IMG   = 6;

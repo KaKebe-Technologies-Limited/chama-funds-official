@@ -121,7 +121,7 @@ if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $title      = trim($_POST['title'] ?? '');
-    $description= trim($_POST['description'] ?? '');
+    $description= sanitizeStoryHtml($_POST['description'] ?? ''); // strips to a safe formatting allowlist — never trust client HTML
     $category   = trim($_POST['category'] ?? '');
     $goalAmount = (float)($_POST['goal_amount'] ?? 0);
     $currency   = $conn->real_escape_string($_POST['currency'] ?? 'UGX');
@@ -293,7 +293,10 @@ if ($action === 'update' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $allowed = ['title','description','category','goal_amount','mobile_money_number','mobile_money_network','country','end_date'];
     foreach ($allowed as $field) {
         if (isset($_POST[$field])) {
-            $val    = $conn->real_escape_string(trim($_POST[$field]));
+            // Story field carries safe formatting HTML (bold/lists) — sanitize
+            // to an allowlist instead of treating it as plain text.
+            $raw    = $field === 'description' ? sanitizeStoryHtml($_POST[$field]) : trim($_POST[$field]);
+            $val    = $conn->real_escape_string($raw);
             $sets[] = "`$field` = '$val'";
         }
     }
@@ -384,6 +387,46 @@ if ($action === 'add_images' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     echo json_encode(['success' => true, 'images' => $added]);
+    exit;
+}
+
+// ── SET a photo as the cover (shows first) ──────────────────────
+if ($action === 'set_cover' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!isset($_SESSION['user_id'])) {
+        echo json_encode(['success' => false, 'message' => 'Not authenticated.']);
+        exit;
+    }
+    $imageId = (int)($_POST['image_id'] ?? 0);
+    $uid     = (int)$_SESSION['user_id'];
+    $role    = $_SESSION['role'];
+
+    $result = $conn->query(
+        "SELECT ci.image_id, ci.campaign_id, ci.image_url, c.campaigner_id
+         FROM campaign_images ci
+         JOIN campaigns c ON ci.campaign_id = c.campaign_id
+         WHERE ci.image_id = $imageId LIMIT 1"
+    );
+    if (!$result || $result->num_rows === 0) {
+        echo json_encode(['success' => false, 'message' => 'Photo not found.']);
+        exit;
+    }
+    $img = $result->fetch_assoc();
+    if ($role !== 'admin' && $img['campaigner_id'] != $uid) {
+        echo json_encode(['success' => false, 'message' => 'Access denied.']);
+        exit;
+    }
+
+    $campaignId = (int)$img['campaign_id'];
+    $urlEsc     = $conn->real_escape_string($img['image_url']);
+    $minSort    = (int)$conn->query(
+        "SELECT COALESCE(MIN(sort_order), 0) FROM campaign_images WHERE campaign_id = $campaignId"
+    )->fetch_row()[0];
+
+    $conn->query("UPDATE campaign_images SET is_cover = 0 WHERE campaign_id = $campaignId");
+    $conn->query("UPDATE campaign_images SET is_cover = 1, sort_order = " . ($minSort - 1) . " WHERE image_id = $imageId");
+    $conn->query("UPDATE campaigns SET image_url = '$urlEsc' WHERE campaign_id = $campaignId");
+
+    echo json_encode(['success' => true, 'image_id' => $imageId]);
     exit;
 }
 

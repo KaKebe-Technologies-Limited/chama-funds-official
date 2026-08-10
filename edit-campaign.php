@@ -39,7 +39,7 @@ $errorMsg   = '';
 if (!isset($permError) && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $title    = trim($_POST['title']    ?? '');
-    $desc     = trim($_POST['description'] ?? '');
+    $desc     = sanitizeStoryHtml($_POST['description'] ?? ''); // strips to a safe formatting allowlist — never trust client HTML
     $category = trim($_POST['category'] ?? '');
     $goal     = (float)($_POST['goal_amount'] ?? 0);
     $currency = $conn->real_escape_string(trim($_POST['currency'] ?? 'UGX'));
@@ -113,6 +113,7 @@ if (!isset($permError)) {
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link rel="stylesheet" href="<?= BASE ?>/css/style.css?v=<?= @filemtime(__DIR__ . '/css/style.css') ?: time() ?>" />
+  <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
 </head>
 <body>
 
@@ -206,7 +207,11 @@ if (!isset($permError)) {
           <!-- Description -->
           <div class="form-group">
             <label class="form-label">Campaign Story <span class="required">*</span></label>
-            <textarea name="description" class="form-input" rows="7" required><?= htmlspecialchars($c['description']) ?></textarea>
+            <div class="story-editor-wrap">
+              <div id="storyEditor"></div>
+            </div>
+            <textarea name="description" id="descriptionField" style="display:none;"><?= storyToEditableHtml($c['description']) ?></textarea>
+            <p style="font-size:.74rem;color:#9ca3af;margin-top:4px;">Use <b>bold</b> and bullet points to make it easy to read.</p>
           </div>
 
           <!-- Goal + Currency -->
@@ -278,13 +283,14 @@ if (!isset($permError)) {
       <!-- CAMPAIGN PHOTOS -->
       <div class="card" style="padding:36px;grid-column:1;margin-top:24px;">
         <label class="form-label" style="margin-bottom:4px;display:block;">Campaign Photos</label>
-        <p style="font-size:.78rem;color:#9ca3af;margin-bottom:16px;">The first photo is used as the cover image. Deleting the cover promotes the next photo automatically. Changes save immediately — no need to click "Save Changes".</p>
+        <p style="font-size:.78rem;color:#9ca3af;margin-bottom:16px;">The first photo is used as the cover image. Click the star on any photo to make it the cover — it moves to the front. Deleting the cover promotes the next photo automatically. Changes save immediately — no need to click "Save Changes".</p>
 
         <div id="galleryGrid" class="ec-gallery-grid">
           <?php foreach ($galleryImages as $gi): ?>
           <div class="ec-gallery-item" data-image-id="<?= (int)$gi['image_id'] ?>">
             <img src="<?= htmlspecialchars(imgUrl($gi['image_url'])) ?>" alt="" />
             <span class="ec-gallery-cover-badge<?= $gi['is_cover'] ? '' : ' hidden' ?>">Cover</span>
+            <button type="button" class="ec-gallery-cover-btn<?= $gi['is_cover'] ? ' hidden' : '' ?>" title="Make this the cover photo"><i class="fas fa-star"></i></button>
             <button type="button" class="ec-gallery-delete" title="Delete photo"><i class="fas fa-times"></i></button>
           </div>
           <?php endforeach; ?>
@@ -380,24 +386,64 @@ if (!isset($permError)) {
   font-size: .62rem; font-weight: 700; padding: 2px 8px;
   border-radius: 99px; letter-spacing: .03em;
 }
-.ec-gallery-delete {
-  position: absolute; top: 6px; right: 6px;
+.ec-gallery-delete, .ec-gallery-cover-btn {
+  position: absolute; top: 6px;
   width: 22px; height: 22px; border-radius: 50%;
   background: rgba(0,0,0,.55); color: #fff; border: none;
   font-size: .68rem; display: flex; align-items: center; justify-content: center;
   cursor: pointer; transition: background .15s;
 }
+.ec-gallery-delete { right: 6px; }
 .ec-gallery-delete:hover { background: #ef4444; }
+.ec-gallery-cover-btn { left: 6px; }
+.ec-gallery-cover-btn:hover { background: #f59e0b; }
 .ec-gallery-item.ec-uploading { opacity: .5; }
+
+/* ── Campaign story rich-text editor ─────────────────────────── */
+.story-editor-wrap .ql-toolbar.ql-snow {
+  border: 1.5px solid var(--gray-200); border-bottom: none;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  background: var(--gray-50);
+}
+.story-editor-wrap .ql-container.ql-snow {
+  border: 1.5px solid var(--gray-200);
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  font-family: 'Inter', sans-serif; font-size: .95rem;
+}
+.story-editor-wrap .ql-editor { min-height: 260px; line-height: 1.7; }
 </style>
 
-<script src="<?= BASE ?>/js/main.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+<script src="<?= BASE ?>/js/main.js?v=<?= @filemtime(__DIR__ . '/js/main.js') ?: time() ?>"></script>
 <script>
 // Mobile layout
 var mobileBar = document.getElementById('mobileTopBar');
 function checkMobile(){ mobileBar.style.display = window.innerWidth < 1024 ? 'flex' : 'none'; }
 checkMobile(); window.addEventListener('resize', checkMobile);
 document.querySelector('.dashboard-layout').style.paddingTop = window.innerWidth < 1024 ? '60px' : '0';
+
+// ── Campaign story rich-text editor ─────────────────────────
+var storyQuill = new Quill('#storyEditor', {
+  theme: 'snow',
+  placeholder: 'Tell your story — why are you raising funds? Be specific and personal.',
+  modules: {
+    toolbar: [
+      ['bold', 'italic'],
+      [{ list: 'bullet' }, { list: 'ordered' }],
+    ],
+  },
+});
+var descriptionField = document.getElementById('descriptionField');
+// Parse via Quill's own clipboard matchers (not a raw innerHTML swap) so it
+// correctly recognizes plain <ul>/<ol><li> as real lists for editing.
+if (descriptionField.value.trim()) {
+  storyQuill.clipboard.dangerouslyPasteHTML(descriptionField.value);
+}
+function syncStoryField() {
+  descriptionField.value = storyQuill.getText().trim() ? quillHtmlToSemantic(storyQuill.root.innerHTML) : '';
+}
+storyQuill.on('text-change', syncStoryField);
+syncStoryField();
 
 // ── Campaign photo gallery manager (AJAX — independent of Save Changes) ──
 var galleryGrid   = document.getElementById('galleryGrid');
@@ -424,12 +470,42 @@ function buildGalleryItem(img) {
   div.innerHTML =
     '<img src="' + img.image_url + '" alt="" />' +
     '<span class="ec-gallery-cover-badge' + (img.is_cover ? '' : ' hidden') + '">Cover</span>' +
+    '<button type="button" class="ec-gallery-cover-btn' + (img.is_cover ? ' hidden' : '') + '" title="Make this the cover photo"><i class="fas fa-star"></i></button>' +
     '<button type="button" class="ec-gallery-delete" title="Delete photo"><i class="fas fa-times"></i></button>';
   return div;
 }
 
-// Delete a photo (event delegation — works for existing and newly-added tiles)
+function markAsCoverInDom(item) {
+  galleryGrid.querySelectorAll('.ec-gallery-cover-badge').forEach(function(b){ b.classList.add('hidden'); });
+  galleryGrid.querySelectorAll('.ec-gallery-cover-btn').forEach(function(b){ b.classList.remove('hidden'); });
+  item.querySelector('.ec-gallery-cover-badge').classList.remove('hidden');
+  item.querySelector('.ec-gallery-cover-btn').classList.add('hidden');
+  galleryGrid.insertBefore(item, galleryGrid.firstChild);
+}
+
+// Event delegation — works for existing tiles and ones added after upload
 galleryGrid.addEventListener('click', function(e) {
+  var coverBtn = e.target.closest('.ec-gallery-cover-btn');
+  if (coverBtn) {
+    var coverItem = coverBtn.closest('.ec-gallery-item');
+    coverBtn.disabled = true;
+    var fd0 = new FormData();
+    fd0.append('image_id', coverItem.dataset.imageId);
+    fetch('<?= BASE ?>/api/campaigns.php?action=set_cover', { method: 'POST', body: fd0 })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        coverBtn.disabled = false;
+        if (!data.success) { setGalleryStatus(data.message || 'Could not set cover photo.', true); return; }
+        markAsCoverInDom(coverItem);
+        setGalleryStatus('Cover photo updated.', false);
+      })
+      .catch(function() {
+        coverBtn.disabled = false;
+        setGalleryStatus('Network error — please try again.', true);
+      });
+    return;
+  }
+
   var btn = e.target.closest('.ec-gallery-delete');
   if (!btn) return;
   var item = btn.closest('.ec-gallery-item');
@@ -455,8 +531,12 @@ galleryGrid.addEventListener('click', function(e) {
       item.remove();
       if (data.new_cover) {
         var promoted = galleryGrid.querySelector('[data-image-id="' + data.new_cover.image_id + '"]');
-        var badge = promoted ? promoted.querySelector('.ec-gallery-cover-badge') : null;
-        if (badge) badge.classList.remove('hidden');
+        if (promoted) {
+          var badge = promoted.querySelector('.ec-gallery-cover-badge');
+          var star  = promoted.querySelector('.ec-gallery-cover-btn');
+          if (badge) badge.classList.remove('hidden');
+          if (star) star.classList.add('hidden');
+        }
       }
       setGalleryStatus('Photo deleted.', false);
       updateGalleryEmptyState();

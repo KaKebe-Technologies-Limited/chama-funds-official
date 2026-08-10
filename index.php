@@ -168,14 +168,16 @@ include __DIR__ . '/includes/header.php';
 
 <!-- LIVE CAMPAIGNS -->
 <?php
-  function campaignCalc($c) {
+  function campaignCalc($conn, $c) {
     $daysLeft = (int)$c['days_left'];
+    $gallery  = campaignCardGallery($conn, $c['campaign_id']);
     return [
       'pct'      => min(100, (float)$c['pct']),
       'daysLeft' => $daysLeft,
       'daysStr'  => $daysLeft > 0 ? "$daysLeft days left" : ($daysLeft === 0 ? 'Ends today' : 'Ended'),
       'catClass' => 'badge-' . strtolower($c['category']),
-      'image'    => imgUrl($c['image_url'] ?: ''),
+      'image'    => !empty($gallery) ? $gallery[0] : imgUrl($c['image_url'] ?: ''),
+      'gallery'  => $gallery,
     ];
   }
   $featuredCount = count($featuredArr);
@@ -199,12 +201,16 @@ include __DIR__ . '/includes/header.php';
       <?php
         $largeCard  = $featuredArr[0];
         $smallCards = array_slice($featuredArr, 1, 4);
-        $lg = campaignCalc($largeCard);
+        $lg = campaignCalc($conn, $largeCard);
       ?>
       <div class="bento-grid">
         <a href="<?= BASE ?>/campaign-detail.php?id=<?= $largeCard['campaign_id'] ?>" class="bento-large">
           <div class="bento-large-img-wrap">
-            <img src="<?= htmlspecialchars($lg['image']) ?>" alt="<?= htmlspecialchars($largeCard['title']) ?>" loading="lazy" />
+            <?php if (!empty($lg['gallery'])): ?>
+              <?= renderSliderImages($lg['gallery'], $largeCard['title']) ?>
+            <?php else: ?>
+              <img src="<?= htmlspecialchars($lg['image']) ?>" alt="<?= htmlspecialchars($largeCard['title']) ?>" loading="lazy" />
+            <?php endif; ?>
             <span class="bento-stat-pill"><i class="fas fa-users" style="margin-right:5px;"></i><?= $largeCard['contributor_count'] ?> supporters</span>
           </div>
           <div class="bento-info">
@@ -222,10 +228,14 @@ include __DIR__ . '/includes/header.php';
         </a>
 
         <div class="bento-small-grid">
-          <?php foreach ($smallCards as $c): $sm = campaignCalc($c); ?>
+          <?php foreach ($smallCards as $c): $sm = campaignCalc($conn, $c); ?>
           <a href="<?= BASE ?>/campaign-detail.php?id=<?= $c['campaign_id'] ?>" class="bento-small">
             <div class="bento-small-img-wrap">
-              <img src="<?= htmlspecialchars($sm['image']) ?>" alt="<?= htmlspecialchars($c['title']) ?>" loading="lazy" />
+              <?php if (!empty($sm['gallery'])): ?>
+                <?= renderSliderImages($sm['gallery'], $c['title']) ?>
+              <?php else: ?>
+                <img src="<?= htmlspecialchars($sm['image']) ?>" alt="<?= htmlspecialchars($c['title']) ?>" loading="lazy" />
+              <?php endif; ?>
               <span class="bento-stat-pill"><i class="fas fa-users" style="margin-right:4px;"></i><?= $c['contributor_count'] ?></span>
             </div>
             <div class="bento-info">
@@ -241,9 +251,13 @@ include __DIR__ . '/includes/header.php';
     <?php else: ?>
       <!-- Fewer than 3 campaigns — simple grid -->
       <div class="home-campaigns-grid">
-        <?php foreach ($featuredArr as $c): $cc = campaignCalc($c); ?>
+        <?php foreach ($featuredArr as $c): $cc = campaignCalc($conn, $c); ?>
         <a href="<?= BASE ?>/campaign-detail.php?id=<?= $c['campaign_id'] ?>" class="card campaign-card" style="text-decoration:none;color:inherit;">
-          <img class="card-img" src="<?= htmlspecialchars($cc['image']) ?>" alt="<?= htmlspecialchars($c['title']) ?>" loading="lazy" />
+          <?php if (!empty($cc['gallery'])): ?>
+            <?= renderCardImageSlider($cc['gallery'], $c['title']) ?>
+          <?php else: ?>
+            <img class="card-img" src="<?= htmlspecialchars($cc['image']) ?>" alt="<?= htmlspecialchars($c['title']) ?>" loading="lazy" />
+          <?php endif; ?>
           <div class="card-body">
             <div class="campaign-meta">
               <span class="category-badge <?= $cc['catClass'] ?>"><?= htmlspecialchars($c['category']) ?></span>

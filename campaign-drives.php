@@ -89,7 +89,8 @@ include __DIR__ . '/includes/header.php';
         $daysStr  = $daysLeft > 0 ? "$daysLeft days left" : ($daysLeft === 0 ? 'Ends today' : 'Ended');
         $catLower = strtolower($c['category']);
         $catClass = 'badge-' . $catLower;
-        $image    = imgUrl($c['image_url'] ?: '');
+        $gallery  = campaignCardGallery($conn, $c['campaign_id']);
+        $image    = !empty($gallery) ? $gallery[0] : imgUrl($c['image_url'] ?: '');
       ?>
       <a href="<?= BASE ?>/campaign-detail.php?id=<?= $c['campaign_id'] ?>"
          class="card campaign-card filterable-card"
@@ -99,7 +100,9 @@ include __DIR__ . '/includes/header.php';
          data-country="<?= strtolower($c['country']) ?>"
          data-pct="<?= $pct ?>"
          data-days="<?= $daysLeft ?>">
-        <?php if ($image): ?>
+        <?php if (!empty($gallery)): ?>
+          <?= renderCardImageSlider($gallery, $c['title']) ?>
+        <?php elseif ($image): ?>
           <img class="card-img" src="<?= htmlspecialchars($image) ?>" alt="<?= htmlspecialchars($c['title']) ?>" loading="lazy" />
         <?php else: ?>
           <div class="card-img-placeholder"><?= $catLower === 'medical' ? '🏥' : ($catLower === 'education' ? '📚' : ($catLower === 'emergency' ? '🆘' : ($catLower === 'community' ? '💧' : ($catLower === 'business' ? '💼' : '🌟')))) ?></div>

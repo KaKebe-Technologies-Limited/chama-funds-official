@@ -102,8 +102,10 @@ if (!$pendingWithdrawals) $pendingWithdrawals = false;
 $countries = $conn->query("SELECT * FROM countries ORDER BY country_name");
 if (!$countries) $countries = false;
 
-// Hero slider images
+// Hero slider images — gracefully handle a missing table (e.g. before migration runs)
+$prevReport = mysqli_report(MYSQLI_REPORT_OFF);
 $heroSlidesAdmin = $conn->query("SELECT * FROM hero_slides ORDER BY sort_order ASC, slide_id ASC");
+mysqli_report($prevReport);
 if (!$heroSlidesAdmin) $heroSlidesAdmin = false;
 
 // Settings
@@ -603,7 +605,7 @@ if (!$adminLogs) $adminLogs = false;
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
-<script src="<?= BASE ?>/js/main.js"></script>
+<script src="<?= BASE ?>/js/main.js?v=<?= @filemtime(dirname(__DIR__) . '/js/main.js') ?: time() ?>"></script>
 <script>
 // ── Helpers ──────────────────────────────────────────────────
 function adminAlert(msg, ok) {

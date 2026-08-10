@@ -191,30 +191,45 @@ if (!empty($ogImage)) {
     $ogImage = preg_replace('#^http://#', 'https://', $ogImage);
 }
 
+// Plain-text version of the (possibly HTML, from the rich-text editor)
+// story — turn block breaks into spaces first so paragraphs don't get
+// mashed together with no space when tags are stripped.
+function descriptionToPlainText($html) {
+    $withBreaks = preg_replace('/<\/(p|li|div|h[1-6])>|<br\s*\/?>/i', ' ', $html ?? '');
+    $text       = html_entity_decode(strip_tags($withBreaks), ENT_QUOTES);
+    return trim(preg_replace('/\s+/', ' ', $text));
+}
+function wordLimit($text, $limit) {
+    $words = preg_split('/\s+/', trim($text));
+    if (count($words) <= $limit) return trim($text);
+    return implode(' ', array_slice($words, 0, $limit)) . '…';
+}
+
+$goal_fmt   = number_format($c['goal_amount']);
+$descPlain  = descriptionToPlainText($c['description']);
+$desc50     = wordLimit($descPlain, 50);
+
 // Fallback to dynamic branded campaign card
 if (empty($ogImage)) {
     $ogTitle_enc = urlencode($c['title']);
-    $ogSub_enc   = urlencode($c['currency'] . ' ' . number_format($c['raised_amount']) . ' raised · ' . $totalDonorsAll . ' supporters');
+    $ogSub_enc   = urlencode('Goal: ' . $c['currency'] . ' ' . $goal_fmt);
     $ogImage     = 'https://' . $_SERVER['HTTP_HOST'] . '/campaign-og.php?title=' . $ogTitle_enc . '&sub=' . $ogSub_enc;
 }
 
 $ogTitle      = htmlspecialchars($c['title'], ENT_QUOTES);
 $ogDesc       = htmlspecialchars(
-    ($c['currency'] . ' ' . number_format($c['raised_amount']) . ' raised · ' .
-     number_format($totalDonorsAll) . ' supporters · ' .
-     substr(strip_tags($c['description']), 0, 120) . '…'),
+    ($desc50 . ' · Goal: ' . $c['currency'] . ' ' . $goal_fmt),
     ENT_QUOTES
 );
 $pageTitle    = htmlspecialchars($c['title']).' – ChamaFunds';
 $pageDescription = $ogDesc;
 
 // ── Build rich share text ────────────────────────────────────
-$raised_fmt   = number_format($c['raised_amount']);
-$goal_fmt     = number_format($c['goal_amount']);
+// No raised amount, no contributor count, no days left — just what the
+// campaign needs, the story, and the link.
 $shareText    = $c['title'] . "\n\n"
-              . substr(strip_tags($c['description']), 0, 120) . "…\n\n"
-              . $c['currency'] . " " . $raised_fmt . " raised of " . $c['currency'] . " " . $goal_fmt . " goal\n"
-              . $totalDonorsAll . " contributors · " . $daysStr . "\n\n"
+              . $desc50 . "\n\n"
+              . "Goal: " . $c['currency'] . " " . $goal_fmt . "\n\n"
               . "Support here: " . $canonicalUrl;
 $shareTextEnc = urlencode($shareText);
 $shareTitleEnc = urlencode($c['title'] . ' – ChamaFunds');
@@ -409,7 +424,7 @@ include __DIR__ . '/includes/header.php';
           <div class="cd-section cd-story-section cd-order-3">
             <h2 class="cd-section-h">Campaign Story</h2>
             <div class="cd-story">
-              <?= nl2br(htmlspecialchars($c['description'])) ?>
+              <?= renderStoryHtml($c['description']) ?>
             </div>
             <div class="cd-verified">
               <i class="fas fa-shield-alt"></i>
@@ -834,13 +849,18 @@ include __DIR__ . '/includes/header.php';
         $sPct      = min(100, (float)$sc['pct']);
         $sDaysLeft = (int)$sc['days_left'];
         $sDaysStr  = $sDaysLeft > 0 ? "$sDaysLeft days left" : ($sDaysLeft === 0 ? 'Ends today' : 'Ended');
+        $sGallery  = campaignCardGallery($conn, $sc['campaign_id']);
         $sImg      = !empty($sc['image_url'])
                         ? htmlspecialchars(imgUrl($sc['image_url']))
                         : htmlspecialchars($categoryHeros[$sc['category']] ?? $categoryHeros['Other']);
       ?>
       <a href="<?= BASE ?>/campaign-detail.php?id=<?= $sc['campaign_id'] ?>" class="cd-sim-card">
         <div class="cd-sim-img">
-          <img src="<?= $sImg ?>" alt="<?= htmlspecialchars($sc['title']) ?>" loading="lazy" />
+          <?php if (!empty($sGallery)): ?>
+            <?= renderSliderImages($sGallery, $sc['title']) ?>
+          <?php else: ?>
+            <img src="<?= $sImg ?>" alt="<?= htmlspecialchars($sc['title']) ?>" loading="lazy" />
+          <?php endif; ?>
           <span class="cd-sim-cat"><?= htmlspecialchars($sc['category']) ?></span>
         </div>
         <div class="cd-sim-body">
@@ -1228,6 +1248,13 @@ include __DIR__ . '/includes/header.php';
 
 /* Story */
 .cd-story { font-size:.92rem; color:#334155; line-height:2; margin-bottom:16px; }
+.cd-story p { margin-bottom:14px; }
+.cd-story p:last-child { margin-bottom:0; }
+.cd-story ul, .cd-story ol { margin:0 0 14px; padding-left:1.4em; }
+.cd-story ul { list-style:disc; }
+.cd-story ol { list-style:decimal; }
+.cd-story li { margin-bottom:6px; }
+.cd-story b, .cd-story strong { font-weight:700; color:#1e293b; }
 .cd-verified {
   display:flex; align-items:flex-start; gap:8px;
   background:#f8fafc; border-radius:10px;

@@ -567,7 +567,7 @@ if (!empty($_SESSION['user_id'])) { header('Location: ' . BASE . '/dashboard.php
   </div><!-- /.signup-right -->
 </div><!-- /.signup-page -->
 
-<script src="<?= BASE ?>/js/main.js"></script>
+<script src="<?= BASE ?>/js/main.js?v=<?= @filemtime(__DIR__ . '/js/main.js') ?: time() ?>"></script>
 <script>
 // ── Toggle password visibility ──────────────────────────────
 function togglePw(id, btn) {

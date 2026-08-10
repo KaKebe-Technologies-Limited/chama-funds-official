@@ -71,4 +71,137 @@ function imgUrl($url) {
     // Relative path — prepend BASE (which is already https on live)
     return BASE . '/' . ltrim($url, '/');
 }
+
+// ── Campaign story rich text (bold/italic/lists) ────────────────
+// The story field is edited with a rich-text toolbar and stored as HTML.
+// Everything below enforces a strict allowlist server-side — never trust
+// HTML submitted by a campaigner just because it came from "our own"
+// editor; a malicious/compromised client could still POST raw <script>
+// or event-handler attributes directly to the save endpoint.
+const STORY_ALLOWED_TAGS = ['p', 'br', 'b', 'strong', 'i', 'em', 'u', 'ul', 'ol', 'li'];
+
+function sanitizeStoryHtml($html) {
+    $html = trim($html ?? '');
+    if ($html === '') return '';
+
+    $dom = new DOMDocument();
+    libxml_use_internal_errors(true);
+    $ok = $dom->loadHTML(
+        '<?xml encoding="utf-8" ?><html><body>' . $html . '</body></html>',
+        LIBXML_NOERROR | LIBXML_NOWARNING
+    );
+    libxml_clear_errors();
+
+    $body = $ok ? $dom->getElementsByTagName('body')->item(0) : null;
+    if (!$body) return htmlspecialchars(strip_tags($html));
+
+    _sanitizeStoryNode($body, STORY_ALLOWED_TAGS);
+
+    $out = '';
+    foreach (iterator_to_array($body->childNodes) as $child) {
+        $out .= $dom->saveHTML($child);
+    }
+    return trim($out);
+}
+
+function _sanitizeStoryNode($node, $allowedTags) {
+    foreach (iterator_to_array($node->childNodes) as $child) {
+        if ($child->nodeType === XML_COMMENT_NODE) {
+            $node->removeChild($child);
+            continue;
+        }
+        if ($child->nodeType !== XML_ELEMENT_NODE) continue;
+
+        $tag = strtolower($child->nodeName);
+        if ($tag === 'script' || $tag === 'style') {
+            $node->removeChild($child);
+            continue;
+        }
+
+        _sanitizeStoryNode($child, $allowedTags); // recurse before deciding to unwrap
+
+        if (!in_array($tag, $allowedTags, true)) {
+            // Not on the allowlist — drop the tag but keep its (already-cleaned) contents
+            while ($child->firstChild) {
+                $node->insertBefore($child->firstChild, $child);
+            }
+            $node->removeChild($child);
+            continue;
+        }
+
+        // Strip every attribute (no style=, onclick=, href=, etc.)
+        if ($child->hasAttributes()) {
+            foreach (iterator_to_array($child->attributes) as $attr) {
+                $child->removeAttribute($attr->name);
+            }
+        }
+    }
+}
+
+// Render a stored campaign story for display. New stories are sanitized
+// HTML from the rich-text editor; older campaigns stored plain text with
+// literal newlines — detect which and render accordingly either way.
+// Re-sanitizes on every render as defense-in-depth.
+function renderStoryHtml($raw) {
+    $raw = $raw ?? '';
+    if ($raw === '') return '';
+    $looksLikeHtml = ($raw !== strip_tags($raw));
+    return $looksLikeHtml ? sanitizeStoryHtml($raw) : nl2br(htmlspecialchars($raw));
+}
+
+// Convert a stored story into HTML suitable for loading back into the
+// rich-text editor (used when opening the edit form).
+function storyToEditableHtml($raw) {
+    $raw = $raw ?? '';
+    if ($raw === '') return '';
+    if ($raw !== strip_tags($raw)) return sanitizeStoryHtml($raw);
+    // Legacy plain text — one <p> per non-empty line so the editor treats
+    // each as a separate block, matching how it always used to display.
+    $out = '';
+    foreach (preg_split('/\r\n|\r|\n/', $raw) as $line) {
+        $line = trim($line);
+        if ($line !== '') $out .= '<p>' . htmlspecialchars($line) . '</p>';
+    }
+    return $out;
+}
+
+// ── Campaign card image slider ──────────────────────────────────
+// Fetch up to $limit gallery photo URLs (already resolved via imgUrl())
+// for a campaign, in display order, for the auto-sliding card image.
+function campaignCardGallery($conn, $campaignId, $limit = 5) {
+    $cid    = (int)$campaignId;
+    $limit  = (int)$limit;
+    $result = $conn->query(
+        "SELECT image_url FROM campaign_images WHERE campaign_id = $cid ORDER BY sort_order ASC LIMIT $limit"
+    );
+    $urls = [];
+    if ($result) {
+        while ($row = $result->fetch_assoc()) $urls[] = imgUrl($row['image_url']);
+    }
+    return $urls;
+}
+
+// Stacked <img class="card-slider-img"> tags only — no wrapper div — so it
+// can be dropped into any already-positioned container (a plain card, or a
+// bento layout's own differently-sized image wrapper). See .card-slider-img
+// in style.css and the auto-advance logic in main.js.
+function renderSliderImages($images, $alt, $imgClass = 'card-img') {
+    if (empty($images)) return '';
+    $alt  = htmlspecialchars($alt);
+    $html = '';
+    foreach ($images as $i => $url) {
+        $active = $i === 0 ? ' active' : '';
+        $html .= '<img class="' . $imgClass . ' card-slider-img' . $active . '" src="' . htmlspecialchars($url) . '" alt="' . $alt . '" loading="lazy" />';
+    }
+    return $html;
+}
+
+// Render a campaign card's image area with its own sized wrapper. Two or
+// more photos become an auto-sliding crossfade; a single photo just
+// renders statically. Use renderSliderImages() directly instead when the
+// container is already sized/positioned (e.g. the homepage bento layout).
+function renderCardImageSlider($images, $alt) {
+    if (empty($images)) return '';
+    return '<div class="card-slider">' . renderSliderImages($images, $alt) . '</div>';
+}
 ?>
