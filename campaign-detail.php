@@ -1247,7 +1247,7 @@ include __DIR__ . '/includes/header.php';
 .cd-urgent-txt i { color: #ef4444 !important; }
 
 /* Story */
-.cd-story { font-size:.92rem; color:#334155; line-height:2; margin-bottom:16px; }
+.cd-story { font-size:.92rem; color:#334155; line-height:1.65; margin-bottom:16px; }
 .cd-story p { margin-bottom:14px; }
 .cd-story p:last-child { margin-bottom:0; }
 .cd-story ul, .cd-story ol { margin:0 0 14px; padding-left:1.4em; }
