@@ -261,36 +261,6 @@ if (!isset($permError)) {
             </div>
           </div>
 
-          <!-- Campaign Image -->
-          <div class="form-group">
-            <label class="form-label">Campaign Image</label>
-            <!-- Current image preview -->
-            <?php if ($c['image_url']): ?>
-            <div style="margin-bottom:12px;position:relative;display:inline-block;">
-              <img src="<?= htmlspecialchars(imgUrl($c['image_url'])) ?>"
-                   id="currentImagePreview"
-                   style="width:100%;max-height:200px;object-fit:cover;border-radius:12px;display:block;" />
-              <span style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,.55);color:#fff;font-size:.72rem;padding:3px 10px;border-radius:99px;">Current image</span>
-            </div>
-            <?php else: ?>
-            <div id="noImageNote" style="background:#f9fafb;border-radius:12px;padding:16px;text-align:center;color:#9ca3af;font-size:.85rem;margin-bottom:12px;">
-              <i class="fas fa-image" style="font-size:2rem;display:block;margin-bottom:8px;opacity:.4;"></i>No image uploaded yet
-            </div>
-            <?php endif; ?>
-            <div class="file-upload-area" id="fileUploadArea">
-              <i class="fas fa-cloud-upload-alt" style="font-size:1.6rem;color:#d1d5db;"></i>
-              <p style="font-size:.85rem;color:#9ca3af;margin-top:6px;">Click to upload a new image (replaces current)</p>
-              <p style="font-size:.75rem;color:#d1d5db;">PNG, JPG, WEBP — max 5MB</p>
-              <input type="file" id="fileInput" name="image" accept="image/*" style="display:none;" />
-            </div>
-            <div id="filePreview" class="hidden" style="margin-top:10px;">
-              <img id="previewImage" src="#" alt="New image preview" style="max-height:160px;border-radius:10px;" />
-              <button type="button" id="removeFile" style="display:block;font-size:.78rem;color:#ef4444;margin-top:6px;cursor:pointer;">
-                <i class="fas fa-times" style="margin-right:4px;"></i>Remove new image
-              </button>
-            </div>
-          </div>
-
           <!-- Action Buttons -->
           <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
             <button type="submit" id="saveBtn" class="btn btn-primary btn-lg" style="flex:1;justify-content:center;">
@@ -303,6 +273,34 @@ if (!isset($permError)) {
           </div>
 
         </form>
+      </div>
+
+      <!-- CAMPAIGN PHOTOS -->
+      <div class="card" style="padding:36px;grid-column:1;margin-top:24px;">
+        <label class="form-label" style="margin-bottom:4px;display:block;">Campaign Photos</label>
+        <p style="font-size:.78rem;color:#9ca3af;margin-bottom:16px;">The first photo is used as the cover image. Deleting the cover promotes the next photo automatically. Changes save immediately — no need to click "Save Changes".</p>
+
+        <div id="galleryGrid" class="ec-gallery-grid">
+          <?php foreach ($galleryImages as $gi): ?>
+          <div class="ec-gallery-item" data-image-id="<?= (int)$gi['image_id'] ?>">
+            <img src="<?= htmlspecialchars(imgUrl($gi['image_url'])) ?>" alt="" />
+            <span class="ec-gallery-cover-badge<?= $gi['is_cover'] ? '' : ' hidden' ?>">Cover</span>
+            <button type="button" class="ec-gallery-delete" title="Delete photo"><i class="fas fa-times"></i></button>
+          </div>
+          <?php endforeach; ?>
+        </div>
+
+        <div id="galleryEmpty" class="<?= empty($galleryImages) ? '' : 'hidden' ?>" style="background:#f9fafb;border-radius:12px;padding:16px;text-align:center;color:#9ca3af;font-size:.85rem;margin:12px 0;">
+          <i class="fas fa-image" style="font-size:2rem;display:block;margin-bottom:8px;opacity:.4;"></i>No photos uploaded yet
+        </div>
+
+        <div class="file-upload-area" id="addPhotosArea" style="margin-top:12px;">
+          <i class="fas fa-cloud-upload-alt" style="font-size:1.6rem;color:#d1d5db;"></i>
+          <p style="font-size:.85rem;color:#9ca3af;margin-top:6px;">Click to add photos</p>
+          <p style="font-size:.75rem;color:#d1d5db;">PNG, JPG, WEBP — max 5MB each · multiple allowed</p>
+          <input type="file" id="addPhotosInput" accept="image/*" multiple style="display:none;" />
+        </div>
+        <p id="galleryStatus" style="font-size:.8rem;margin-top:10px;"></p>
       </div>
 
       <!-- SIDEBAR INFO -->
@@ -359,8 +357,38 @@ if (!isset($permError)) {
 }
 @media(max-width:767px){
   div[style*="grid-template-columns:1fr 280px"]{display:block!important;}
-  div[style*="grid-template-columns:1fr 280px"] > div:last-child{margin-top:16px;}
+  div[style*="grid-template-columns:1fr 280px"] > div:not(:first-child){margin-top:16px;}
 }
+
+/* ── Campaign photo gallery manager ────────────────────────── */
+.ec-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 10px;
+}
+.ec-gallery-item {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f3f4f6;
+}
+.ec-gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ec-gallery-cover-badge {
+  position: absolute; top: 6px; left: 6px;
+  background: rgba(26,42,108,.85); color: #fff;
+  font-size: .62rem; font-weight: 700; padding: 2px 8px;
+  border-radius: 99px; letter-spacing: .03em;
+}
+.ec-gallery-delete {
+  position: absolute; top: 6px; right: 6px;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: rgba(0,0,0,.55); color: #fff; border: none;
+  font-size: .68rem; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: background .15s;
+}
+.ec-gallery-delete:hover { background: #ef4444; }
+.ec-gallery-item.ec-uploading { opacity: .5; }
 </style>
 
 <script src="<?= BASE ?>/js/main.js"></script>
@@ -371,46 +399,126 @@ function checkMobile(){ mobileBar.style.display = window.innerWidth < 1024 ? 'fl
 checkMobile(); window.addEventListener('resize', checkMobile);
 document.querySelector('.dashboard-layout').style.paddingTop = window.innerWidth < 1024 ? '60px' : '0';
 
-// Image preview
-var fileArea    = document.getElementById('fileUploadArea');
-var fileInput   = document.getElementById('fileInput');
-var filePreview = document.getElementById('filePreview');
-var previewImg  = document.getElementById('previewImage');
-var removeFile  = document.getElementById('removeFile');
+// ── Campaign photo gallery manager (AJAX — independent of Save Changes) ──
+var galleryGrid   = document.getElementById('galleryGrid');
+var galleryEmpty  = document.getElementById('galleryEmpty');
+var galleryStatus = document.getElementById('galleryStatus');
+var addPhotosArea = document.getElementById('addPhotosArea');
+var addPhotosInput= document.getElementById('addPhotosInput');
+var CAMPAIGN_ID   = <?= (int)$cid ?>;
 
-fileArea?.addEventListener('click', function(){ fileInput.click(); });
-fileArea?.addEventListener('dragover', function(e){ e.preventDefault(); fileArea.classList.add('dragover'); });
-fileArea?.addEventListener('dragleave', function(){ fileArea.classList.remove('dragover'); });
-fileArea?.addEventListener('drop', function(e){
-  e.preventDefault(); fileArea.classList.remove('dragover');
-  if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
-});
-fileInput?.addEventListener('change', function(e){
-  if (e.target.files[0]) handleFile(e.target.files[0]);
-});
-
-function handleFile(file) {
-  if (!file.type.startsWith('image/')) { window.showToast('Please upload an image file','error'); return; }
-  if (file.size > 5 * 1024 * 1024)    { window.showToast('File must be under 5MB','error'); return; }
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    previewImg.src = e.target.result;
-    filePreview.classList.remove('hidden');
-    fileArea.classList.add('hidden');
-    // Dim current image to show it will be replaced
-    var cur = document.getElementById('currentImagePreview');
-    if (cur) cur.style.opacity = '.4';
-  };
-  reader.readAsDataURL(file);
+function setGalleryStatus(msg, isError) {
+  galleryStatus.textContent = msg || '';
+  galleryStatus.style.color = isError ? '#ef4444' : '#10b981';
 }
 
-removeFile?.addEventListener('click', function(){
-  filePreview.classList.add('hidden');
-  fileArea.classList.remove('hidden');
-  fileInput.value = '';
-  var cur = document.getElementById('currentImagePreview');
-  if (cur) cur.style.opacity = '1';
+function updateGalleryEmptyState() {
+  var hasItems = galleryGrid.querySelector('.ec-gallery-item') !== null;
+  galleryEmpty.classList.toggle('hidden', hasItems);
+}
+
+function buildGalleryItem(img) {
+  var div = document.createElement('div');
+  div.className = 'ec-gallery-item';
+  div.dataset.imageId = img.image_id;
+  div.innerHTML =
+    '<img src="' + img.image_url + '" alt="" />' +
+    '<span class="ec-gallery-cover-badge' + (img.is_cover ? '' : ' hidden') + '">Cover</span>' +
+    '<button type="button" class="ec-gallery-delete" title="Delete photo"><i class="fas fa-times"></i></button>';
+  return div;
+}
+
+// Delete a photo (event delegation — works for existing and newly-added tiles)
+galleryGrid.addEventListener('click', function(e) {
+  var btn = e.target.closest('.ec-gallery-delete');
+  if (!btn) return;
+  var item = btn.closest('.ec-gallery-item');
+  var imageId = item.dataset.imageId;
+  if (!confirm('Delete this photo? This cannot be undone.')) return;
+
+  item.classList.add('ec-uploading');
+  btn.disabled = true;
+
+  var fd = new FormData();
+  fd.append('action', 'delete_image');
+  fd.append('image_id', imageId);
+
+  fetch('<?= BASE ?>/api/campaigns.php?action=delete_image', { method: 'POST', body: fd })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (!data.success) {
+        setGalleryStatus(data.message || 'Could not delete photo.', true);
+        item.classList.remove('ec-uploading');
+        btn.disabled = false;
+        return;
+      }
+      item.remove();
+      if (data.new_cover) {
+        var promoted = galleryGrid.querySelector('[data-image-id="' + data.new_cover.image_id + '"]');
+        var badge = promoted ? promoted.querySelector('.ec-gallery-cover-badge') : null;
+        if (badge) badge.classList.remove('hidden');
+      }
+      setGalleryStatus('Photo deleted.', false);
+      updateGalleryEmptyState();
+    })
+    .catch(function() {
+      setGalleryStatus('Network error — please try again.', true);
+      item.classList.remove('ec-uploading');
+      btn.disabled = false;
+    });
 });
+
+// Add new photos
+addPhotosArea?.addEventListener('click', function(){ addPhotosInput.click(); });
+addPhotosArea?.addEventListener('dragover', function(e){ e.preventDefault(); addPhotosArea.classList.add('dragover'); });
+addPhotosArea?.addEventListener('dragleave', function(){ addPhotosArea.classList.remove('dragover'); });
+addPhotosArea?.addEventListener('drop', function(e){
+  e.preventDefault(); addPhotosArea.classList.remove('dragover');
+  if (e.dataTransfer.files.length) uploadPhotos(e.dataTransfer.files);
+});
+addPhotosInput?.addEventListener('change', function(e){
+  if (e.target.files.length) uploadPhotos(e.target.files);
+});
+
+function uploadPhotos(fileList) {
+  var fd = new FormData();
+  fd.append('campaign_id', CAMPAIGN_ID);
+  var validCount = 0;
+  for (var i = 0; i < fileList.length; i++) {
+    var f = fileList[i];
+    if (!f.type.startsWith('image/')) continue;
+    if (f.size > 5 * 1024 * 1024) { setGalleryStatus('"' + f.name + '" is over 5MB and was skipped.', true); continue; }
+    fd.append('images[]', f);
+    validCount++;
+  }
+  if (!validCount) return;
+
+  setGalleryStatus('Uploading ' + validCount + ' photo' + (validCount > 1 ? 's' : '') + '…', false);
+  addPhotosArea.style.opacity = '.6';
+
+  fetch('<?= BASE ?>/api/campaigns.php?action=add_images', { method: 'POST', body: fd })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      addPhotosArea.style.opacity = '1';
+      addPhotosInput.value = '';
+      if (!data.success) {
+        setGalleryStatus(data.message || 'Upload failed.', true);
+        return;
+      }
+      data.images.forEach(function(img) {
+        if (img.is_cover) {
+          galleryGrid.querySelectorAll('.ec-gallery-cover-badge').forEach(function(b){ b.classList.add('hidden'); });
+        }
+        galleryGrid.appendChild(buildGalleryItem(img));
+      });
+      setGalleryStatus('Added ' + data.images.length + ' photo' + (data.images.length > 1 ? 's' : '') + '.', false);
+      updateGalleryEmptyState();
+    })
+    .catch(function() {
+      addPhotosArea.style.opacity = '1';
+      setGalleryStatus('Network error — please try again.', true);
+    });
+}
 
 // Save button loading state
 document.getElementById('editForm')?.addEventListener('submit', function(){
