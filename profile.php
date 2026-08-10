@@ -55,7 +55,7 @@ $userRow = $conn->query(
         <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
           <div style="width:80px;height:80px;border-radius:50%;background:#e5e7eb;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.5rem;color:#1A2A6C;flex-shrink:0;overflow:hidden;">
             <?php if ($userRow['avatar_url']): ?>
-              <img src="<?= htmlspecialchars($userRow['avatar_url']) ?>" style="width:100%;height:100%;object-fit:cover;" alt="Avatar" />
+              <img src="<?= htmlspecialchars(imgUrl($userRow['avatar_url'])) ?>" style="width:100%;height:100%;object-fit:cover;" alt="Avatar" />
             <?php else: ?>
               <?= strtoupper(substr($userRow['full_name'], 0, 2)) ?>
             <?php endif; ?>

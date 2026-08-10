@@ -288,7 +288,7 @@ include __DIR__ . '/includes/header.php';
       <div class="cd-hero-meta">
         <span class="cd-meta-item">
           <?php if ($c['campaigner_avatar']): ?>
-            <img src="<?= htmlspecialchars($c['campaigner_avatar']) ?>" class="cd-mini-avatar" alt="" />
+            <img src="<?= htmlspecialchars(imgUrl($c['campaigner_avatar'])) ?>" class="cd-mini-avatar" alt="" />
           <?php else: ?>
             <span class="cd-mini-avatar cd-mini-init"><?= strtoupper(substr($c['campaigner_name'],0,1)) ?></span>
           <?php endif; ?>
@@ -718,7 +718,7 @@ include __DIR__ . '/includes/header.php';
           <div class="cd-widget cd-camp-widget">
             <div class="cd-campaigner-row">
               <?php if ($c['campaigner_avatar']): ?>
-                <img src="<?= htmlspecialchars($c['campaigner_avatar']) ?>" class="cd-camp-ava" alt="" />
+                <img src="<?= htmlspecialchars(imgUrl($c['campaigner_avatar'])) ?>" class="cd-camp-ava" alt="" />
               <?php else: ?>
                 <div class="cd-camp-ava cd-camp-ava-init"><?= strtoupper(substr($c['campaigner_name'],0,1)) ?></div>
               <?php endif; ?>

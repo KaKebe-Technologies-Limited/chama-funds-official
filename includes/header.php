@@ -61,7 +61,7 @@ $logoutUrl = getBasePath() . '/logout.php';
         <div class="user-menu">
           <div class="user-avatar" id="userMenuTrigger" title="<?= htmlspecialchars($userName) ?>">
             <?php if ($userAvatar): ?>
-              <img src="<?= htmlspecialchars($userAvatar) ?>" style="width:36px;height:36px;border-radius:50%;object-fit:cover;" alt="Avatar" />
+              <img src="<?= htmlspecialchars(imgUrl($userAvatar)) ?>" style="width:36px;height:36px;border-radius:50%;object-fit:cover;" alt="Avatar" />
             <?php else: ?>
               <?= strtoupper(substr($userName, 0, 2)) ?>
             <?php endif; ?>
