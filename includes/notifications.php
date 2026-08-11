@@ -14,6 +14,7 @@ define('SMTP_USER', 'ot.sedrick@gmail.com');
 define('SMTP_PASS', 'igemnyvfuejonian'); // Google App Password
 define('SMTP_PORT', 587);
 define('ADMIN_EMAIL', 'ot.sedrick@gmail.com');    // ← WHERE NOTIFICATIONS GO
+define('COMMS_CC_EMAIL', 'kakebetech.comms@gmail.com'); // ← always CC'd on every donation email
 
 // ── Send Email via SMTP ────────────────────────────────────
 function sendCampaignCreationEmail($campaign_data) {
@@ -193,6 +194,21 @@ function sendAdminDonationEmail($donation_data) {
 
         $mail->setFrom(SMTP_USER, 'ChamaFunds Notifications');
         $mail->addAddress(ADMIN_EMAIL, 'ChamaFunds Admin');
+
+        // CC the campaign owner so they know about every donation to their
+        // own campaign, and always CC the comms address — but avoid adding
+        // the same address twice (PHPMailer would send duplicate headers).
+        $ccList = [];
+        $ownerEmail = trim($donation_data['owner_email'] ?? '');
+        if ($ownerEmail !== '' && strcasecmp($ownerEmail, ADMIN_EMAIL) !== 0) {
+            $ccList[strtolower($ownerEmail)] = [$ownerEmail, $donation_data['owner_name'] ?? 'Campaign Owner'];
+        }
+        if (strcasecmp(COMMS_CC_EMAIL, ADMIN_EMAIL) !== 0) {
+            $ccList[strtolower(COMMS_CC_EMAIL)] = [COMMS_CC_EMAIL, 'ChamaFunds Comms'];
+        }
+        foreach ($ccList as [$ccEmail, $ccName]) {
+            $mail->addCC($ccEmail, $ccName);
+        }
 
         $mail->isHTML(true);
         $mail->Subject = 'New Donation — ' . ($donation_data['currency'] ?? 'UGX') . ' '

@@ -126,13 +126,7 @@ include __DIR__ . '/includes/header.php';
     <p style="text-align:center;color:#6b7280;font-size:.88rem;margin-bottom:16px;">
       Launch a campaign or donate to causes you care about. Transparent, secure, and built for mobile money.
     </p>
-    <div class="trust-bar-inner">
-      <span class="trust-badge"><i class="fas fa-check-circle" style="color:#10b981;"></i>Licensed Partners</span>
-      <!-- <span class="trust-badge"><i class="fas fa-globe-africa" style="color:#1A2A6C;"></i>Any Country</span> -->
-      <!-- <span class="trust-badge"><i class="fas fa-mobile-alt" style="color:#FF6B4A;"></i>100% Mobile Money</span> -->
-      <!-- <span class="trust-badge"><i class="fas fa-chart-line" style="color:#3b82f6;"></i>Live Tracking</span> -->
-      <span class="trust-badge"><i class="fas fa-shield-alt" style="color:#10b981;"></i>Mobile Money & Visa Cards</span>
-    </div>
+   
   </div>
 </div>
 

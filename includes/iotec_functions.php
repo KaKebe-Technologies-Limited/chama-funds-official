@@ -292,7 +292,9 @@ function markDonationCompleted($conn, $donation_id) {
     );
 
     $campRow = $conn->query(
-        "SELECT campaigner_id, title FROM campaigns WHERE campaign_id = $campaign_id LIMIT 1"
+        "SELECT c.campaigner_id, c.title, u.email AS owner_email, u.full_name AS owner_name
+         FROM campaigns c JOIN users u ON c.campaigner_id = u.user_id
+         WHERE c.campaign_id = $campaign_id LIMIT 1"
     )->fetch_assoc();
     if ($campRow) {
         $ownerId     = (int)$campRow['campaigner_id'];
@@ -331,6 +333,8 @@ function markDonationCompleted($conn, $donation_id) {
         'mobile_money_network'   => $donRow['mobile_money_network'],
         'added_by_admin_id'      => $donRow['added_by_admin_id'] ?? null,
         'transaction_reference'  => $donRow['transaction_reference'],
+        'owner_email'            => $campRow['owner_email'] ?? '',
+        'owner_name'             => $campRow['owner_name'] ?? '',
     ]);
 
     return true;
