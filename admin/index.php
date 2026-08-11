@@ -83,8 +83,11 @@ if (!$allUsers) $allUsers = false;
 
 // Donations
 $allDonations = $conn->query(
-    "SELECT d.*, c.title AS campaign_title FROM donations d
-     JOIN campaigns c ON d.campaign_id=c.campaign_id ORDER BY d.created_at DESC LIMIT 50"
+    "SELECT d.*, c.title AS campaign_title, a.full_name AS added_by_admin_name
+     FROM donations d
+     JOIN campaigns c ON d.campaign_id=c.campaign_id
+     LEFT JOIN users a ON d.added_by_admin_id = a.user_id
+     ORDER BY d.created_at DESC LIMIT 50"
 );
 if (!$allDonations) $allDonations = false;
 
@@ -265,6 +268,10 @@ if (!$adminLogs) $adminLogs = false;
                   <div style="display:flex;gap:8px;font-size:.85rem;">
                     <a href="<?= BASE ?>/campaign-detail.php?id=<?= $c['campaign_id'] ?>" title="View" style="color:#1A2A6C;"><i class="fas fa-eye"></i></a>
                     <a href="<?= BASE ?>/edit-campaign.php?id=<?= $c['campaign_id'] ?>" title="Edit" style="color:#3b82f6;"><i class="fas fa-edit"></i></a>
+                    <button onclick="openAddFundsModal(<?= $c['campaign_id'] ?>, '<?= htmlspecialchars(addslashes($c['title'])) ?>', '<?= htmlspecialchars(addslashes($c['currency'])) ?>')"
+                            title="Add Funds Manually" style="color:#10b981;background:none;border:none;cursor:pointer;font-size:.85rem;">
+                      <i class="fas fa-hand-holding-usd"></i>
+                    </button>
                     <?php if ($c['status'] === 'active'): ?>
                     <button onclick="adminCampAction(<?= $c['campaign_id'] ?>,'paused')" title="Pause" style="color:#f59e0b;background:none;border:none;cursor:pointer;font-size:.85rem;"><i class="fas fa-pause"></i></button>
                     <?php elseif ($c['status'] === 'draft'): ?>
@@ -352,7 +359,15 @@ if (!$adminLogs) $adminLogs = false;
               <tr>
                 <td style="font-family:monospace;font-size:.72rem;color:#9ca3af;"><?= htmlspecialchars($d['transaction_reference'] ?? '—') ?></td>
                 <td style="color:#6b7280;font-size:.82rem;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?= htmlspecialchars($d['campaign_title']) ?></td>
-                <td style="font-weight:600;color:#1A2A6C;font-size:.82rem;"><?= $d['is_anonymous'] ? 'Anonymous' : htmlspecialchars($d['donor_name'] ?? '—') ?></td>
+                <td style="font-weight:600;color:#1A2A6C;font-size:.82rem;">
+                  <?= $d['is_anonymous'] ? 'Anonymous' : htmlspecialchars($d['donor_name'] ?? '—') ?>
+                  <?php if (!empty($d['added_by_admin_id'])): ?>
+                    <span title="Manually added by <?= htmlspecialchars($d['added_by_admin_name'] ?? 'an admin') ?>"
+                          style="display:inline-block;margin-left:6px;background:#fef3c7;color:#92400e;font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:99px;">
+                      <i class="fas fa-user-shield" style="margin-right:3px;"></i>Manual
+                    </span>
+                  <?php endif; ?>
+                </td>
                 <td style="font-size:.78rem;color:#6b7280;"><?= htmlspecialchars($d['mobile_money_network']) ?></td>
                 <td style="color:#10b981;font-weight:700;">UGX <?= number_format($d['amount']) ?></td>
                 <td style="color:#FF6B4A;font-size:.82rem;">UGX <?= number_format($d['fee_amount']) ?></td>
@@ -607,6 +622,43 @@ if (!$adminLogs) $adminLogs = false;
   </main>
 </div><!-- end admin-layout -->
 
+<!-- ══════════════ MODAL: ADD FUNDS MANUALLY ══════════════ -->
+<div class="modal-overlay" id="addFundsModal">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header" style="border-bottom:1px solid #f1f5f9;padding-bottom:14px;">
+      <div>
+        <p style="font-weight:800;color:#0f172a;font-size:1rem;margin:0;">Add Funds Manually</p>
+        <p id="addFundsCampaignName" style="font-size:.78rem;color:#9ca3af;margin:2px 0 0;"></p>
+      </div>
+      <button class="modal-close" onclick="document.getElementById('addFundsModal').classList.remove('open')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" style="padding:18px 22px 24px;">
+      <div style="background:#fef3c7;color:#92400e;font-size:.78rem;padding:10px 14px;border-radius:10px;margin-bottom:16px;">
+        <i class="fas fa-info-circle" style="margin-right:6px;"></i>
+        Use this for funds received outside the platform (cash, bank transfer, etc.). It's added to the campaign total immediately and flagged as a manual entry for accountability.
+      </div>
+      <div class="form-group">
+        <label class="form-label">Donor Name</label>
+        <input type="text" id="addFundsDonorName" class="form-input" placeholder="e.g. John Doe" />
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;color:#6b7280;margin-bottom:16px;cursor:pointer;">
+        <input type="checkbox" id="addFundsAnonymous" /> Keep this contributor anonymous
+      </label>
+      <div class="form-group">
+        <label class="form-label">Amount (<span id="addFundsCurrency">UGX</span>)</label>
+        <input type="number" id="addFundsAmount" class="form-input" min="1" placeholder="e.g. 50000" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Note <em style="font-weight:400;color:#9ca3af;">(internal, for your records — not shown publicly)</em></label>
+        <textarea id="addFundsNote" class="form-input" rows="2" placeholder="e.g. Cash handed over at fundraising event on Aug 10"></textarea>
+      </div>
+      <button class="btn btn-primary btn-block" id="addFundsSubmitBtn" onclick="submitAddFunds()">
+        <i class="fas fa-hand-holding-usd" style="margin-right:6px;"></i>Add Funds
+      </button>
+    </div>
+  </div>
+</div>
+
 <style>
 @media(max-width:1023px){
   .admin-sidebar{display:none;}
@@ -679,6 +731,56 @@ async function confirmDonationManually(donationId, currency, amount) {
   var d = await apiPost('<?= BASE ?>/api/donations.php?action=admin_mark_completed', {donation_id: donationId});
   adminAlert(d.message, d.success);
   if (d.success) setTimeout(function(){ location.reload(); }, 1000);
+}
+
+// ── Add funds manually (offline contributions) ─────────────────
+var addFundsCampaignId = null;
+function openAddFundsModal(campaignId, campaignTitle, currency) {
+  addFundsCampaignId = campaignId;
+  document.getElementById('addFundsCampaignName').textContent = campaignTitle;
+  document.getElementById('addFundsCurrency').textContent = currency;
+  document.getElementById('addFundsDonorName').value = '';
+  document.getElementById('addFundsAnonymous').checked = false;
+  document.getElementById('addFundsAmount').value = '';
+  document.getElementById('addFundsNote').value = '';
+  document.getElementById('addFundsModal').classList.add('open');
+}
+
+async function submitAddFunds() {
+  var donorName = document.getElementById('addFundsDonorName').value.trim();
+  var isAnon    = document.getElementById('addFundsAnonymous').checked;
+  var amount    = parseFloat(document.getElementById('addFundsAmount').value);
+  var note      = document.getElementById('addFundsNote').value.trim();
+  var currency  = document.getElementById('addFundsCurrency').textContent;
+
+  if (!amount || amount <= 0) { adminAlert('Enter a valid amount.', false); return; }
+  if (!isAnon && !donorName)  { adminAlert('Enter a donor name, or mark it anonymous.', false); return; }
+
+  var confirmMsg = 'Add ' + currency + ' ' + amount.toLocaleString() + ' from ' +
+                    (isAnon ? 'an anonymous contributor' : donorName) +
+                    ' to this campaign?\n\nThis adds to the total immediately and is flagged as a manual entry.';
+  if (!confirm(confirmMsg)) return;
+
+  var btn = document.getElementById('addFundsSubmitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:6px;"></i>Adding…';
+
+  var d = await apiPost('<?= BASE ?>/api/donations.php?action=admin_add_manual', {
+    campaign_id: addFundsCampaignId,
+    donor_name: donorName,
+    is_anonymous: isAnon ? 1 : '',
+    amount: amount,
+    note: note
+  });
+
+  btn.disabled = false;
+  btn.innerHTML = '<i class="fas fa-hand-holding-usd" style="margin-right:6px;"></i>Add Funds';
+
+  adminAlert(d.message, d.success);
+  if (d.success) {
+    document.getElementById('addFundsModal').classList.remove('open');
+    setTimeout(function(){ location.reload(); }, 1000);
+  }
 }
 
 // ── Campaign actions ─────────────────────────────────────────

@@ -447,6 +447,9 @@ include __DIR__ . '/includes/header.php';
             }
             // ── Payment method badge ──────────────────────────
             function paymentMethodBadge($network) {
+                if ($network === 'Manual Entry') {
+                    return '<span class="cd-pay-badge"><i class="fas fa-hand-holding-heart"></i>Contribution</span>';
+                }
                 $isCard = ($network === 'Card Payment');
                 $icon   = $isCard ? 'fa-credit-card' : 'fa-mobile-alt';
                 $label  = $isCard ? 'Card' : 'Mobile Money';
