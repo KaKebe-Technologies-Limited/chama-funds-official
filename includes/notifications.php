@@ -44,7 +44,7 @@ function sendCampaignCreationEmail($campaign_data) {
 
         // Content
         $mail->isHTML(true);
-        $mail->Subject = '🚀 New Campaign by ' . ($campaign_data['campaigner_name'] ?? 'Unknown') . ' — ' . $campaign_data['title'];
+        $mail->Subject = 'New Campaign by ' . ($campaign_data['campaigner_name'] ?? 'Unknown') . ' — ' . $campaign_data['title'];
         $mail->Body    = buildEmailBody($campaign_data);
         $mail->AltBody = strip_tags($mail->Body);
 
@@ -126,7 +126,7 @@ function sendDonationThankYouEmail($donation_data) {
         $mail->addAddress($donation_data['donor_email'], $donation_data['donor_name'] ?? 'Donor');
 
         $mail->isHTML(true);
-        $mail->Subject = 'Thank you for your donation to ' . $donation_data['campaign_title'] . '! 🎉';
+        $mail->Subject = 'Thank you for your donation to ' . $donation_data['campaign_title'] . '!';
         $mail->Body    = buildDonationThankYouEmailBody($donation_data);
         $mail->AltBody = strip_tags($mail->Body);
 
@@ -195,7 +195,7 @@ function sendAdminDonationEmail($donation_data) {
         $mail->addAddress(ADMIN_EMAIL, 'ChamaFunds Admin');
 
         $mail->isHTML(true);
-        $mail->Subject = '💰 New Donation — ' . ($donation_data['currency'] ?? 'UGX') . ' '
+        $mail->Subject = 'New Donation — ' . ($donation_data['currency'] ?? 'UGX') . ' '
                         . number_format($donation_data['amount']) . ' to ' . $donation_data['campaign_title'];
         $mail->Body    = buildAdminDonationEmailBody($donation_data);
         $mail->AltBody = strip_tags($mail->Body);
