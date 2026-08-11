@@ -192,6 +192,8 @@ if ($action === 'admin_add_manual' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $isAnon     = !empty($_POST['is_anonymous']) ? 1 : 0;
     $note       = trim($_POST['note'] ?? '');
     $adminId    = (int)$_SESSION['user_id'];
+    $method     = trim($_POST['payment_method'] ?? '');
+    $method     = in_array($method, ['Mobile Money', 'Bank Transfer'], true) ? $method : 'Mobile Money';
 
     if ($campaignId <= 0 || $amount <= 0) {
         echo json_encode(['success' => false, 'message' => 'Campaign and a positive amount are required.']);
@@ -209,9 +211,10 @@ if ($action === 'admin_add_manual' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $campRow = $camp->fetch_assoc();
 
-    $nameEsc = $conn->real_escape_string($isAnon ? 'Anonymous' : $donorName);
-    $refEsc  = $conn->real_escape_string('ADMIN_' . uniqid());
-    $currEsc = $conn->real_escape_string($campRow['currency'] ?: 'UGX');
+    $nameEsc   = $conn->real_escape_string($isAnon ? 'Anonymous' : $donorName);
+    $refEsc    = $conn->real_escape_string('ADMIN_' . uniqid());
+    $currEsc   = $conn->real_escape_string($campRow['currency'] ?: 'UGX');
+    $methodEsc = $conn->real_escape_string($method);
 
     $conn->query(
         "INSERT INTO donations
@@ -219,7 +222,7 @@ if ($action === 'admin_add_manual' && $_SERVER['REQUEST_METHOD'] === 'POST') {
               transaction_reference, mobile_money_network, currency, added_by_admin_id)
          VALUES
              ($campaignId, '$nameEsc', $isAnon, $amount, 0, 'pending',
-              '$refEsc', 'Manual Entry', '$currEsc', $adminId)"
+              '$refEsc', '$methodEsc', '$currEsc', $adminId)"
     );
     if ($conn->error) {
         echo json_encode(['success' => false, 'message' => 'Failed to save: ' . $conn->error]);
@@ -233,7 +236,7 @@ if ($action === 'admin_add_manual' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     logAdminAction($conn, 'Manually Added Funds', 'donation', $newId,
         $campRow['title'] . ' — ' . ($isAnon ? 'Anonymous' : $donorName),
-        ['amount' => $amount, 'currency' => $campRow['currency'], 'campaign_id' => $campaignId, 'note' => $note]
+        ['amount' => $amount, 'currency' => $campRow['currency'], 'campaign_id' => $campaignId, 'payment_method' => $method, 'note' => $note]
     );
 
     echo json_encode(['success' => true, 'message' => 'Funds added.', 'donation_id' => $newId]);

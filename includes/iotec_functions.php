@@ -320,6 +320,19 @@ function markDonationCompleted($conn, $donation_id) {
         'transaction_reference'  => $donRow['transaction_reference'],
     ]);
 
+    sendAdminDonationEmail([
+        'donor_name'             => $donRow['donor_name'],
+        'donor_phone'            => $donRow['donor_phone'],
+        'is_anonymous'           => $donRow['is_anonymous'],
+        'amount'                 => $amt,
+        'currency'               => $donRow['currency'] ?? 'UGX',
+        'campaign_title'         => $campRow['title'] ?? '',
+        'campaign_id'            => $campaign_id,
+        'mobile_money_network'   => $donRow['mobile_money_network'],
+        'added_by_admin_id'      => $donRow['added_by_admin_id'] ?? null,
+        'transaction_reference'  => $donRow['transaction_reference'],
+    ]);
+
     return true;
 }
 

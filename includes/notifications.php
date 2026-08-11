@@ -178,6 +178,84 @@ function buildDonationThankYouEmailBody($d) {
     ";
 }
 
+// ── Admin Donation Alert ─────────────────────────────────────
+function sendAdminDonationEmail($donation_data) {
+    $mail = new PHPMailer(true);
+
+    try {
+        $mail->isSMTP();
+        $mail->Host       = SMTP_HOST;
+        $mail->SMTPAuth   = true;
+        $mail->Username   = SMTP_USER;
+        $mail->Password   = SMTP_PASS;
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = SMTP_PORT;
+
+        $mail->setFrom(SMTP_USER, 'ChamaFunds Notifications');
+        $mail->addAddress(ADMIN_EMAIL, 'ChamaFunds Admin');
+
+        $mail->isHTML(true);
+        $mail->Subject = '💰 New Donation — ' . ($donation_data['currency'] ?? 'UGX') . ' '
+                        . number_format($donation_data['amount']) . ' to ' . $donation_data['campaign_title'];
+        $mail->Body    = buildAdminDonationEmailBody($donation_data);
+        $mail->AltBody = strip_tags($mail->Body);
+
+        $mail->send();
+        error_log('✅ Admin donation alert sent to ' . ADMIN_EMAIL);
+        return true;
+    } catch (Exception $e) {
+        error_log('❌ Admin donation alert failed: ' . $mail->ErrorInfo);
+        return false;
+    }
+}
+
+function buildAdminDonationEmailBody($d) {
+    $title   = htmlspecialchars($d['campaign_title']);
+    $name    = htmlspecialchars($d['is_anonymous'] ? 'Anonymous' : ($d['donor_name'] ?: 'Anonymous'));
+    $phone   = htmlspecialchars($d['donor_phone'] ?: '—');
+    $amount  = htmlspecialchars($d['currency'] ?? 'UGX') . ' ' . number_format($d['amount']);
+    $method  = htmlspecialchars($d['mobile_money_network'] ?? '');
+    $manual  = !empty($d['added_by_admin_id']);
+    $ref     = htmlspecialchars($d['transaction_reference'] ?? '');
+    $link    = BASE . '/admin/index.php?tab=transactions';
+
+    return "
+    <html>
+    <head><style>
+        body { font-family: Arial, sans-serif; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #1A2A6C; color: white; padding: 24px; text-align: center; border-radius: 10px 10px 0 0; }
+        .content { background: #f8fafc; padding: 30px; border: 1px solid #e2e8f0; border-radius: 0 0 10px 10px; }
+        .detail { margin: 15px 0; padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #10b981; }
+        .label { font-weight: bold; color: #1A2A6C; }
+        .badge { display:inline-block; background:#fef3c7; color:#92400e; font-size:12px; font-weight:bold; padding:3px 10px; border-radius:99px; margin-top:8px; }
+        .btn { display: inline-block; padding: 12px 24px; background: #FF6B4A; color: white; text-decoration: none; border-radius: 8px; }
+        .footer { text-align: center; padding: 20px; color: #94a3b8; font-size: 12px; }
+    </style></head>
+    <body>
+        <div class='container'>
+            <div class='header'><h2>💰 New Donation Received!</h2></div>
+            <div class='content'>
+                <p><strong>Hi Admin,</strong></p>
+                <p>A donation was just confirmed on ChamaFunds.</p>
+                <div class='detail'>
+                    <p><span class='label'>📌 Campaign:</span> $title</p>
+                    <p><span class='label'>👤 Donor:</span> $name</p>
+                    <p><span class='label'>📱 Number:</span> $phone</p>
+                    <p><span class='label'>💵 Amount:</span> $amount</p>
+                    <p><span class='label'>💳 Method:</span> $method</p>
+                    " . ($ref ? "<p><span class='label'>Reference:</span> $ref</p>" : '') . "
+                    " . ($manual ? "<p><span class='badge'>⚠ Manually added by an admin</span></p>" : '') . "
+                </div>
+                <p style='text-align: center;'><a href='$link' class='btn'>View All Transactions</a></p>
+            </div>
+            <div class='footer'><p>&copy; 2026 ChamaFunds. All rights reserved.</p></div>
+        </div>
+    </body>
+    </html>
+    ";
+}
+
 // ── In-App Notification ─────────────────────────────────────
 function saveInAppNotification($conn, $campaign_data) {
     $title = 'New Campaign: ' . $campaign_data['title'];

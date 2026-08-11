@@ -649,6 +649,13 @@ if (!$adminLogs) $adminLogs = false;
         <input type="number" id="addFundsAmount" class="form-input" min="1" placeholder="e.g. 50000" />
       </div>
       <div class="form-group">
+        <label class="form-label">Payment Method</label>
+        <select id="addFundsMethod" class="form-input">
+          <option value="Mobile Money">Mobile Money</option>
+          <option value="Bank Transfer">Bank</option>
+        </select>
+      </div>
+      <div class="form-group">
         <label class="form-label">Note <em style="font-weight:400;color:#9ca3af;">(internal, for your records — not shown publicly)</em></label>
         <textarea id="addFundsNote" class="form-input" rows="2" placeholder="e.g. Cash handed over at fundraising event on Aug 10"></textarea>
       </div>
@@ -742,6 +749,7 @@ function openAddFundsModal(campaignId, campaignTitle, currency) {
   document.getElementById('addFundsDonorName').value = '';
   document.getElementById('addFundsAnonymous').checked = false;
   document.getElementById('addFundsAmount').value = '';
+  document.getElementById('addFundsMethod').value = 'Mobile Money';
   document.getElementById('addFundsNote').value = '';
   document.getElementById('addFundsModal').classList.add('open');
 }
@@ -750,6 +758,7 @@ async function submitAddFunds() {
   var donorName = document.getElementById('addFundsDonorName').value.trim();
   var isAnon    = document.getElementById('addFundsAnonymous').checked;
   var amount    = parseFloat(document.getElementById('addFundsAmount').value);
+  var method    = document.getElementById('addFundsMethod').value;
   var note      = document.getElementById('addFundsNote').value.trim();
   var currency  = document.getElementById('addFundsCurrency').textContent;
 
@@ -770,6 +779,7 @@ async function submitAddFunds() {
     donor_name: donorName,
     is_anonymous: isAnon ? 1 : '',
     amount: amount,
+    payment_method: method,
     note: note
   });
 
