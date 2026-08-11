@@ -346,7 +346,7 @@ if (!$adminLogs) $adminLogs = false;
       <div class="card" style="padding:0;overflow:hidden;">
         <div class="table-wrap">
           <table id="txTable">
-            <thead><tr><th>Ref</th><th>Campaign</th><th>Donor</th><th>Network</th><th>Amount</th><th>Fee</th><th>Net</th><th>Status</th><th>Date</th></tr></thead>
+            <thead><tr><th>Ref</th><th>Campaign</th><th>Donor</th><th>Network</th><th>Amount</th><th>Fee</th><th>Net</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
             <tbody>
               <?php if ($allDonations): $allDonations->data_seek(0); while ($d = $allDonations->fetch_assoc()): ?>
               <tr>
@@ -359,6 +359,14 @@ if (!$adminLogs) $adminLogs = false;
                 <td style="font-weight:600;font-size:.82rem;">UGX <?= number_format($d['net_amount']) ?></td>
                 <td><span class="status-badge status-<?= $d['status']==='completed'?'approved':$d['status'] ?>"><?= ucfirst($d['status']) ?></span></td>
                 <td style="font-size:.75rem;color:#9ca3af;"><?= date('M j, Y', strtotime($d['created_at'])) ?></td>
+                <td>
+                  <?php if ($d['status'] === 'pending'): ?>
+                  <button class="btn btn-outline btn-sm" style="padding:5px 12px;font-size:.72rem;white-space:nowrap;"
+                          onclick="confirmDonationManually(<?= (int)$d['donation_id'] ?>, '<?= htmlspecialchars(addslashes($d['currency'] ?? 'UGX')) ?>', <?= (float)$d['amount'] ?>)">
+                    <i class="fas fa-check" style="margin-right:4px;"></i>Confirm Payment
+                  </button>
+                  <?php endif; ?>
+                </td>
               </tr>
               <?php endwhile; endif; ?>
             </tbody>
@@ -657,6 +665,20 @@ async function reconcilePending() {
   status.style.display = 'block';
 
   if (d.completed > 0) setTimeout(function(){ location.reload(); }, 2000);
+}
+
+// ── Manually confirm a pending donation ────────────────────────
+async function confirmDonationManually(donationId, currency, amount) {
+  var msg = 'Confirm this donation as PAID?\n\n' +
+            currency + ' ' + amount.toLocaleString() + ' will be added to the campaign\'s ' +
+            'raised amount and contributor count immediately.\n\n' +
+            'Only do this if you\'ve verified the money actually arrived ' +
+            '(e.g. checked the mobile money statement) — this cannot be undone from here.';
+  if (!confirm(msg)) return;
+
+  var d = await apiPost('<?= BASE ?>/api/donations.php?action=admin_mark_completed', {donation_id: donationId});
+  adminAlert(d.message, d.success);
+  if (d.success) setTimeout(function(){ location.reload(); }, 1000);
 }
 
 // ── Campaign actions ─────────────────────────────────────────

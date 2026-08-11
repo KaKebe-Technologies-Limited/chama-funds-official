@@ -128,6 +128,49 @@ if ($action === 'reconcile' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
+// ── MANUALLY confirm a pending donation (admin only) ──────────────────
+// For cases the admin has verified some other way (e.g. checked the
+// mobile money statement directly) and doesn't want to wait on ioTec.
+if ($action === 'admin_mark_completed' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_once __DIR__ . '/../includes/iotec_functions.php';
+    require_once __DIR__ . '/../includes/auth.php';
+
+    if (($_SESSION['role'] ?? '') !== 'admin') {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => 'Admin only.']);
+        exit;
+    }
+
+    $donationId = (int)($_POST['donation_id'] ?? 0);
+    $result = $conn->query(
+        "SELECT donation_id, campaign_id, amount, currency, donor_name, status
+         FROM donations WHERE donation_id = $donationId LIMIT 1"
+    );
+    $donation = $result ? $result->fetch_assoc() : null;
+    if (!$donation) {
+        echo json_encode(['success' => false, 'message' => 'Donation not found.']);
+        exit;
+    }
+    if ($donation['status'] !== 'pending') {
+        echo json_encode(['success' => false, 'message' => 'This donation is already ' . $donation['status'] . '.']);
+        exit;
+    }
+
+    $didUpdate = markDonationCompleted($conn, $donationId);
+    if (!$didUpdate) {
+        echo json_encode(['success' => false, 'message' => 'Could not confirm this donation. Please refresh and try again.']);
+        exit;
+    }
+
+    logAdminAction($conn, 'Manually Confirmed Donation', 'donation', $donationId,
+        $donation['donor_name'] ?: 'Anonymous',
+        ['amount' => $donation['amount'], 'currency' => $donation['currency'], 'campaign_id' => $donation['campaign_id']]
+    );
+
+    echo json_encode(['success' => true, 'message' => 'Donation confirmed.']);
+    exit;
+}
+
 // ── LIST donations for a campaign ────────────────────────────
 if ($action === 'list' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $campaignId = (int)($_GET['campaign_id'] ?? 0);
