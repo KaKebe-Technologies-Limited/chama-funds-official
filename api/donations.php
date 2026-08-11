@@ -110,6 +110,24 @@ if ($action === 'check_status' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     exit;
 }
 
+// ── RECONCILE stuck pending donations against ioTec (admin only) ─────
+// Catches payments that actually succeeded on ioTec's side but never got
+// finalized locally — e.g. the donor closed their browser before the
+// on-page poll caught up, and the ioTec callback URL isn't set up yet.
+if ($action === 'reconcile' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_once __DIR__ . '/../includes/iotec_functions.php';
+
+    if (($_SESSION['role'] ?? '') !== 'admin') {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => 'Admin only.']);
+        exit;
+    }
+
+    $summary = reconcilePendingDonations($conn, 50);
+    echo json_encode(['success' => true] + $summary);
+    exit;
+}
+
 // ── LIST donations for a campaign ────────────────────────────
 if ($action === 'list' && $_SERVER['REQUEST_METHOD'] === 'GET') {
     $campaignId = (int)($_GET['campaign_id'] ?? 0);

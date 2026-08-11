@@ -68,6 +68,15 @@ $pageTitle = $status === 'pending' ? 'Processing Payment' : 'Payment Failed';
     <div class="ds-icon ds-icon-pending"><i class="fas fa-clock"></i></div>
     <h1 class="ds-title">Payment Processing…</h1>
     <p class="ds-sub">We're waiting for confirmation from your mobile money network. This usually takes less than a minute.</p>
+
+    <div class="ds-stay-warning">
+      <i class="fas fa-mobile-alt"></i>
+      <div>
+        <strong>Enter your PIN, then stay on this page.</strong>
+        <span>Closing the app or browser now may prevent your donation from being confirmed.</span>
+      </div>
+    </div>
+
     <p class="ds-note">You'll receive an email confirmation once the payment is verified. You can also check back on the campaign page.</p>
 
     <div class="ds-actions">

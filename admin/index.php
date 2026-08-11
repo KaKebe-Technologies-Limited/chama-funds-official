@@ -335,8 +335,14 @@ if (!$adminLogs) $adminLogs = false;
     <div class="tab-panel" id="tab-transactions">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
         <h2 style="font-weight:800;color:#1A2A6C;">All Transactions</h2>
-        <div class="search-input-wrap" style="max-width:260px;"><i class="fas fa-search"></i><input type="text" class="form-input" placeholder="Search by ref or donor…" oninput="filterTable('txTable',this.value)" /></div>
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+          <div class="search-input-wrap" style="max-width:260px;"><i class="fas fa-search"></i><input type="text" class="form-input" placeholder="Search by ref or donor…" oninput="filterTable('txTable',this.value)" /></div>
+          <button class="btn btn-outline btn-sm" id="reconcileBtn" onclick="reconcilePending()" title="Re-check pending donations directly against ioTec — catches payments that succeeded but never got marked complete">
+            <i class="fas fa-sync-alt" style="margin-right:6px;"></i>Reconcile Pending
+          </button>
+        </div>
       </div>
+      <p id="reconcileStatus" style="font-size:.82rem;margin:-12px 0 16px;display:none;"></p>
       <div class="card" style="padding:0;overflow:hidden;">
         <div class="table-wrap">
           <table id="txTable">
@@ -621,6 +627,36 @@ async function apiPost(url, data) {
   for (var k in data) fd.append(k, data[k]);
   var res  = await fetch(url, {method:'POST', body: fd});
   return res.json();
+}
+
+// ── Reconcile stuck pending donations against ioTec ───────────
+async function reconcilePending() {
+  var btn    = document.getElementById('reconcileBtn');
+  var status = document.getElementById('reconcileStatus');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:6px;"></i>Checking…';
+  status.style.display = 'none';
+
+  var d = await apiPost('<?= BASE ?>/api/donations.php?action=reconcile', {});
+
+  btn.disabled = false;
+  btn.innerHTML = '<i class="fas fa-sync-alt" style="margin-right:6px;"></i>Reconcile Pending';
+
+  if (!d.success) {
+    status.style.color = '#ef4444';
+    status.textContent = d.message || 'Reconcile failed.';
+    status.style.display = 'block';
+    return;
+  }
+
+  status.style.color = d.completed > 0 ? '#10b981' : '#6b7280';
+  status.textContent = 'Checked ' + d.checked + ' pending donation(s): ' +
+    d.completed + ' newly completed, ' + d.failed + ' failed, ' +
+    d.still_pending + ' still pending' + (d.errors ? ', ' + d.errors + ' errors' : '') + '.' +
+    (d.checked >= 50 ? ' There may be more — run again to continue.' : '');
+  status.style.display = 'block';
+
+  if (d.completed > 0) setTimeout(function(){ location.reload(); }, 2000);
 }
 
 // ── Campaign actions ─────────────────────────────────────────

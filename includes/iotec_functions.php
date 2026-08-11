@@ -365,8 +365,44 @@ function verifyIotecTransaction($conn, $donation_id) {
         return ['success' => true, 'status' => 'pending'];
     } catch (Exception $e) {
         // Network/API hiccup — leave as pending, the webhook or next poll will resolve it.
-        return ['success' => true, 'status' => 'pending'];
+        return ['success' => true, 'status' => 'pending', 'error' => $e->getMessage()];
     }
+}
+
+/**
+ * Sweep locally-pending donations and re-check each directly against
+ * ioTec Pay's status API. Catches donations that actually succeeded (or
+ * failed) but never got finalized — e.g. the donor closed their browser
+ * before the on-page status poll caught up, and the ioTec callback URL
+ * isn't configured yet to notify us independently. Safe to run repeatedly;
+ * only ever touches rows still sitting at 'pending'.
+ */
+function reconcilePendingDonations($conn, $limit = 50) {
+    $limit  = (int)$limit;
+    $result = $conn->query(
+        "SELECT donation_id FROM donations
+         WHERE status = 'pending' AND iotec_transaction_id IS NOT NULL AND iotec_transaction_id != ''
+         ORDER BY created_at ASC LIMIT $limit"
+    );
+    $summary = ['checked' => 0, 'completed' => 0, 'failed' => 0, 'still_pending' => 0, 'errors' => 0, 'details' => []];
+    if (!$result) return $summary;
+
+    while ($row = $result->fetch_assoc()) {
+        $summary['checked']++;
+        $r = verifyIotecTransaction($conn, $row['donation_id']);
+        if (!empty($r['error'])) {
+            $summary['errors']++;
+        } elseif (($r['status'] ?? '') === 'completed') {
+            $summary['completed']++;
+            $summary['details'][] = ['donation_id' => $row['donation_id'], 'result' => 'completed'];
+        } elseif (($r['status'] ?? '') === 'failed') {
+            $summary['failed']++;
+            $summary['details'][] = ['donation_id' => $row['donation_id'], 'result' => 'failed'];
+        } else {
+            $summary['still_pending']++;
+        }
+    }
+    return $summary;
 }
 
 /**
