@@ -61,8 +61,32 @@ if ($heroSlidesResult) {
     while ($hs = $heroSlidesResult->fetch_assoc()) $heroSlides[] = $hs;
 }
 
-// Fetch top 5 most recent active campaigns for home grid
-// (1 featured + up to 4 more — bento layout kicks in at 3+)
+// Campaigns an admin has marked as featured also join the hero photo orbit,
+// linked through to their campaign page.
+$prevReport = mysqli_report(MYSQLI_REPORT_OFF);
+$featuredHeroResult = $conn->query(
+    "SELECT campaign_id, title, image_url FROM campaigns
+     WHERE status = 'active' AND is_featured = 1
+     ORDER BY created_at DESC LIMIT 6"
+);
+mysqli_report($prevReport);
+if ($featuredHeroResult) {
+    while ($fh = $featuredHeroResult->fetch_assoc()) {
+        $fhGallery = campaignCardGallery($conn, $fh['campaign_id'], 1);
+        $fhImage   = !empty($fhGallery) ? $fhGallery[0] : imgUrl($fh['image_url'] ?: '');
+        if ($fhImage) {
+            $heroSlides[] = [
+                'image_url' => $fhImage,
+                'alt_text'  => $fh['title'],
+                'href'      => BASE . '/campaign-detail.php?id=' . $fh['campaign_id'],
+            ];
+        }
+    }
+}
+
+// Fetch top 5 active campaigns for home grid — featured campaigns first,
+// then most recent (1 featured/spotlight + up to 4 more — bento layout
+// kicks in at 3+).
 $featured = $conn->query(
     "SELECT c.*, u.full_name AS campaigner_name,
             ROUND((c.raised_amount / c.goal_amount) * 100, 1) AS pct,
@@ -70,7 +94,7 @@ $featured = $conn->query(
      FROM campaigns c
      JOIN users u ON c.campaigner_id = u.user_id
      WHERE c.status = 'active'
-     ORDER BY c.created_at DESC
+     ORDER BY c.is_featured DESC, c.created_at DESC
      LIMIT 5"
 );
 $featuredArr = [];
@@ -96,15 +120,21 @@ include __DIR__ . '/includes/header.php';
       </div>
     </div>
 
-    <!-- Coverflow photo showcase — managed from the admin dashboard -->
+    <!-- Coverflow photo showcase — managed from the admin dashboard,
+         plus any campaigns an admin has marked as featured -->
     <?php if (!empty($heroSlides)): ?>
     <div class="swiper hero-swiper">
       <div class="swiper-wrapper">
-        <?php foreach ($heroSlides as $i => $slide): ?>
+        <?php foreach ($heroSlides as $i => $slide):
+          $slideImg = '<img src="' . htmlspecialchars(imgUrl($slide['image_url'])) . '" alt="' . htmlspecialchars($slide['alt_text']) . '" '
+                    . ($i === 0 ? 'loading="eager" fetchpriority="high"' : 'loading="lazy"') . ' />';
+        ?>
         <div class="swiper-slide">
-          <img src="<?= htmlspecialchars(imgUrl($slide['image_url'])) ?>"
-               alt="<?= htmlspecialchars($slide['alt_text']) ?>"
-               <?= $i === 0 ? 'loading="eager" fetchpriority="high"' : 'loading="lazy"' ?> />
+          <?php if (!empty($slide['href'])): ?>
+            <a href="<?= htmlspecialchars($slide['href']) ?>"><?= $slideImg ?></a>
+          <?php else: ?>
+            <?= $slideImg ?>
+          <?php endif; ?>
         </div>
         <?php endforeach; ?>
       </div>
@@ -138,23 +168,44 @@ include __DIR__ . '/includes/header.php';
       <h2 class="section-title">Three Simple Steps. Ninety Seconds.</h2>
       <p class="section-sub">Create, share, and receive — all in under two minutes.</p>
     </div>
-    <div class="steps-grid">
-      <div class="card step-card">
-        <div class="step-icon-wrap">1</div>
-        <h3 style="font-weight:800;color:#1A2A6C;font-size:1.1rem;margin-bottom:10px;">Create a Campaign</h3>
-        <p style="color:#6b7280;font-size:.9rem;line-height:1.7;">Set up your campaign in 60 seconds. Add details, set your goal, and get a shareable link instantly.</p>
-        <p style="margin-top:12px;font-size:.78rem;font-weight:700;color:#FF6B4A;">FREE to start</p>
+    <div class="steps-accordion">
+      <div class="step-acc-item open">
+        <button type="button" class="step-acc-header">
+          <span class="step-acc-num">1</span>
+          <span class="step-acc-title">Create a Campaign</span>
+          <span class="step-acc-icon">+</span>
+        </button>
+        <div class="step-acc-body">
+          <div class="step-acc-body-inner">
+            <p>Set up your campaign in 60 seconds. Add details, set your goal, and get a shareable link instantly.</p>
+            <p style="margin-top:10px;font-size:.78rem;font-weight:700;color:#FF6B4A;">FREE to start</p>
+          </div>
+        </div>
       </div>
-      <div class="card step-card">
-        <div class="step-icon-wrap">2</div>
-        <h3 style="font-weight:800;color:#1A2A6C;font-size:1.1rem;margin-bottom:10px;">Share with Your People</h3>
-        <p style="color:#6b7280;font-size:.9rem;line-height:1.7;">Post your link on WhatsApp, social media, or anywhere. No account needed to contribute.</p>
+      <div class="step-acc-item">
+        <button type="button" class="step-acc-header">
+          <span class="step-acc-num">2</span>
+          <span class="step-acc-title">Share with Your People</span>
+          <span class="step-acc-icon">+</span>
+        </button>
+        <div class="step-acc-body">
+          <div class="step-acc-body-inner">
+            <p>Post your link on WhatsApp, social media, or anywhere. No account needed to contribute.</p>
+          </div>
+        </div>
       </div>
-      <div class="card step-card">
-        <div class="step-icon-wrap">3</div>
-        <h3 style="font-weight:800;color:#1A2A6C;font-size:1.1rem;margin-bottom:10px;">Grow &amp; Receive Funds</h3>
-        <p style="color:#6b7280;font-size:.9rem;line-height:1.7;">Watch contributions come in live and withdraw funds to mobile money — processed within 48 hours.</p>
-        <p style="margin-top:12px;font-size:.78rem;font-weight:700;color:#10b981;"><i class="fas fa-check-circle" style="margin-right:4px;"></i>Payout within 48hrs</p>
+      <div class="step-acc-item">
+        <button type="button" class="step-acc-header">
+          <span class="step-acc-num">3</span>
+          <span class="step-acc-title">Grow &amp; Receive Funds</span>
+          <span class="step-acc-icon">+</span>
+        </button>
+        <div class="step-acc-body">
+          <div class="step-acc-body-inner">
+            <p>Watch contributions come in live and withdraw funds to mobile money — processed within 48 hours.</p>
+            <p style="margin-top:10px;font-size:.78rem;font-weight:700;color:#10b981;"><i class="fas fa-check-circle" style="margin-right:4px;"></i>Payout within 48hrs</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -166,12 +217,13 @@ include __DIR__ . '/includes/header.php';
     $daysLeft = (int)$c['days_left'];
     $gallery  = campaignCardGallery($conn, $c['campaign_id']);
     return [
-      'pct'      => min(100, (float)$c['pct']),
-      'daysLeft' => $daysLeft,
-      'daysStr'  => $daysLeft > 0 ? "$daysLeft days left" : ($daysLeft === 0 ? 'Ends today' : 'Ended'),
-      'catClass' => 'badge-' . strtolower($c['category']),
-      'image'    => !empty($gallery) ? $gallery[0] : imgUrl($c['image_url'] ?: ''),
-      'gallery'  => $gallery,
+      'pct'         => min(100, (float)$c['pct']),
+      'daysLeft'    => $daysLeft,
+      'daysStr'     => $daysLeft > 0 ? "$daysLeft days left" : ($daysLeft === 0 ? 'Ends today' : 'Ended'),
+      'catClass'    => 'badge-' . strtolower($c['category']),
+      'image'       => !empty($gallery) ? $gallery[0] : imgUrl($c['image_url'] ?: ''),
+      'gallery'     => $gallery,
+      'isFeatured'  => !empty($c['is_featured']),
     ];
   }
   $featuredCount = count($featuredArr);
@@ -205,6 +257,7 @@ include __DIR__ . '/includes/header.php';
             <?php else: ?>
               <img src="<?= htmlspecialchars($lg['image']) ?>" alt="<?= htmlspecialchars($largeCard['title']) ?>" loading="lazy" />
             <?php endif; ?>
+            <?php if ($lg['isFeatured']): ?><span class="featured-badge"><i class="fas fa-star"></i> Featured</span><?php endif; ?>
             <span class="bento-stat-pill"><i class="fas fa-users" style="margin-right:5px;"></i><?= $largeCard['contributor_count'] ?> supporters</span>
           </div>
           <div class="bento-info">
@@ -230,6 +283,7 @@ include __DIR__ . '/includes/header.php';
               <?php else: ?>
                 <img src="<?= htmlspecialchars($sm['image']) ?>" alt="<?= htmlspecialchars($c['title']) ?>" loading="lazy" />
               <?php endif; ?>
+              <?php if ($sm['isFeatured']): ?><span class="featured-badge"><i class="fas fa-star"></i> Featured</span><?php endif; ?>
               <span class="bento-stat-pill"><i class="fas fa-users" style="margin-right:4px;"></i><?= $c['contributor_count'] ?></span>
             </div>
             <div class="bento-info">
@@ -246,12 +300,13 @@ include __DIR__ . '/includes/header.php';
       <!-- Fewer than 3 campaigns — simple grid -->
       <div class="home-campaigns-grid">
         <?php foreach ($featuredArr as $c): $cc = campaignCalc($conn, $c); ?>
-        <a href="<?= BASE ?>/campaign-detail.php?id=<?= $c['campaign_id'] ?>" class="card campaign-card" style="text-decoration:none;color:inherit;">
+        <a href="<?= BASE ?>/campaign-detail.php?id=<?= $c['campaign_id'] ?>" class="card campaign-card" style="text-decoration:none;color:inherit;position:relative;">
           <?php if (!empty($cc['gallery'])): ?>
             <?= renderCardImageSlider($cc['gallery'], $c['title']) ?>
           <?php else: ?>
             <img class="card-img" src="<?= htmlspecialchars($cc['image']) ?>" alt="<?= htmlspecialchars($c['title']) ?>" loading="lazy" />
           <?php endif; ?>
+          <?php if ($cc['isFeatured']): ?><span class="featured-badge"><i class="fas fa-star"></i> Featured</span><?php endif; ?>
           <div class="card-body">
             <div class="campaign-meta">
               <span class="category-badge <?= $cc['catClass'] ?>"><?= htmlspecialchars($c['category']) ?></span>
@@ -332,7 +387,7 @@ document.addEventListener('DOMContentLoaded', function() {
     effect: 'coverflow',
     grabCursor: true,
     centeredSlides: true,
-    loop: true,
+    rewind: true,
     initialSlide: 1,
     slidesPerView: 'auto',
     coverflowEffect: {
@@ -345,7 +400,7 @@ document.addEventListener('DOMContentLoaded', function() {
     autoplay: {
       delay: 2600,
       disableOnInteraction: false,
-      pauseOnMouseEnter: true,
+      pauseOnMouseEnter: false,
     },
     pagination: { el: '.hero-swiper .swiper-pagination', clickable: true },
   });

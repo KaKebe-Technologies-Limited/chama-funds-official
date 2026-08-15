@@ -55,8 +55,6 @@ $logoutUrl = getBasePath() . '/logout.php';
     </a>
     <div class="navbar-links">
       <a href="<?= BASE ?>/campaign-drives.php" <?= $currentPage === 'campaign-drives.php' ? 'style="color:#FF6B4A;"' : '' ?>>Campaign Drives</a>
-      <a href="<?= BASE ?>/donate.php" <?= $currentPage === 'donate.php' ? 'style="color:#FF6B4A;"' : '' ?>>Donate</a>
-      <a href="<?= BASE ?>/index.php#how-it-works">How It Works</a>
       <?php if ($isLoggedIn): ?>
         <div class="user-menu">
           <div class="user-avatar" id="userMenuTrigger" title="<?= htmlspecialchars($userName) ?>">
@@ -98,8 +96,6 @@ $logoutUrl = getBasePath() . '/logout.php';
     <span style="font-weight:800;color:var(--navy);font-size:1rem;">ChamaFunds</span>
   </a>
   <a href="<?= BASE ?>/campaign-drives.php">Campaign Drives</a>
-  <a href="<?= BASE ?>/donate.php">Donate</a>
-  <a href="<?= BASE ?>/index.php#how-it-works">How It Works</a>
   <?php if ($isLoggedIn): ?>
     <a href="<?= BASE ?>/dashboard.php"><i class="fas fa-th-large"></i> Dashboard</a>
     <?php if ($userRole === 'admin'): ?>

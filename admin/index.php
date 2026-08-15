@@ -272,6 +272,11 @@ if (!$adminLogs) $adminLogs = false;
                             title="Add Funds Manually" style="color:#10b981;background:none;border:none;cursor:pointer;font-size:.85rem;">
                       <i class="fas fa-hand-holding-usd"></i>
                     </button>
+                    <button onclick="toggleFeatured(<?= $c['campaign_id'] ?>)"
+                            title="<?= $c['is_featured'] ? 'Remove from Featured' : 'Feature this Campaign' ?>"
+                            style="color:<?= $c['is_featured'] ? '#facc15' : '#9ca3af' ?>;background:none;border:none;cursor:pointer;font-size:.85rem;">
+                      <i class="<?= $c['is_featured'] ? 'fas' : 'far' ?> fa-star"></i>
+                    </button>
                     <?php if ($c['status'] === 'active'): ?>
                     <button onclick="adminCampAction(<?= $c['campaign_id'] ?>,'paused')" title="Pause" style="color:#f59e0b;background:none;border:none;cursor:pointer;font-size:.85rem;"><i class="fas fa-pause"></i></button>
                     <?php elseif ($c['status'] === 'draft'): ?>
@@ -799,6 +804,12 @@ async function adminCampAction(id, status) {
   var d = await apiPost('<?= BASE ?>/api/campaigns.php?action=set_status', {campaign_id: id, status: status});
   adminAlert(d.message, d.success);
   if (d.success) setTimeout(function(){ location.reload(); }, 1200);
+}
+
+async function toggleFeatured(id) {
+  var d = await apiPost('<?= BASE ?>/api/admin.php?action=toggle_featured', {campaign_id: id});
+  adminAlert(d.message, d.success);
+  if (d.success) setTimeout(function(){ location.reload(); }, 900);
 }
 
 // ── Withdrawal actions ───────────────────────────────────────

@@ -191,19 +191,8 @@ if (!empty($ogImage)) {
     $ogImage = preg_replace('#^http://#', 'https://', $ogImage);
 }
 
-// Plain-text version of the (possibly HTML, from the rich-text editor)
-// story — turn block breaks into spaces first so paragraphs don't get
-// mashed together with no space when tags are stripped.
-function descriptionToPlainText($html) {
-    $withBreaks = preg_replace('/<\/(p|li|div|h[1-6])>|<br\s*\/?>/i', ' ', $html ?? '');
-    $text       = html_entity_decode(strip_tags($withBreaks), ENT_QUOTES);
-    return trim(preg_replace('/\s+/', ' ', $text));
-}
-function wordLimit($text, $limit) {
-    $words = preg_split('/\s+/', trim($text));
-    if (count($words) <= $limit) return trim($text);
-    return implode(' ', array_slice($words, 0, $limit)) . '…';
-}
+// descriptionToPlainText() and wordLimit() now live in includes/config.php
+// (shared with campaign-drives.php's featured-card excerpts).
 
 $goal_fmt   = number_format($c['goal_amount']);
 $descPlain  = descriptionToPlainText($c['description']);

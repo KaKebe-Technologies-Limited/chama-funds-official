@@ -108,6 +108,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  /* ── 3b. HOMEPAGE "HOW IT WORKS" STEPS ACCORDION ─────────────── */
+  document.querySelectorAll('.step-acc-header').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item  = btn.closest('.step-acc-item');
+      const group = item.closest('.steps-accordion');
+      const isOpen = item.classList.contains('open');
+      group.querySelectorAll('.step-acc-item.open').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+
   /* ── 4. FEE CALCULATOR ─────────────────────────────────────── */
   const feeSlider    = document.getElementById('feeSlider');
   const feeDisplayEl = document.getElementById('feeDisplay');

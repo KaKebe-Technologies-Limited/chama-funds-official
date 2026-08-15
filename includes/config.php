@@ -165,6 +165,20 @@ function storyToEditableHtml($raw) {
     return $out;
 }
 
+// Plain-text version of a (possibly HTML, from the rich-text editor) story —
+// turns block breaks into spaces first so paragraphs don't get mashed
+// together with no space when tags are stripped.
+function descriptionToPlainText($html) {
+    $withBreaks = preg_replace('/<\/(p|li|div|h[1-6])>|<br\s*\/?>/i', ' ', $html ?? '');
+    $text       = html_entity_decode(strip_tags($withBreaks), ENT_QUOTES);
+    return trim(preg_replace('/\s+/', ' ', $text));
+}
+function wordLimit($text, $limit) {
+    $words = preg_split('/\s+/', trim($text));
+    if (count($words) <= $limit) return trim($text);
+    return implode(' ', array_slice($words, 0, $limit)) . '…';
+}
+
 // ── Campaign card image slider ──────────────────────────────────
 // Fetch up to $limit gallery photo URLs (already resolved via imgUrl())
 // for a campaign, in display order, for the auto-sliding card image.
