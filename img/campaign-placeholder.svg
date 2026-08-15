@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
+  <defs>
+    <linearGradient id="cf-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1A2A6C"/>
+      <stop offset="100%" stop-color="#FF6B4A"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="800" fill="url(#cf-bg)"/>
+  <rect x="285" y="285" width="230" height="230" rx="52" fill="#ffffff" fill-opacity=".97"/>
+  <text x="400" y="432" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="112" fill="#1A2A6C">CF</text>
+  <text x="400" y="565" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="46" letter-spacing="1" fill="#ffffff" fill-opacity=".92">ChamaFunds</text>
+</svg>

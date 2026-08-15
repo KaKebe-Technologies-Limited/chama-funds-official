@@ -392,23 +392,6 @@ include __DIR__ . '/includes/header.php';
             </button>
           </div>
 
-          <!-- ── Mini progress bar ─────────────────────────── -->
-          <div class="cd-mini-progress cd-order-2">
-            <div class="cd-mini-prog-row">
-              <span class="cd-mini-prog-raised"><?= $c['currency'] ?> <?= number_format($c['raised_amount']) ?> raised</span>
-              <span class="cd-mini-prog-pct"><?= $pct ?>% of <?= $c['currency'] ?> <?= number_format($c['goal_amount']) ?></span>
-            </div>
-            <div class="cd-mini-prog-track">
-              <div class="cd-mini-prog-fill" style="width:<?= $pct ?>%;"></div>
-            </div>
-            <div class="cd-mini-prog-stats">
-              <span><i class="fas fa-users"></i> <?= number_format($totalDonorsAll) ?> supporter<?= $totalDonorsAll !== 1 ? 's' : '' ?></span>
-              <span><i class="fas fa-eye"></i> <?= number_format($c['view_count']) ?> views</span>
-              <span><i class="fas fa-share-alt"></i> <span id="shareCountMini"><?= number_format($c['share_count']) ?></span> shares</span>
-              <span class="<?= $daysUrgent ? 'cd-urgent-txt' : '' ?>"><i class="fas fa-clock"></i> <?= htmlspecialchars($daysStr) ?></span>
-            </div>
-          </div>
-
           <!-- Campaign story -->
           <div class="cd-section cd-story-section cd-order-3">
             <h2 class="cd-section-h">Campaign Story</h2>
@@ -1029,15 +1012,13 @@ include __DIR__ . '/includes/header.php';
 /* ── Mobile section order ──────────────────────────────────── */
 /* Desktop: natural DOM order */
 .cd-order-1 { order: 1; }
-.cd-order-2 { order: 2; }
 .cd-order-3 { order: 3; }
 .cd-order-4 { order: 4; }
-/* Mobile: image → copy button → stats → story → supporters */
+/* Mobile: image → copy button → story → supporters → stats */
 @media (max-width: 1023px) {
   .cd-panel.active { display: flex; flex-direction: column; }
   .cd-photos-section  { order: 0; }
   .cd-order-1         { order: 1; } /* copy link button */
-  .cd-order-2         { order: 2; } /* mini progress / raised stats */
   .cd-order-3         { order: 3; } /* story */
   .cd-order-4         { order: 4; } /* recent supporters */
   .cd-stats-section   { order: 5; } /* full progress card */
@@ -1202,41 +1183,6 @@ include __DIR__ . '/includes/header.php';
 /* ── Copy link button ──────────────────────────────────────── */
 .cd-copy-btn { transition: background .2s !important; }
 .cd-copy-btn:hover { background: #2a3f8a !important; }
-
-.cd-mini-progress {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 16px 18px;
-  margin-bottom: 20px;
-}
-.cd-mini-prog-row {
-  display: flex; justify-content: space-between; align-items: baseline;
-  margin-bottom: 8px;
-}
-.cd-mini-prog-raised {
-  font-weight: 800; color: #1A2A6C; font-size: 1rem;
-}
-.cd-mini-prog-pct {
-  font-size: .78rem; color: #6b7280; font-weight: 600;
-}
-.cd-mini-prog-track {
-  height: 8px; background: #e2e8f0; border-radius: 99px;
-  overflow: hidden; margin-bottom: 12px;
-}
-.cd-mini-prog-fill {
-  height: 100%; border-radius: 99px;
-  background: linear-gradient(90deg, #FF6B4A, #f59e0b);
-  transition: width .6s ease;
-  min-width: 2px;
-}
-.cd-mini-prog-stats {
-  display: flex; gap: 16px; flex-wrap: wrap;
-  font-size: .78rem; color: #6b7280; font-weight: 600;
-}
-.cd-mini-prog-stats i { margin-right: 4px; color: #9ca3af; }
-.cd-urgent-txt { color: #ef4444 !important; }
-.cd-urgent-txt i { color: #ef4444 !important; }
 
 /* Story */
 .cd-story { font-size:.92rem; color:#334155; line-height:1.65; margin-bottom:16px; }

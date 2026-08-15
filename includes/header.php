@@ -47,6 +47,29 @@ $logoutUrl = getBasePath() . '/logout.php';
 </head>
 <body>
 
+<script>
+// ── Broken campaign photo fallback ──────────────────────────
+// If any campaign photo fails to load (deleted file, bad URL, etc.),
+// swap it for a branded placeholder instead of showing a broken-image
+// icon. Registered as early as possible, on the capturing phase (img
+// "error" events don't bubble, but capturing still reaches them), so it
+// catches failures no matter when they fire relative to page load.
+(function () {
+  var FALLBACK_SRC = '<?= BASE ?>/img/campaign-placeholder.svg';
+  var SELECTOR = '.card-img, .card-slider-img, .bento-large-img-wrap img, ' +
+    '.bento-small-img-wrap img, .cd-list-thumb img, .cd-feat-media img, ' +
+    '#cdPhotoMainImg, .cd-photo-thumb img, .cd-sim-img img';
+  document.addEventListener('error', function (e) {
+    var img = e.target;
+    if (!img || img.tagName !== 'IMG') return;
+    if (img.src === FALLBACK_SRC) return; // avoid loop if the fallback itself fails
+    if (!img.matches || !img.matches(SELECTOR)) return;
+    img.src = FALLBACK_SRC;
+    img.srcset = '';
+  }, true);
+})();
+</script>
+
 <nav class="navbar">
   <div class="container">
     <a href="<?= BASE ?>/index.php" class="navbar-brand">
