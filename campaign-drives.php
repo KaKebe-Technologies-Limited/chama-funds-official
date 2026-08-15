@@ -63,7 +63,7 @@ include __DIR__ . '/includes/header.php';
               <span class="cdh-avatar" style="background:<?= $avatarColours[$i % 4] ?>;"><?= strtoupper(substr($n, 0, 1)) ?></span>
               <?php endforeach; ?>
             </div>
-            <div class="cdh-stat"><strong><?= number_format($totalSupporters) ?>+</strong><span>Generous Donors</span></div>
+            <div class="cdh-stat"><strong><?= number_format($totalSupporters) ?>+</strong><span>Donors</span></div>
           </div>
         </div>
       </div>
@@ -153,13 +153,37 @@ include __DIR__ . '/includes/header.php';
   .cdh-col:nth-child(2) { margin-top:-32px; }
 }
 @media (max-width:640px) {
-  .cdh-hero { padding:80px 0 0; }
-  .cdh-badge { font-size:.74rem; padding:5px 14px; margin-bottom:14px; }
-  .cdh-title { font-size:1.4rem; margin-bottom:10px; }
+  /* Full-bleed mobile hero: the flowing photo collage becomes the whole
+     background (faded + tinted for contrast), with the headline pinned
+     near the top and the CTA + social proof pinned near the bottom. */
+  .cdh-hero { padding:0; }
+  .cdh-grid {
+    position:relative; display:block; min-height:100vh;
+    grid-template-columns:1fr; gap:0;
+  }
+  .cdh-grid::before {
+    content:''; position:absolute; inset:0; z-index:1; pointer-events:none;
+    background:linear-gradient(180deg, rgba(15,23,42,.4) 0%, rgba(26,42,108,.5) 55%, rgba(15,23,42,.82) 100%);
+  }
+  .cdh-collage {
+    position:absolute; inset:0; z-index:0;
+    width:100%; height:100%; opacity:.55;
+    grid-template-columns:repeat(3,1fr);
+  }
+  .cdh-collage .cdh-col:nth-child(3) { display:flex; }
+  .cdh-badge { display:none; }
+  .cdh-copy {
+    position:relative; z-index:2; min-height:100vh;
+    display:flex; flex-direction:column; justify-content:space-between;
+    padding:110px 22px 36px;
+  }
+  .cdh-title { color:#fff; font-size:1.7rem; margin-bottom:0; text-shadow:0 2px 14px rgba(0,0,0,.4); }
   .cdh-sub { display:none; } /* keep mobile lean — headline + CTA say enough */
-  .cdh-cta-row { flex-direction:column; align-items:center; gap:14px; margin-top:4px; }
+  .cdh-cta-row { flex-direction:column; align-items:center; gap:16px; }
   .cdh-social-proof { margin-left:0; }
-  .cdh-collage { height:220px; margin-top:4px; }
+  .cdh-stat { color:rgba(255,255,255,.85); }
+  .cdh-stat strong { color:#fff; }
+  .cdh-avatar { border-color:rgba(255,255,255,.85); }
   .cdh-footer-row { padding:22px 0 18px; flex-direction:column; align-items:flex-start; gap:14px; }
 }
 </style>
