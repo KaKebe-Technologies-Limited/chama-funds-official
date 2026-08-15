@@ -108,9 +108,11 @@
   font-family: 'Inter', sans-serif;
 }
 .cf-whatsapp-float:hover .cf-wa-tooltip { opacity: 1; }
-/* On mobile push it above the sticky donate bar (~90px tall) */
+/* On mobile, only push it above the sticky donate bar (~90px tall) on
+   pages that actually have one (campaign-detail.php) — everywhere else
+   it stays down near the corner. */
 @media (max-width: 1023px) {
-  .cf-whatsapp-float { bottom: 110px; }
+  body:has(.cd-mobile-donate-bar) .cf-whatsapp-float { bottom: 110px; }
 }
 </style>
 

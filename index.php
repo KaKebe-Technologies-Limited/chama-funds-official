@@ -139,7 +139,7 @@ include __DIR__ . '/includes/header.php';
     <div class="cdh-grid">
       <div class="cdh-copy">
         <div class="cdh-badge"><i class="fas fa-bolt"></i> Built for African Causes</div>
-        <h1 class="cdh-title">Pool Money Together for <span class="cdh-accent">What Matters Most</span></h1>
+        <h1 class="cdh-title"><span class="cdh-bordered">Pool Money</span> Together for <span class="cdh-accent">What Matters Most</span></h1>
         <p class="cdh-sub">Launch a campaign or donate to causes you care about. Transparent, secure, and built for mobile money.</p>
         <div class="cdh-cta-row">
           <div class="cdh-btn-row">
@@ -189,8 +189,10 @@ include __DIR__ . '/includes/header.php';
 }
 .cdh-title { font-size:clamp(1.6rem,3vw,2.3rem); font-weight:800; line-height:1.16; color:#0f172a; margin-bottom:18px; }
 .cdh-accent { color:#FF6B4A; }
-.cdh-sub { color:#64748b; font-size:1rem; line-height:1.7; max-width:440px; margin-bottom:32px; }
-.cdh-cta-row { display:flex; align-items:center; gap:24px; flex-wrap:wrap; }
+.cdh-bordered { border:3px solid #FF6B4A; border-radius:12px; padding:2px 10px; display:inline-block; }
+.cdh-sub { color:#64748b; font-size:1rem; line-height:1.7; max-width:440px; margin:0 auto 32px; }
+.cdh-copy { text-align:center; }
+.cdh-cta-row { display:flex; align-items:center; justify-content:center; gap:24px; flex-wrap:wrap; }
 .cdh-btn-row { display:flex; align-items:center; gap:12px; }
 .cdh-social-proof { display:flex; align-items:center; gap:12px; }
 .cdh-avatars { display:flex; }
@@ -222,9 +224,6 @@ include __DIR__ . '/includes/header.php';
 
 @media (max-width:1023px) {
   .cdh-grid { grid-template-columns:1fr; gap:28px; }
-  .cdh-copy { text-align:center; }
-  .cdh-sub { margin-left:auto; margin-right:auto; }
-  .cdh-cta-row { justify-content:center; }
   /* Simpler 2-column flow on mobile/tablet — shorter, lighter, still "alive" */
   .cdh-collage { grid-template-columns:repeat(2,1fr); height:280px; gap:10px; }
   .cdh-collage .cdh-col:nth-child(3) { display:none; }
@@ -241,11 +240,11 @@ include __DIR__ . '/includes/header.php';
   }
   .cdh-grid::before {
     content:''; position:absolute; inset:0; z-index:1; pointer-events:none;
-    background:linear-gradient(180deg, rgba(15,23,42,.55) 0%, rgba(26,42,108,.6) 55%, rgba(15,23,42,.85) 100%);
+    background:linear-gradient(180deg, rgba(15,23,42,.25) 0%, rgba(26,42,108,.3) 55%, rgba(15,23,42,.65) 100%);
   }
   .cdh-collage {
     position:absolute; inset:0; z-index:0;
-    width:100%; height:100%; opacity:.6;
+    width:100%; height:100%;
     grid-template-columns:repeat(3,1fr);
   }
   .cdh-collage .cdh-col:nth-child(3) { display:flex; }
