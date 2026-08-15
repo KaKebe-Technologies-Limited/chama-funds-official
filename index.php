@@ -41,8 +41,6 @@ $extraCss = <<<HTML
   <meta name="keywords"                content="crowdfunding Uganda, mobile money fundraising, MTN mobile money, chama funds, campaign donations Africa"/>
   <meta name="robots"                  content="index, follow"/>
   <link rel="canonical"                href="{$siteUrl}/"/>
-  <!-- ══ Swiper (hero photo carousel) ══ -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@14.0.1/swiper-bundle.min.css"/>
 HTML;
 
 // DB connection status for popup
@@ -84,6 +82,38 @@ if ($featuredHeroResult) {
     }
 }
 
+// Site-wide donor stat + a few campaigner initials for the hero's avatar
+// stack (same approach as campaign-drives.php's hero).
+$totalSupporters = (int)($conn->query(
+    "SELECT COALESCE(SUM(contributor_count),0) FROM campaigns WHERE status = 'active'"
+)->fetch_row()[0]);
+$avatarSeed = [];
+$avatarSeedResult = $conn->query(
+    "SELECT DISTINCT u.full_name FROM campaigns c
+     JOIN users u ON c.campaigner_id = u.user_id
+     WHERE c.status = 'active' ORDER BY c.created_at DESC LIMIT 4"
+);
+if ($avatarSeedResult) {
+    while ($as = $avatarSeedResult->fetch_assoc()) {
+        $n = trim($as['full_name']);
+        if ($n) $avatarSeed[] = $n;
+    }
+}
+$avatarColours = ['#FF6B4A','#1A2A6C','#10b981','#f59e0b'];
+
+// Distribute the hero photos across 3 flowing columns for the collage,
+// cycling through whatever images are available.
+function cdCollageColumn($images, $offset, $count = 4) {
+    $out = []; $n = count($images);
+    if ($n === 0) return $out;
+    for ($i = 0; $i < $count; $i++) $out[] = $images[($offset + $i) % $n];
+    return $out;
+}
+$heroImages = array_map(function ($s) { return imgUrl($s['image_url']); }, $heroSlides);
+$col1 = cdCollageColumn($heroImages, 0);
+$col2 = cdCollageColumn($heroImages, 2);
+$col3 = cdCollageColumn($heroImages, 4);
+
 // Fetch top 5 active campaigns for home grid — featured campaigns first,
 // then most recent (1 featured/spotlight + up to 4 more — bento layout
 // kicks in at 3+).
@@ -104,61 +134,137 @@ include __DIR__ . '/includes/header.php';
 ?>
 
 <!-- ═══════════════════════════ HERO ═══════════════════════════ -->
-<section class="hero-light hero-section" style="overflow:hidden;margin-top:64px;">
-  <div class="container" style="position:relative;z-index:2;">
-    <div class="hero-inner">
-      <div class="hero-copy">
-        <div class="hero-badge"><i class="fas fa-bolt" style="color:#f59e0b"></i> Built for African Causes</div>
-        <h1 style="font-size:clamp(1.6rem,4.2vw,2.9rem);font-weight:800;line-height:1.15;color:#1A2A6C;margin-bottom:16px;">
-          Pool Money Together for<br>
-          <span style="color:#FF6B4A;">What Matters Most</span>
-        </h1>
-        <div class="hero-cta-row" style="margin-top:14px;">
-          <a href="<?= BASE ?>/donate.php" class="btn btn-outline btn-sm">Donate</a>
-          <a href="<?= BASE ?>/create-campaign.php" class="btn btn-primary btn-sm">Start a Campaign</a>
+<section class="cdh-hero">
+  <div class="container">
+    <div class="cdh-grid">
+      <div class="cdh-copy">
+        <div class="cdh-badge"><i class="fas fa-bolt"></i> Built for African Causes</div>
+        <h1 class="cdh-title">Pool Money Together for <span class="cdh-accent">What Matters Most</span></h1>
+        <p class="cdh-sub">Launch a campaign or donate to causes you care about. Transparent, secure, and built for mobile money.</p>
+        <div class="cdh-cta-row">
+          <div class="cdh-btn-row">
+            <a href="<?= BASE ?>/donate.php" class="btn btn-primary">Donate</a>
+            <a href="<?= BASE ?>/create-campaign.php" class="btn btn-outline">Start a Campaign</a>
+          </div>
+          <div class="cdh-social-proof">
+            <div class="cdh-avatars">
+              <?php foreach ($avatarSeed as $i => $n): ?>
+              <span class="cdh-avatar" style="background:<?= $avatarColours[$i % 4] ?>;"><?= strtoupper(substr($n, 0, 1)) ?></span>
+              <?php endforeach; ?>
+            </div>
+            <div class="cdh-stat"><strong><?= number_format($totalSupporters) ?>+</strong><span>Donors</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cdh-collage" aria-hidden="true">
+        <div class="cdh-col cdh-col-up">
+          <?php foreach (array_merge($col1, $col1) as $src): ?>
+          <img src="<?= htmlspecialchars($src) ?>" alt="" loading="lazy" />
+          <?php endforeach; ?>
+        </div>
+        <div class="cdh-col cdh-col-down">
+          <?php foreach (array_merge($col2, $col2) as $src): ?>
+          <img src="<?= htmlspecialchars($src) ?>" alt="" loading="lazy" />
+          <?php endforeach; ?>
+        </div>
+        <div class="cdh-col cdh-col-up">
+          <?php foreach (array_merge($col3, $col3) as $src): ?>
+          <img src="<?= htmlspecialchars($src) ?>" alt="" loading="lazy" />
+          <?php endforeach; ?>
         </div>
       </div>
     </div>
-
-    <!-- Coverflow photo showcase — managed from the admin dashboard,
-         plus any campaigns an admin has marked as featured -->
-    <?php if (!empty($heroSlides)): ?>
-    <div class="swiper hero-swiper">
-      <div class="swiper-wrapper">
-        <?php foreach ($heroSlides as $i => $slide):
-          $slideImg = '<img src="' . htmlspecialchars(imgUrl($slide['image_url'])) . '" alt="' . htmlspecialchars($slide['alt_text']) . '" '
-                    . ($i === 0 ? 'loading="eager" fetchpriority="high"' : 'loading="lazy"') . ' />';
-        ?>
-        <div class="swiper-slide">
-          <?php if (!empty($slide['href'])): ?>
-            <a href="<?= htmlspecialchars($slide['href']) ?>"><?= $slideImg ?></a>
-          <?php else: ?>
-            <?= $slideImg ?>
-          <?php endif; ?>
-        </div>
-        <?php endforeach; ?>
-      </div>
-      <div class="swiper-pagination"></div>
-    </div>
-    <?php endif; ?>
-
-    <!-- <div class="hero-trust-row">
-      <span><i class="fas fa-check-circle" style="color:#10b981;margin-right:6px;"></i>Free to start</span>
-      <span><i class="fas fa-check-circle" style="color:#10b981;margin-right:6px;"></i>Payout within 48hrs</span>
-      <span><i class="fas fa-check-circle" style="color:#10b981;margin-right:6px;"></i>Live tracking</span>
-    </div> -->
   </div>
 </section>
 
-<!-- TRUST BAR -->
-<div class="trust-bar">
-  <div class="container">
-    <p style="text-align:center;color:#6b7280;font-size:.88rem;margin-bottom:16px;">
-      Launch a campaign or donate to causes you care about. Transparent, secure, and built for mobile money.
-    </p>
-   
-  </div>
-</div>
+<style>
+.cdh-hero { background:#fff; padding:96px 0 0; overflow:hidden; }
+.cdh-grid { display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:center; }
+.cdh-badge {
+  display:inline-flex; align-items:center; gap:8px;
+  background:#fff7ed; color:#c2410c; border:1px solid #fed7aa;
+  padding:6px 16px; border-radius:99px; font-size:.8rem; font-weight:700;
+  margin-bottom:20px;
+}
+.cdh-title { font-size:clamp(1.6rem,3vw,2.3rem); font-weight:800; line-height:1.16; color:#0f172a; margin-bottom:18px; }
+.cdh-accent { color:#FF6B4A; }
+.cdh-sub { color:#64748b; font-size:1rem; line-height:1.7; max-width:440px; margin-bottom:32px; }
+.cdh-cta-row { display:flex; align-items:center; gap:24px; flex-wrap:wrap; }
+.cdh-btn-row { display:flex; align-items:center; gap:12px; }
+.cdh-social-proof { display:flex; align-items:center; gap:12px; }
+.cdh-avatars { display:flex; }
+.cdh-avatar {
+  width:38px; height:38px; border-radius:50%; border:3px solid #fff;
+  display:flex; align-items:center; justify-content:center;
+  color:#fff; font-weight:700; font-size:.85rem;
+  margin-left:-12px; box-shadow:0 2px 6px rgba(0,0,0,.12);
+}
+.cdh-avatars .cdh-avatar:first-child { margin-left:0; }
+.cdh-stat { font-size:.82rem; color:#64748b; line-height:1.3; }
+.cdh-stat strong { display:block; color:#1A2A6C; font-size:1.05rem; font-weight:800; }
+
+/* ── Flowing photo collage ──────────────────────────────────── */
+.cdh-collage {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:14px;
+  height:560px; overflow:hidden;
+  -webkit-mask-image:linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent);
+  mask-image:linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent);
+}
+.cdh-col { display:flex; flex-direction:column; gap:14px; will-change:transform; }
+.cdh-col img { width:100%; aspect-ratio:3/4; object-fit:cover; border-radius:18px; display:block; }
+.cdh-col-up   { animation:cdhScrollUp 26s linear infinite; }
+.cdh-col-down { animation:cdhScrollDown 30s linear infinite; }
+.cdh-col:nth-child(2) { margin-top:-48px; }
+@keyframes cdhScrollUp   { from { transform:translateY(0); }    to { transform:translateY(-50%); } }
+@keyframes cdhScrollDown { from { transform:translateY(-50%); } to { transform:translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .cdh-col { animation:none; } }
+
+@media (max-width:1023px) {
+  .cdh-grid { grid-template-columns:1fr; gap:28px; }
+  .cdh-copy { text-align:center; }
+  .cdh-sub { margin-left:auto; margin-right:auto; }
+  .cdh-cta-row { justify-content:center; }
+  /* Simpler 2-column flow on mobile/tablet — shorter, lighter, still "alive" */
+  .cdh-collage { grid-template-columns:repeat(2,1fr); height:280px; gap:10px; }
+  .cdh-collage .cdh-col:nth-child(3) { display:none; }
+  .cdh-col:nth-child(2) { margin-top:-32px; }
+}
+@media (max-width:640px) {
+  /* Full-bleed mobile hero: the flowing photo collage becomes the whole
+     background, with the headline and the CTA + social proof both
+     centered vertically in the middle. */
+  .cdh-hero { padding:0; }
+  .cdh-grid {
+    position:relative; display:block; min-height:100vh;
+    grid-template-columns:1fr; gap:0;
+  }
+  .cdh-grid::before {
+    content:''; position:absolute; inset:0; z-index:1; pointer-events:none;
+    background:linear-gradient(180deg, rgba(15,23,42,.55) 0%, rgba(26,42,108,.6) 55%, rgba(15,23,42,.85) 100%);
+  }
+  .cdh-collage {
+    position:absolute; inset:0; z-index:0;
+    width:100%; height:100%; opacity:.6;
+    grid-template-columns:repeat(3,1fr);
+  }
+  .cdh-collage .cdh-col:nth-child(3) { display:flex; }
+  .cdh-badge { display:none; }
+  .cdh-copy {
+    position:relative; z-index:2; min-height:100vh;
+    display:flex; flex-direction:column; justify-content:center; align-items:center;
+    gap:36px; padding:110px 22px 36px;
+  }
+  .cdh-title { color:#fff; font-size:1.7rem; margin-bottom:0; text-shadow:0 2px 14px rgba(0,0,0,.4); }
+  .cdh-sub { display:none; } /* keep mobile lean — headline + CTA say enough */
+  .cdh-cta-row { flex-direction:column; align-items:center; gap:16px; }
+  .cdh-btn-row { flex-wrap:nowrap; } /* Donate + Start a Campaign stay on one line */
+  .cdh-social-proof { margin-left:0; }
+  .cdh-stat { color:rgba(255,255,255,.85); }
+  .cdh-stat strong { color:#fff; }
+  .cdh-avatar { border-color:rgba(255,255,255,.85); }
+}
+</style>
 
 <!-- HOW IT WORKS -->
 <section class="section" id="how-it-works" style="background:#f9fafb;">
@@ -364,7 +470,6 @@ include __DIR__ . '/includes/header.php';
 
 <?php include __DIR__ . '/includes/footer.php'; ?>
 
-<script src="https://cdn.jsdelivr.net/npm/swiper@14.0.1/swiper-bundle.min.js"></script>
 <script>
 // ── DB Connection popup on page load ─────────────────────────
 document.addEventListener('DOMContentLoaded', function() {
@@ -379,30 +484,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 });
-
-// ── Hero coverflow photo showcase (Swiper) ──────────────────────
-(function() {
-  if (!document.querySelector('.hero-swiper') || typeof Swiper === 'undefined') return;
-  new Swiper('.hero-swiper', {
-    effect: 'coverflow',
-    grabCursor: true,
-    centeredSlides: true,
-    rewind: true,
-    initialSlide: 1,
-    slidesPerView: 'auto',
-    coverflowEffect: {
-      rotate: 40,
-      stretch: 0,
-      depth: 140,
-      modifier: 1,
-      slideShadows: true,
-    },
-    autoplay: {
-      delay: 2600,
-      disableOnInteraction: false,
-      pauseOnMouseEnter: false,
-    },
-    pagination: { el: '.hero-swiper .swiper-pagination', clickable: true },
-  });
-})();
 </script>

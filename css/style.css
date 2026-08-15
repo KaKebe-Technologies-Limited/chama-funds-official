@@ -486,15 +486,6 @@ textarea.form-input { resize: vertical; min-height: 120px; }
 }
 
 /* ── Trust Badge Bar ────────────────────────────────────────── */
-.trust-bar {
-  background: var(--white); border-bottom: 1px solid var(--gray-100);
-  padding: 16px 0;
-}
-.trust-bar-inner {
-  display: flex; flex-wrap: wrap; justify-content: center;
-  gap: 24px 40px; align-items: center;
-}
-.trust-badge { display: flex; align-items: center; gap: 8px; font-size: .85rem; font-weight: 600; color: var(--gray-500); }
 .trust-badge i { font-size: 1.1rem; }
 
 /* ── Step Cards ─────────────────────────────────────────────── */
