@@ -167,7 +167,7 @@ include __DIR__ . '/includes/header.php';
   }
   .cdh-collage {
     position:absolute; inset:0; z-index:0;
-    width:100%; height:100%; opacity:.3;
+    width:100%; height:100%;
     grid-template-columns:repeat(3,1fr);
   }
   .cdh-collage .cdh-col:nth-child(3) { display:flex; }
