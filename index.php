@@ -240,11 +240,11 @@ include __DIR__ . '/includes/header.php';
   }
   .cdh-grid::before {
     content:''; position:absolute; inset:0; z-index:1; pointer-events:none;
-    background:linear-gradient(180deg, rgba(15,23,42,.25) 0%, rgba(26,42,108,.3) 55%, rgba(15,23,42,.65) 100%);
+    background:linear-gradient(180deg, rgba(15,23,42,.55) 0%, rgba(26,42,108,.6) 55%, rgba(15,23,42,.85) 100%);
   }
   .cdh-collage {
     position:absolute; inset:0; z-index:0;
-    width:100%; height:100%;
+    width:100%; height:100%; opacity:.6;
     grid-template-columns:repeat(3,1fr);
   }
   .cdh-collage .cdh-col:nth-child(3) { display:flex; }
