@@ -154,8 +154,8 @@ include __DIR__ . '/includes/header.php';
 }
 @media (max-width:640px) {
   /* Full-bleed mobile hero: the flowing photo collage becomes the whole
-     background (faded + tinted for contrast), with the headline pinned
-     near the top and the CTA + social proof pinned near the bottom. */
+     background (faded + tinted for contrast), with the headline and the
+     CTA + social proof both centered vertically in the middle. */
   .cdh-hero { padding:0; }
   .cdh-grid {
     position:relative; display:block; min-height:100vh;
@@ -163,19 +163,19 @@ include __DIR__ . '/includes/header.php';
   }
   .cdh-grid::before {
     content:''; position:absolute; inset:0; z-index:1; pointer-events:none;
-    background:linear-gradient(180deg, rgba(15,23,42,.4) 0%, rgba(26,42,108,.5) 55%, rgba(15,23,42,.82) 100%);
+    background:linear-gradient(180deg, rgba(15,23,42,.55) 0%, rgba(26,42,108,.6) 55%, rgba(15,23,42,.85) 100%);
   }
   .cdh-collage {
     position:absolute; inset:0; z-index:0;
-    width:100%; height:100%; opacity:.55;
+    width:100%; height:100%; opacity:.3;
     grid-template-columns:repeat(3,1fr);
   }
   .cdh-collage .cdh-col:nth-child(3) { display:flex; }
   .cdh-badge { display:none; }
   .cdh-copy {
     position:relative; z-index:2; min-height:100vh;
-    display:flex; flex-direction:column; justify-content:space-between;
-    padding:110px 22px 36px;
+    display:flex; flex-direction:column; justify-content:center; align-items:center;
+    gap:36px; padding:110px 22px 36px;
   }
   .cdh-title { color:#fff; font-size:1.7rem; margin-bottom:0; text-shadow:0 2px 14px rgba(0,0,0,.4); }
   .cdh-sub { display:none; } /* keep mobile lean — headline + CTA say enough */
