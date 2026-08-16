@@ -139,7 +139,7 @@ include __DIR__ . '/includes/header.php';
     <div class="cdh-grid">
       <div class="cdh-copy">
         <div class="cdh-badge"><i class="fas fa-bolt"></i> Built for African Causes</div>
-        <h1 class="cdh-title"><span class="cdh-bordered">Pool Money</span> Together for <span class="cdh-accent">What Matters Most</span></h1>
+        <h1 class="cdh-title"><span class="cdh-bordered">Pool Funds</span> For <span class="cdh-accent">What Matters Most</span></h1>
         <p class="cdh-sub">Launch a campaign or donate to causes you care about. Transparent, secure, and built for mobile money.</p>
         <div class="cdh-cta-row">
           <div class="cdh-btn-row">
