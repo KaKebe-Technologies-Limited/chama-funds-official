@@ -61,7 +61,10 @@
 </footer>
 
 <!-- ── WhatsApp Floating Button ─────────────────────────── -->
-<a href="https://wa.me/256779712990?text=ChamaFunds%20Inquiry"
+<?php
+$waMessage = rawurlencode("Hi ChamaFunds! I'm reaching out with an inquiry about ChamaFunds: " . BASE . "/");
+?>
+<a href="https://wa.me/256759516143?text=<?= $waMessage ?>"
    target="_blank"
    class="cf-whatsapp-float"
    aria-label="Chat with us on WhatsApp">
@@ -73,7 +76,7 @@
 .cf-whatsapp-float {
   position: fixed;
   bottom: 28px;
-  right: 28px;
+  left: 28px;
   z-index: 9999;
   width: 58px;
   height: 58px;
@@ -94,7 +97,7 @@
 }
 .cf-wa-tooltip {
   position: absolute;
-  right: 68px;
+  left: 68px;
   background: #1a1a1a;
   color: #fff;
   font-size: .76rem;
