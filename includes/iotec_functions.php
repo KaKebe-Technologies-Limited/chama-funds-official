@@ -484,3 +484,36 @@ function processIotecIpn($conn) {
 
     return ['success' => true, 'status' => $status];
 }
+
+/**
+ * ioTec's published disbursement pricing (https://iotec.io/pricing),
+ * checked 2026-08-19. Flat fee per tier, not a percentage — this is
+ * what ioTec charges ChamaFunds to actually send a withdrawal payout,
+ * separate from ChamaFunds' own platform fee. Kept here (not in the
+ * DB) since it's an external price list, not application data.
+ *
+ * Tiers are [minAmount, maxAmount, feeUgx]. ChamaFunds withdrawals only
+ * pay out via "Wallet To Mobile Money" (MTN & Airtel) today.
+ */
+const IOTEC_PAYOUT_FEE_TIERS = [
+    'mobile_money' => [
+        [500,       60000,    600],
+        [60001,     500000,   1200],
+        [500001,    1000000,  2000],
+        [1000001,   5000000,  2400],
+    ],
+];
+
+/**
+ * Looks up ioTec's flat disbursement fee for a payout of $amount UGX
+ * via $method ('mobile_money'). Amounts above the published top tier
+ * fall back to that tier's fee as a floor, rather than 0.
+ */
+function calculateIotecPayoutFee(float $amount, string $method = 'mobile_money'): int {
+    $tiers = IOTEC_PAYOUT_FEE_TIERS[$method] ?? IOTEC_PAYOUT_FEE_TIERS['mobile_money'];
+    foreach ($tiers as [$min, $max, $fee]) {
+        if ($amount >= $min && $amount <= $max) return $fee;
+    }
+    $last = end($tiers);
+    return $amount > $last[1] ? $last[2] : 0;
+}

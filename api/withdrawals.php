@@ -8,6 +8,8 @@ if (session_status() === PHP_SESSION_NONE) session_start();
 header('Content-Type: application/json');
 
 require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/iotec_functions.php';
+require_once __DIR__ . '/../includes/receipt_pdf.php';
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
 // ── REQUEST withdrawal (logged-in campaigner) ─────────────────
@@ -57,15 +59,17 @@ if ($action === 'request' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
+    $iotecFee = calculateIotecPayoutFee($gross, 'mobile_money');
+
     $conn->query(
-        "INSERT INTO withdrawals (campaign_id, campaigner_id, gross_amount, fee_percentage,
+        "INSERT INTO withdrawals (campaign_id, campaigner_id, gross_amount, fee_percentage, iotec_fee,
                                   mobile_money_number, mobile_money_network, status)
-         VALUES ($campaignId, $uid, $gross, 7.50, '$momoNum', '$momoNet', 'pending')"
+         VALUES ($campaignId, $uid, $gross, 7.50, $iotecFee, '$momoNum', '$momoNet', 'pending')"
     );
     $wid = $conn->insert_id;
 
     $fee = round($gross * 0.075, 2);
-    $net = $gross - $fee;
+    $net = $gross - $fee - $iotecFee;
 
     echo json_encode([
         'success'       => true,
@@ -73,6 +77,7 @@ if ($action === 'request' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         'withdrawal_id' => $wid,
         'gross'         => $gross,
         'fee'           => $fee,
+        'iotec_fee'     => $iotecFee,
         'net'           => $net,
     ]);
     exit;
@@ -128,6 +133,18 @@ if ($action === 'approve' && $_SERVER['REQUEST_METHOD'] === 'POST') {
          WHERE withdrawal_id = $wid AND status IN ('pending','approved')"
     );
 
+    // Generate the PDF receipt now that it's genuinely paid, then attach
+    // its path so it's downloadable from both the campaigner and admin side.
+    try {
+        $receiptFile = generateWithdrawalReceipt($conn, $wid);
+        if ($receiptFile) {
+            $receiptFileEsc = $conn->real_escape_string($receiptFile);
+            $conn->query("UPDATE withdrawals SET receipt_path = '$receiptFileEsc' WHERE withdrawal_id = $wid");
+        }
+    } catch (\Throwable $e) {
+        error_log('generateWithdrawalReceipt: ' . $e->getMessage());
+    }
+
     // Notify campaigner
     $w = $conn->query("SELECT campaigner_id, gross_amount FROM withdrawals WHERE withdrawal_id = $wid")->fetch_assoc();
     if ($w) {
@@ -139,7 +156,7 @@ if ($action === 'approve' && $_SERVER['REQUEST_METHOD'] === 'POST') {
              VALUES ({$w['campaigner_id']}, 'withdrawal', 'Withdrawal Approved', '$msg', '$withdrawLink')"
         );
     }
-    echo json_encode(['success' => true, 'message' => 'Withdrawal approved and processed.']);
+    echo json_encode(['success' => true, 'message' => 'Withdrawal approved, paid, and receipt generated.']);
     exit;
 }
 

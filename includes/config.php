@@ -36,6 +36,18 @@ define('JS_URL', BASE . '/js');
 define('ASSETS_URL', BASE . '/assets');
 define('IMAGES_URL', BASE . '/assets/images');
 
+// Generated withdrawal receipt PDFs — kept outside the git-managed project
+// folder (a sibling of it) so a deploy/redeploy never wipes a financial
+// record. Served only via receipt-download.php, which is auth-checked
+// (owning campaigner or admin) — never linked publicly.
+define('PERSISTENT_RECEIPTS_DIR', dirname(__DIR__, 2) . '/chamafunds_persistent_uploads/receipts/');
+
+function ensurePersistentReceiptsDir(): void {
+    if (!is_dir(PERSISTENT_RECEIPTS_DIR)) {
+        @mkdir(PERSISTENT_RECEIPTS_DIR, 0755, true);
+    }
+}
+
 // Database connection - auto-detects local vs live
 // Use $GLOBALS so $conn is accessible everywhere after this file is included
 if (!isset($GLOBALS['conn']) || !($GLOBALS['conn'] instanceof mysqli)) {

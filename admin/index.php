@@ -113,6 +113,16 @@ $pendingWithdrawals = $conn->query(
 );
 if (!$pendingWithdrawals) $pendingWithdrawals = false;
 
+// All withdrawals (for the full history + receipt downloads)
+$allWithdrawalsHistory = $conn->query(
+    "SELECT w.*, c.title AS campaign_title, u.full_name AS campaigner_name, c.currency
+     FROM withdrawals w
+     JOIN campaigns c ON w.campaign_id=c.campaign_id
+     JOIN users u ON w.campaigner_id=u.user_id
+     ORDER BY w.requested_at DESC LIMIT 50"
+);
+if (!$allWithdrawalsHistory) $allWithdrawalsHistory = false;
+
 // Countries
 $countries = $conn->query("SELECT * FROM countries ORDER BY country_name");
 if (!$countries) $countries = false;
@@ -522,7 +532,7 @@ $activeRatePct = $totalCampaigns > 0 ? round(($activeCampaigns / $totalCampaigns
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>ID</th><th>Campaigner</th><th>Campaign</th><th>Gross</th><th>Fee</th><th>Net</th><th>Mobile #</th><th>Network</th><th>Requested</th><th>Actions</th></tr></thead>
+            <thead><tr><th>ID</th><th>Campaigner</th><th>Campaign</th><th>Gross</th><th>Fees</th><th>Net</th><th>Mobile #</th><th>Network</th><th>Requested</th><th>Actions</th></tr></thead>
             <tbody>
               <?php while ($w = $pendingWithdrawals->fetch_assoc()): ?>
               <tr>
@@ -530,7 +540,10 @@ $activeRatePct = $totalCampaigns > 0 ? round(($activeCampaigns / $totalCampaigns
                 <td style="font-weight:600;color:#1A2A6C;"><?= htmlspecialchars($w['campaigner_name']) ?></td>
                 <td style="font-size:.82rem;color:#6b7280;"><?= htmlspecialchars($w['campaign_title']) ?></td>
                 <td style="font-weight:600;"><?= $w['currency'] ?> <?= number_format($w['gross_amount']) ?></td>
-                <td style="color:#FF6B4A;"><?= $w['currency'] ?> <?= number_format($w['fee_amount']) ?></td>
+                <td style="color:#FF6B4A;font-size:.8rem;">
+                  <?= $w['currency'] ?> <?= number_format($w['fee_amount'] + ($w['iotec_fee'] ?? 0)) ?>
+                  <br><span style="color:#9ca3af;font-size:.66rem;">Platform <?= number_format($w['fee_amount']) ?> + ioTec <?= number_format($w['iotec_fee'] ?? 0) ?></span>
+                </td>
                 <td style="color:#10b981;font-weight:700;"><?= $w['currency'] ?> <?= number_format($w['net_amount']) ?></td>
                 <td style="font-family:monospace;font-size:.82rem;"><?= htmlspecialchars($w['mobile_money_number']) ?></td>
                 <td style="font-size:.78rem;"><?= htmlspecialchars($w['mobile_money_network']) ?></td>
@@ -548,11 +561,51 @@ $activeRatePct = $totalCampaigns > 0 ? round(($activeCampaigns / $totalCampaigns
         </div>
       </div>
       <?php else: ?>
-      <div class="card" style="padding:40px;text-align:center;color:#9ca3af;">
+      <div class="card" style="padding:40px;text-align:center;color:#9ca3af;margin-bottom:24px;">
         <i class="fas fa-check-circle" style="font-size:2.5rem;color:#10b981;margin-bottom:12px;display:block;"></i>
         <p>No pending withdrawal requests. All caught up!</p>
       </div>
       <?php endif; ?>
+
+      <!-- All withdrawals — full history with receipts -->
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div style="padding:14px 20px;border-bottom:1px solid #e5e7eb;font-weight:700;color:#1A2A6C;font-size:.9rem;">
+          📜 All Withdrawals
+        </div>
+        <?php if ($allWithdrawalsHistory && $allWithdrawalsHistory->num_rows > 0): ?>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Campaigner</th><th>Campaign</th><th>Net Paid</th><th>Requested</th><th>Status</th><th>Receipt</th></tr></thead>
+            <tbody>
+              <?php while ($w = $allWithdrawalsHistory->fetch_assoc()): ?>
+              <tr>
+                <td style="font-size:.75rem;color:#9ca3af;">#<?= $w['withdrawal_id'] ?></td>
+                <td style="font-weight:600;color:#1A2A6C;">
+                  <div class="cell-with-avatar">
+                    <?= initialsAvatar($w['campaigner_name']) ?>
+                    <?= htmlspecialchars($w['campaigner_name']) ?>
+                  </div>
+                </td>
+                <td style="font-size:.82rem;color:#6b7280;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?= htmlspecialchars($w['campaign_title']) ?></td>
+                <td style="color:#10b981;font-weight:700;"><?= $w['currency'] ?> <?= number_format($w['net_amount']) ?></td>
+                <td style="font-size:.75rem;color:#9ca3af;"><?= date('M j, Y g:ia', strtotime($w['requested_at'])) ?></td>
+                <td><span class="status-badge status-<?= $w['status'] ?>"><?= ucfirst($w['status']) ?></span></td>
+                <td>
+                  <?php if (!empty($w['receipt_path'])): ?>
+                  <a href="<?= BASE ?>/receipt-download.php?id=<?= $w['withdrawal_id'] ?>" target="_blank" style="color:#1A2A6C;" title="Download receipt"><i class="fas fa-file-pdf"></i></a>
+                  <?php else: ?>
+                  <span style="color:#d1d5db;">—</span>
+                  <?php endif; ?>
+                </td>
+              </tr>
+              <?php endwhile; ?>
+            </tbody>
+          </table>
+        </div>
+        <?php else: ?>
+        <div style="padding:32px;text-align:center;color:#9ca3af;">No withdrawals yet.</div>
+        <?php endif; ?>
+      </div>
     </div>
 
     <!-- ══════════════ TAB: COUNTRIES ══════════════ -->

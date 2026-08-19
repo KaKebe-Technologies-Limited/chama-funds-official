@@ -82,7 +82,7 @@ $totalAvailable = $conn->query(
 
     <div id="wdAlert" style="display:none;padding:12px 16px;border-radius:10px;font-size:.88rem;margin-bottom:20px;"></div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;max-width:860px;">
+    <div style="max-width:520px;">
       <!-- Withdraw Form -->
       <div class="card" style="padding:28px;">
         <!-- Balance -->
@@ -122,6 +122,9 @@ $totalAvailable = $conn->query(
             <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #e5e7eb;">
               <span style="color:#6b7280;">Platform Fee (7.5%)</span><span style="font-weight:600;color:#FF6B4A;" id="wdFeeDisplay">UGX 0</span>
             </div>
+            <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #e5e7eb;">
+              <span style="color:#6b7280;">Transfer Fee (ioTec)</span><span style="font-weight:600;color:#FF6B4A;" id="wdIotecFeeDisplay">UGX 0</span>
+            </div>
             <div style="display:flex;justify-content:space-between;padding:8px 0 0;">
               <span style="font-weight:700;color:#1A2A6C;">You Receive</span>
               <span style="font-weight:800;color:#10b981;font-size:1rem;" id="wdNetDisplay">UGX 0</span>
@@ -143,22 +146,35 @@ $totalAvailable = $conn->query(
           </button>
         </form>
       </div>
+    </div>
 
-      <!-- Withdrawal History -->
-      <div class="card" style="padding:24px;">
-        <h2 style="font-weight:800;color:#1A2A6C;margin-bottom:16px;font-size:1rem;">Withdrawal History</h2>
+    <!-- Withdrawal History — full width, its own row below the form -->
+    <div class="card" style="padding:26px;margin-top:24px;max-width:1100px;">
+      <h2 style="font-weight:800;color:#1A2A6C;margin-bottom:16px;font-size:1rem;">Withdrawal History</h2>
         <?php if ($history && $history->num_rows > 0): ?>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Date</th><th>Amount</th><th>Fee</th><th>Net</th><th>Status</th></tr></thead>
+            <thead><tr><th>Date</th><th>Amount</th><th>Fees</th><th>Net</th><th>Status</th><th>Receipt</th></tr></thead>
             <tbody>
               <?php while ($w = $history->fetch_assoc()): ?>
               <tr>
                 <td style="font-size:.78rem;"><?= date('M j, Y', strtotime($w['requested_at'])) ?></td>
                 <td style="font-weight:600;"><?= $w['currency'] ?> <?= number_format($w['gross_amount']) ?></td>
-                <td style="color:#FF6B4A;"><?= $w['currency'] ?> <?= number_format($w['fee_amount']) ?></td>
+                <td style="color:#FF6B4A;font-size:.82rem;">
+                  <?= $w['currency'] ?> <?= number_format($w['fee_amount'] + ($w['iotec_fee'] ?? 0)) ?>
+                  <br><span style="color:#9ca3af;font-size:.68rem;">Platform <?= number_format($w['fee_amount']) ?> + ioTec <?= number_format($w['iotec_fee'] ?? 0) ?></span>
+                </td>
                 <td style="color:#10b981;font-weight:700;"><?= $w['currency'] ?> <?= number_format($w['net_amount']) ?></td>
                 <td><span class="status-badge status-<?= $w['status'] ?>"><?= ucfirst($w['status']) ?></span></td>
+                <td>
+                  <?php if (!empty($w['receipt_path'])): ?>
+                  <a href="<?= BASE ?>/receipt-download.php?id=<?= $w['withdrawal_id'] ?>" target="_blank" style="display:inline-flex;align-items:center;gap:5px;color:#1A2A6C;font-weight:700;font-size:.78rem;text-decoration:none;padding:4px 10px;border-radius:8px;background:#eef1fa;" title="Download receipt">
+                    <i class="fas fa-file-pdf"></i> PDF
+                  </a>
+                  <?php else: ?>
+                  <span style="color:#d1d5db;">—</span>
+                  <?php endif; ?>
+                </td>
               </tr>
               <?php endwhile; ?>
             </tbody>
@@ -168,7 +184,6 @@ $totalAvailable = $conn->query(
         <p style="color:#9ca3af;font-size:.88rem;text-align:center;padding:20px 0;">No withdrawal history yet.</p>
         <?php endif; ?>
       </div>
-    </div>
   </main>
 </div>
 
@@ -185,7 +200,6 @@ $totalAvailable = $conn->query(
 </div>
 
 <style>
-@media(max-width:767px){ div[style*="grid-template-columns:1fr 1fr"]{display:block!important;} }
 @media(max-width:1023px){ .sidebar{display:none;} .sidebar.mobile-open{display:flex;position:fixed;left:0;top:0;bottom:0;z-index:900;} }
 </style>
 <script src="<?= BASE ?>/js/main.js?v=<?= @filemtime(__DIR__ . '/js/main.js') ?: time() ?>"></script>
@@ -195,13 +209,27 @@ function checkMobile(){ mobileBar.style.display = window.innerWidth < 1024 ? 'fl
 checkMobile(); window.addEventListener('resize', checkMobile);
 document.querySelector('.dashboard-layout').style.paddingTop = window.innerWidth < 1024 ? '60px' : '0';
 
+// ioTec's published disbursement pricing (https://iotec.io/pricing) —
+// mirrors calculateIotecPayoutFee() in includes/iotec_functions.php.
+// Flat fee per tier, for ChamaFunds' mobile-money-only payout rail.
+var IOTEC_FEE_TIERS = [[500,60000,600],[60001,500000,1200],[500001,1000000,2000],[1000001,5000000,2400]];
+function getIotecFee(amount) {
+  for (var i = 0; i < IOTEC_FEE_TIERS.length; i++) {
+    if (amount >= IOTEC_FEE_TIERS[i][0] && amount <= IOTEC_FEE_TIERS[i][1]) return IOTEC_FEE_TIERS[i][2];
+  }
+  var last = IOTEC_FEE_TIERS[IOTEC_FEE_TIERS.length - 1];
+  return amount > last[1] ? last[2] : 0;
+}
+
 document.getElementById('withdrawAmount').addEventListener('input', function() {
   var amt = parseFloat(this.value) || 0;
   var fee = Math.round(amt * 0.075);
-  var net = amt - fee;
-  document.getElementById('grossDisplay').textContent  = 'UGX ' + amt.toLocaleString();
-  document.getElementById('wdFeeDisplay').textContent  = 'UGX ' + fee.toLocaleString();
-  document.getElementById('wdNetDisplay').textContent  = 'UGX ' + net.toLocaleString();
+  var iotecFee = amt > 0 ? getIotecFee(amt) : 0;
+  var net = amt - fee - iotecFee;
+  document.getElementById('grossDisplay').textContent     = 'UGX ' + amt.toLocaleString();
+  document.getElementById('wdFeeDisplay').textContent     = 'UGX ' + fee.toLocaleString();
+  document.getElementById('wdIotecFeeDisplay').textContent = 'UGX ' + iotecFee.toLocaleString();
+  document.getElementById('wdNetDisplay').textContent     = 'UGX ' + net.toLocaleString();
 });
 
 document.getElementById('withdrawForm').addEventListener('submit', async function(e) {
