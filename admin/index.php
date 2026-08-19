@@ -55,6 +55,18 @@ function getSum($conn, $query) {
     return 0;
 }
 
+// Small colored initials avatar for donor/user table rows
+function initialsAvatar($name) {
+    $name  = trim($name) !== '' ? trim($name) : 'Anonymous';
+    $parts = preg_split('/\s+/', $name);
+    $initials = strtoupper(substr($parts[0], 0, 1) . (count($parts) > 1 ? substr(end($parts), 0, 1) : ''));
+    $colors = ['#1A2A6C', '#FF6B4A', '#10b981', '#8b5cf6', '#f59e0b', '#3b82f6'];
+    $hash = 0;
+    foreach (str_split($name) as $ch) $hash += ord($ch);
+    $bg = $colors[$hash % count($colors)];
+    return '<span class="avatar-badge" style="background:' . $bg . ';">' . htmlspecialchars($initials) . '</span>';
+}
+
 // Safe stats
 $totalCampaigns    = getCount($conn, "SELECT COUNT(*) FROM campaigns");
 $activeCampaigns   = getCount($conn, "SELECT COUNT(*) FROM campaigns WHERE status='active'");
@@ -126,6 +138,8 @@ $adminLogs = $conn->query(
      JOIN users u ON l.admin_id=u.user_id ORDER BY l.created_at DESC LIMIT 30"
 );
 if (!$adminLogs) $adminLogs = false;
+
+$activeRatePct = $totalCampaigns > 0 ? round(($activeCampaigns / $totalCampaigns) * 100) : 0;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -156,30 +170,32 @@ if (!$adminLogs) $adminLogs = false;
   <aside class="admin-sidebar">
     <div class="sidebar-brand" style="padding:16px 12px 24px;">
       <div class="navbar-logo">CF</div>
-      <span style="font-weight:800;color:#1A2A6C;">Admin</span>
+      <span class="sidebar-brand-label" style="font-weight:800;color:#fff;">Admin</span>
+      <button type="button" class="sidebar-collapse-btn" id="sidebarCollapseBtn" onclick="toggleSidebarCollapse()" title="Collapse menu">
+        <i class="fas fa-angles-left"></i>
+      </button>
     </div>
     <nav class="sidebar-nav">
-      <button class="tab-btn sidebar-link active" data-tab="tab-overview"><i class="fas fa-th-large" style="margin-right:10px;"></i>Overview</button>
-      <button class="tab-btn sidebar-link" data-tab="tab-campaigns"><i class="fas fa-rocket" style="margin-right:10px;"></i>Campaigns</button>
-      <button class="tab-btn sidebar-link" data-tab="tab-users"><i class="fas fa-users" style="margin-right:10px;"></i>Users</button>
-      <button class="tab-btn sidebar-link" data-tab="tab-transactions"><i class="fas fa-credit-card" style="margin-right:10px;"></i>Transactions</button>
-      <button class="tab-btn sidebar-link" data-tab="tab-withdrawals"><i class="fas fa-hand-holding-usd" style="margin-right:10px;"></i>Withdrawals <?php if ($pendingWd > 0): ?><span style="background:#FF6B4A;color:#fff;font-size:.65rem;padding:1px 6px;border-radius:99px;margin-left:4px;"><?= $pendingWd ?></span><?php endif; ?></button>
-      <button class="tab-btn sidebar-link" data-tab="tab-countries"><i class="fas fa-globe-africa" style="margin-right:10px;"></i>Countries</button>
-      <button class="tab-btn sidebar-link" data-tab="tab-hero"><i class="fas fa-images" style="margin-right:10px;"></i>Hero Slider</button>
-      <button class="tab-btn sidebar-link" data-tab="tab-settings"><i class="fas fa-cog" style="margin-right:10px;"></i>Settings</button>
-      <button class="tab-btn sidebar-link" data-tab="tab-logs"><i class="fas fa-list" style="margin-right:10px;"></i>Audit Logs</button>
-      <button class="tab-btn sidebar-link" data-tab="tab-analytics"><i class="fas fa-chart-line" style="margin-right:10px;"></i>Analytics</button>
-      <hr style="border:none;border-top:1px solid #e5e7eb;margin:10px 12px;" />
-      <a href="<?= BASE ?>/create-campaign.php" class="sidebar-link" style="background:linear-gradient(135deg,#FF6B4A,#e85a3a);color:#fff;border-radius:10px;margin:4px 0;font-weight:700;">
-        <i class="fas fa-plus-circle" style="margin-right:10px;"></i>Create Campaign
+      <button class="tab-btn sidebar-link active" data-tab="tab-overview"><i class="fas fa-th-large" style="margin-right:10px;"></i><span class="link-label">Overview</span></button>
+      <button class="tab-btn sidebar-link" data-tab="tab-campaigns"><i class="fas fa-rocket" style="margin-right:10px;"></i><span class="link-label">Campaigns</span></button>
+      <button class="tab-btn sidebar-link" data-tab="tab-users"><i class="fas fa-users" style="margin-right:10px;"></i><span class="link-label">Users</span></button>
+      <button class="tab-btn sidebar-link" data-tab="tab-transactions"><i class="fas fa-credit-card" style="margin-right:10px;"></i><span class="link-label">Transactions</span></button>
+      <button class="tab-btn sidebar-link" data-tab="tab-withdrawals"><i class="fas fa-hand-holding-usd" style="margin-right:10px;"></i><span class="link-label">Withdrawals</span> <?php if ($pendingWd > 0): ?><span class="link-label" style="background:#FF6B4A;color:#fff;font-size:.65rem;padding:1px 6px;border-radius:99px;margin-left:4px;"><?= $pendingWd ?></span><?php endif; ?></button>
+      <button class="tab-btn sidebar-link" data-tab="tab-countries"><i class="fas fa-globe-africa" style="margin-right:10px;"></i><span class="link-label">Countries</span></button>
+      <button class="tab-btn sidebar-link" data-tab="tab-hero"><i class="fas fa-images" style="margin-right:10px;"></i><span class="link-label">Hero Slider</span></button>
+      <button class="tab-btn sidebar-link" data-tab="tab-settings"><i class="fas fa-cog" style="margin-right:10px;"></i><span class="link-label">Settings</span></button>
+      <button class="tab-btn sidebar-link" data-tab="tab-logs"><i class="fas fa-list" style="margin-right:10px;"></i><span class="link-label">Audit Logs</span></button>
+      <button class="tab-btn sidebar-link" data-tab="tab-analytics"><i class="fas fa-chart-line" style="margin-right:10px;"></i><span class="link-label">Analytics</span></button>
+      <hr style="margin:10px 12px;" />
+      <a href="<?= BASE ?>/create-campaign.php" class="sidebar-link" style="background:linear-gradient(135deg,#FF6B4A,#e85a3a);color:#fff;border-radius:99px;margin:4px 0;font-weight:700;">
+        <i class="fas fa-plus-circle" style="margin-right:10px;"></i><span class="link-label">Create Campaign</span>
       </a>
-      <a href="<?= BASE ?>/dashboard.php" class="sidebar-link" style="color:#6b7280;">
-        <i class="fas fa-th-large" style="margin-right:10px;"></i>My Dashboard
+      <a href="<?= BASE ?>/dashboard.php" class="sidebar-link" style="color:rgba(255,255,255,.6);">
+        <i class="fas fa-th-large" style="margin-right:10px;"></i><span class="link-label">My Dashboard</span>
       </a>
     </nav>
   <div class="sidebar-footer">
-  <!--<a href="<?= BASE ?>/dashboard.php" class="sidebar-link"><i class="fas fa-arrow-left"></i>Back to Dashboard</a>-->
-  <a href="<?= BASE ?>/logout.php" class="sidebar-link" style="color:#ef4444;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  <a href="<?= BASE ?>/logout.php" class="sidebar-link" style="color:#fca5a5;"><i class="fas fa-sign-out-alt"></i> <span class="link-label">Logout</span></a>
     </div>
   </aside>
 
@@ -187,24 +203,67 @@ if (!$adminLogs) $adminLogs = false;
   <main class="admin-main">
     <div id="adminAlert" style="display:none;padding:12px 16px;border-radius:10px;font-size:.88rem;margin-bottom:20px;"></div>
     <div class="page-header">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+      <div class="admin-topbar">
         <div>
           <h1>Good <?= date('H') < 12 ? 'morning' : (date('H') < 17 ? 'afternoon' : 'evening') ?>, <?= htmlspecialchars(explode(' ', $admin['full_name'])[0]) ?>! 👋</h1>
           <p>Platform overview — <?= date('F j, Y') ?></p>
         </div>
-        <a href="<?= BASE ?>/create-campaign.php" class="btn btn-primary btn-sm">
-          <i class="fas fa-plus" style="margin-right:6px;"></i>New Campaign
-        </a>
+        <div class="admin-topbar-actions">
+          <div class="admin-search">
+            <i class="fas fa-search"></i>
+            <input type="text" id="globalSearch" placeholder="Search campaigns, users…" onkeydown="if(event.key==='Enter')globalSearch(this.value)" />
+          </div>
+          <button class="admin-bell" onclick="document.querySelector('[data-tab=\'tab-withdrawals\']').click()" title="Pending withdrawals">
+            <i class="fas fa-bell"></i>
+            <?php if ($pendingWd > 0): ?><span class="admin-bell-dot"><?= $pendingWd ?></span><?php endif; ?>
+          </button>
+          <a href="<?= BASE ?>/create-campaign.php" class="btn btn-primary btn-sm">
+            <i class="fas fa-plus" style="margin-right:6px;"></i>New Campaign
+          </a>
+        </div>
       </div>
     </div>
 
     <!-- ══════════════ TAB: OVERVIEW ══════════════ -->
     <div class="tab-panel active" id="tab-overview">
-      <div class="grid-4" style="margin-bottom:24px;">
-        <div class="stat-card"><p class="stat-label">Total Campaigns</p><p class="stat-value"><?= number_format($totalCampaigns) ?></p><p class="stat-sub" style="color:#10b981;"><i class="fas fa-arrow-up"></i> +<?= $newCampsWeek ?> this week</p></div>
-        <div class="stat-card"><p class="stat-label">Total Users</p><p class="stat-value"><?= number_format($totalUsers) ?></p><p class="stat-sub" style="color:#10b981;"><i class="fas fa-arrow-up"></i> +<?= $newUsersWeek ?> this week</p></div>
-        <div class="stat-card"><p class="stat-label">Platform Revenue (Fees)</p><p class="stat-value" style="color:#FF6B4A;">UGX <?= number_format($totalFees) ?></p><p class="stat-sub" style="color:#9ca3af;">From completed donations</p></div>
-        <div class="stat-card"><p class="stat-label">Total Contributions</p><p class="stat-value">UGX <?= number_format($totalDonations) ?></p><p class="stat-sub" style="color:#9ca3af;"><?= $activeCampaigns ?> active campaigns</p></div>
+      <div class="admin-stats-row">
+        <div class="stat-card stat-card--hero">
+          <div class="stat-card--hero-top">
+            <div>
+              <p class="stat-label" style="color:rgba(255,255,255,.75);">Total Contributions</p>
+              <p class="stat-value" style="color:#fff;">UGX <?= number_format($totalDonations) ?></p>
+              <p class="stat-sub" style="color:rgba(255,255,255,.72);"><?= $activeCampaigns ?> active campaigns · UGX <?= number_format($totalFees) ?> in fees</p>
+            </div>
+            <div class="stat-card--hero-icon"><i class="fas fa-hand-holding-heart"></i></div>
+          </div>
+          <canvas id="heroSparkline"></canvas>
+        </div>
+        <div class="card stat-card-donut">
+          <p class="stat-label">Active Rate</p>
+          <div class="stat-donut" style="--pct: <?= $activeRatePct ?>;">
+            <div class="stat-donut-inner">
+              <span class="stat-donut-value"><?= $activeRatePct ?>%</span>
+              <span class="stat-donut-label">Active</span>
+            </div>
+          </div>
+          <p class="stat-sub" style="text-align:center;margin-top:12px;color:var(--gray-400);"><?= $activeCampaigns ?> of <?= $totalCampaigns ?> campaigns</p>
+        </div>
+        <div class="stat-stack">
+          <div class="stat-mini">
+            <div class="stat-mini-icon" style="background:#eef2ff;color:#1A2A6C;"><i class="fas fa-users"></i></div>
+            <div>
+              <p class="stat-mini-value"><?= number_format($totalUsers) ?></p>
+              <p class="stat-mini-label">Total Users · +<?= $newUsersWeek ?> this week</p>
+            </div>
+          </div>
+          <div class="stat-mini">
+            <div class="stat-mini-icon" style="background:#fff1ec;color:#FF6B4A;"><i class="fas fa-rocket"></i></div>
+            <div>
+              <p class="stat-mini-value"><?= number_format($totalCampaigns) ?></p>
+              <p class="stat-mini-label">Total Campaigns · +<?= $newCampsWeek ?> this week</p>
+            </div>
+          </div>
+        </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
         <div class="card" style="padding:24px;"><p style="font-weight:700;color:#1A2A6C;margin-bottom:16px;">Contributions (Last 7 Days)</p><canvas id="contributionsChart" height="180"></canvas></div>
@@ -216,13 +275,22 @@ if (!$adminLogs) $adminLogs = false;
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Ref</th><th>Campaign</th><th>Donor</th><th>Amount</th><th>Fee</th><th>Net</th><th>Status</th><th>Date</th></tr></thead>
+            <thead><tr><th>Campaign</th><th>Donor</th><th>Contact</th><th>Amount</th><th>Fee</th><th>Net</th><th>Status</th><th>Date</th></tr></thead>
             <tbody>
               <?php if ($allDonations): $allDonations->data_seek(0); $i=0; while ($d = $allDonations->fetch_assoc() and $i < 8): $i++; ?>
               <tr>
-                <td style="font-family:monospace;font-size:.72rem;color:#9ca3af;"><?= htmlspecialchars($d['transaction_reference'] ?? '—') ?></td>
-                <td style="color:#6b7280;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?= htmlspecialchars($d['campaign_title']) ?></td>
-                <td style="font-weight:600;color:#1A2A6C;"><?= $d['is_anonymous'] ? 'Anonymous' : htmlspecialchars($d['donor_name'] ?? '—') ?></td>
+                <td style="color:#6b7280;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?= htmlspecialchars($d['campaign_title']) ?></td>
+                <td style="font-weight:600;color:#1A2A6C;">
+                  <div class="cell-with-avatar">
+                    <?= initialsAvatar($d['is_anonymous'] ? 'Anonymous' : ($d['donor_name'] ?? 'Anonymous')) ?>
+                    <?= $d['is_anonymous'] ? 'Anonymous' : htmlspecialchars($d['donor_name'] ?? '—') ?>
+                  </div>
+                </td>
+                <td style="font-size:.78rem;color:#6b7280;">
+                  <?php if (!empty($d['donor_phone'])): ?><div><i class="fas fa-phone" style="margin-right:5px;color:#9ca3af;"></i><?= htmlspecialchars($d['donor_phone']) ?></div><?php endif; ?>
+                  <?php if (!empty($d['donor_email'])): ?><div class="donor-contact"><i class="fas fa-envelope" style="margin-right:5px;"></i><?= htmlspecialchars($d['donor_email']) ?></div><?php endif; ?>
+                  <?php if (empty($d['donor_phone']) && empty($d['donor_email'])): ?>—<?php endif; ?>
+                </td>
                 <td style="color:#10b981;font-weight:700;">UGX <?= number_format($d['amount']) ?></td>
                 <td style="color:#FF6B4A;">UGX <?= number_format($d['fee_amount']) ?></td>
                 <td style="font-weight:600;">UGX <?= number_format($d['net_amount']) ?></td>
@@ -312,7 +380,12 @@ if (!$adminLogs) $adminLogs = false;
               ?>
               <tr>
                 <td style="font-size:.75rem;color:#9ca3af;">#<?= $u['user_id'] ?></td>
-                <td style="font-weight:600;color:#1A2A6C;"><?= htmlspecialchars($u['full_name']) ?></td>
+                <td style="font-weight:600;color:#1A2A6C;">
+                  <div class="cell-with-avatar">
+                    <?= initialsAvatar($u['full_name']) ?>
+                    <?= htmlspecialchars($u['full_name']) ?>
+                  </div>
+                </td>
                 <td style="font-size:.82rem;"><?= htmlspecialchars($u['email']) ?></td>
                 <td style="font-size:.82rem;"><?= htmlspecialchars($u['phone']) ?></td>
                 <td><span style="font-size:.72rem;font-weight:700;color:<?= $roleColor ?>;padding:2px 8px;border-radius:99px;"><?= ucfirst($u['role']) ?></span></td>
@@ -365,13 +438,18 @@ if (!$adminLogs) $adminLogs = false;
                 <td style="font-family:monospace;font-size:.72rem;color:#9ca3af;"><?= htmlspecialchars($d['transaction_reference'] ?? '—') ?></td>
                 <td style="color:#6b7280;font-size:.82rem;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?= htmlspecialchars($d['campaign_title']) ?></td>
                 <td style="font-weight:600;color:#1A2A6C;font-size:.82rem;">
-                  <?= $d['is_anonymous'] ? 'Anonymous' : htmlspecialchars($d['donor_name'] ?? '—') ?>
-                  <?php if (!empty($d['added_by_admin_id'])): ?>
-                    <span title="Manually added by <?= htmlspecialchars($d['added_by_admin_name'] ?? 'an admin') ?>"
-                          style="display:inline-block;margin-left:6px;background:#fef3c7;color:#92400e;font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:99px;">
-                      <i class="fas fa-user-shield" style="margin-right:3px;"></i>Manual
+                  <div class="cell-with-avatar">
+                    <?= initialsAvatar($d['is_anonymous'] ? 'Anonymous' : ($d['donor_name'] ?? 'Anonymous')) ?>
+                    <span>
+                      <?= $d['is_anonymous'] ? 'Anonymous' : htmlspecialchars($d['donor_name'] ?? '—') ?>
+                      <?php if (!empty($d['added_by_admin_id'])): ?>
+                        <span title="Manually added by <?= htmlspecialchars($d['added_by_admin_name'] ?? 'an admin') ?>"
+                              style="display:inline-block;margin-left:6px;background:#fef3c7;color:#92400e;font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:99px;">
+                          <i class="fas fa-user-shield" style="margin-right:3px;"></i>Manual
+                        </span>
+                      <?php endif; ?>
                     </span>
-                  <?php endif; ?>
+                  </div>
                 </td>
                 <td style="font-size:.78rem;color:#6b7280;"><?= htmlspecialchars($d['mobile_money_network']) ?></td>
                 <td style="color:#10b981;font-weight:700;">UGX <?= number_format($d['amount']) ?></td>
@@ -679,7 +757,7 @@ if (!$adminLogs) $adminLogs = false;
   .admin-layout{padding-top:60px;}
 }
 .tab-btn.sidebar-link{font-weight:600;font-size:.85rem;width:100%;text-align:left;border:none;cursor:pointer;}
-.tab-btn.sidebar-link.active{background:#1A2A6C;color:#fff;}
+.tab-btn.sidebar-link.active{background:#fff;color:#1A2A6C;}
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
@@ -692,6 +770,17 @@ function adminAlert(msg, ok) {
   el.style.cssText = 'display:block;padding:12px 16px;border-radius:10px;font-size:.88rem;margin-bottom:20px;background:'
     + (ok ? '#d1fae5;color:#065f46;' : '#fee2e2;color:#991b1b;');
   setTimeout(function(){ el.style.display='none'; }, 4000);
+}
+
+// ── Sidebar collapse (desktop only, remembered via localStorage) ──
+(function() {
+  var sb = document.querySelector('.admin-sidebar');
+  if (sb && localStorage.getItem('adminSidebarCollapsed') === '1') sb.classList.add('collapsed');
+})();
+function toggleSidebarCollapse() {
+  var sb = document.querySelector('.admin-sidebar');
+  sb.classList.toggle('collapsed');
+  localStorage.setItem('adminSidebarCollapsed', sb.classList.contains('collapsed') ? '1' : '0');
 }
 
 async function apiPost(url, data) {
@@ -940,6 +1029,14 @@ function filterTable(tableId, query) {
   });
 }
 
+// ── Topbar global search — filters whichever tab is currently open ──
+function globalSearch(query) {
+  var activePanel = document.querySelector('.tab-panel.active');
+  if (!activePanel) return;
+  var table = activePanel.querySelector('table[id]');
+  if (table) filterTable(table.id, query);
+}
+
 // ── Mobile layout ─────────────────────────────────────────────
 var mobileBar = document.getElementById('mobileTopBar');
 function checkMobile(){ mobileBar.style.display = window.innerWidth < 1024 ? 'flex' : 'none'; }
@@ -955,6 +1052,25 @@ document.querySelector('.admin-layout').style.paddingTop = window.innerWidth < 1
   if (!data.success) return;
 
   var palette = { navy:'#1A2A6C', coral:'#FF6B4A', green:'#10b981', amber:'#f59e0b', purple:'#8b5cf6', blue:'#3b82f6' };
+
+  // Hero card sparkline (7-day contributions, no axes)
+  var ctx0 = document.getElementById('heroSparkline');
+  if (ctx0) new Chart(ctx0, {
+    type: 'line',
+    data: {
+      labels: data.chart_days.length ? data.chart_days : ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+      datasets: [{
+        data: data.chart_amounts.length ? data.chart_amounts : [0,0,0,0,0,0,0],
+        borderColor: '#fff', backgroundColor: 'rgba(255,255,255,.18)',
+        fill: true, tension: .35, pointRadius: 0, borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      scales: { x: { display: false }, y: { display: false } }
+    }
+  });
 
   // Contributions line chart
   var ctx1 = document.getElementById('contributionsChart');

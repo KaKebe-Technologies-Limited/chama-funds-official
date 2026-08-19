@@ -10,11 +10,11 @@ use PHPMailer\PHPMailer\Exception;
 
 // ── SMTP Configuration ──────────────────────────────────────
 define('SMTP_HOST', 'smtp.gmail.com');
-define('SMTP_USER', 'ot.sedrick@gmail.com');
-define('SMTP_PASS', 'igemnyvfuejonian'); // Google App Password
+define('SMTP_USER', 'kakebetech.comms@gmail.com');
+define('SMTP_PASS', 'ybkvjkvxpsjvjkgg'); // Google App Password
 define('SMTP_PORT', 587);
-define('ADMIN_EMAIL', 'ot.sedrick@gmail.com');    // ← WHERE NOTIFICATIONS GO
-define('COMMS_CC_EMAIL', 'kakebetech.comms@gmail.com'); // ← always CC'd on every donation email
+define('ADMIN_EMAIL', 'geoviasharonayoo@gmail.com');    // ← WHERE NOTIFICATIONS GO
+define('COMMS_CC_EMAIL', 'dovinhost@gmail.com'); // ← always CC'd on every donation/campaign email
 
 // ── Send Email via SMTP ────────────────────────────────────
 function sendCampaignCreationEmail($campaign_data) {
@@ -40,6 +40,9 @@ function sendCampaignCreationEmail($campaign_data) {
             );
         }
         $mail->addAddress(ADMIN_EMAIL, 'ChamaFunds Admin');
+        if (strcasecmp(COMMS_CC_EMAIL, ADMIN_EMAIL) !== 0) {
+            $mail->addCC(COMMS_CC_EMAIL, 'ChamaFunds Comms');
+        }
         $mail->addCustomHeader('X-Sender-Name',  $campaign_data['campaigner_name']  ?? '');
         $mail->addCustomHeader('X-Sender-Email', $campaign_data['campaigner_email'] ?? '');
 

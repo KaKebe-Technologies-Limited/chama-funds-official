@@ -435,71 +435,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (fileInput) fileInput.value = '';
   });
 
-  /* ── 17. ADMIN CHARTS (Chart.js) ───────────────────────────── */
-  function initAdminCharts() {
-    const palette = { navy: '#1A2A6C', coral: '#FF6B4A', green: '#10b981', amber: '#f59e0b', purple: '#8b5cf6', blue: '#3b82f6' };
-
-    // Contributions line chart
-    const ctx1 = document.getElementById('contributionsChart');
-    if (ctx1) new Chart(ctx1, {
-      type: 'line',
-      data: {
-        labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
-        datasets: [{ label: 'UGX', data: [120000,85000,150000,95000,210000,180000,245000], borderColor: palette.coral, backgroundColor: 'rgba(255,107,74,.1)', fill: true, tension: .3, pointBackgroundColor: palette.navy }]
-      },
-      options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { callback: v => 'UGX ' + (v/1000) + 'K' } } } }
-    });
-
-    // Category doughnut
-    const ctx2 = document.getElementById('categoryChart');
-    if (ctx2) new Chart(ctx2, {
-      type: 'doughnut',
-      data: { labels: ['Family','Medical','Education','Community','Business'], datasets: [{ data: [45,30,55,40,25], backgroundColor: [palette.navy, palette.coral, palette.green, palette.amber, palette.purple] }] },
-      options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } } }
-    });
-
-    // Revenue line chart
-    const ctx3 = document.getElementById('revenueChart');
-    if (ctx3) new Chart(ctx3, {
-      type: 'line',
-      data: {
-        labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
-        datasets: [{ label: 'Revenue (UGX M)', data: [1.2,1.5,1.1,1.8,2.2,1.9,2.5,2.8,3.1,2.7,3.4,3.9], borderColor: palette.navy, backgroundColor: 'rgba(26,42,108,.08)', fill: true, tension: .3 }]
-      },
-      options: { responsive: true, plugins: { legend: { display: false } } }
-    });
-
-    // User growth bar chart
-    const ctx4 = document.getElementById('userGrowthChart');
-    if (ctx4) new Chart(ctx4, {
-      type: 'bar',
-      data: {
-        labels: ['Jan','Feb','Mar','Apr','May','Jun'],
-        datasets: [{ label: 'New Users', data: [120,210,180,310,260,380], backgroundColor: palette.coral }]
-      },
-      options: { responsive: true, plugins: { legend: { display: false } } }
-    });
-
-    // Success rate pie
-    const ctx5 = document.getElementById('successRateChart');
-    if (ctx5) new Chart(ctx5, {
-      type: 'pie',
-      data: { labels: ['Completed','Active','Paused','Flagged'], datasets: [{ data: [55,30,10,5], backgroundColor: [palette.green, palette.navy, palette.amber, '#ef4444'] }] },
-      options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12 } } } }
-    });
-
-    // Top campaigns horizontal bar
-    const ctx6 = document.getElementById('topCampaignsChart');
-    if (ctx6) new Chart(ctx6, {
-      type: 'bar',
-      data: {
-        labels: ['Borehole Project','Family Medical','School Fees','Clean Water','Harvest Fund','Tech Hub','Funeral Cover','Wedding Pool','Church Build','Business Start'],
-        datasets: [{ label: 'UGX Raised', data: [1200000,950000,800000,750000,600000,550000,480000,420000,380000,310000], backgroundColor: palette.coral }]
-      },
-      options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { callback: v => 'UGX ' + (v/1000) + 'K' } } } }
-    });
-  }
-
-  if (document.getElementById('contributionsChart')) initAdminCharts();
+  // Admin dashboard charts are initialized inline in admin/index.php with
+  // live data from /api/admin.php — that's the only chart init that should
+  // run there; a stale hardcoded-data copy used to live here and collided
+  // with it on the same canvas IDs.
 
 }); // end DOMContentLoaded
