@@ -310,7 +310,7 @@ $activeRatePct = $totalCampaigns > 0 ? round(($activeCampaigns / $totalCampaigns
         <h2 style="font-weight:800;color:#1A2A6C;">All Campaigns</h2>
         <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
           <div class="filter-bar" style="margin:0;">
-            <div class="search-input-wrap" style="max-width:220px;"><i class="fas fa-search"></i><input type="text" id="campSearch" class="form-input" placeholder="Search…" oninput="filterTable('campsTable',this.value)" /></div>
+            <div class="search-input-wrap" style="max-width:220px;"><i class="fas fa-search"></i><input type="text" id="campSearch" class="form-input" placeholder="Search…" oninput="filterAccList('campsAccList',this.value)" /></div>
           </div>
           <a href="<?= BASE ?>/create-campaign.php" class="btn btn-primary btn-sm">
             <i class="fas fa-plus" style="margin-right:6px;"></i>New Campaign
@@ -318,48 +318,64 @@ $activeRatePct = $totalCampaigns > 0 ? round(($activeCampaigns / $totalCampaigns
         </div>
       </div>
       <div class="card" style="padding:0;overflow:hidden;">
-        <div class="table-wrap">
-          <table id="campsTable">
-            <thead><tr><th>ID</th><th>Title</th><th>Campaigner</th><th>Goal</th><th>Raised</th><th>Progress</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
-            <tbody>
-              <?php if ($allCampaigns): while ($c = $allCampaigns->fetch_assoc()): $pct = min(100,(float)$c['pct']); ?>
-              <tr>
-                <td style="font-size:.75rem;color:#9ca3af;">#<?= $c['campaign_id'] ?></td>
-                <td style="font-weight:600;color:#1A2A6C;max-width:160px;"><a href="<?= BASE ?>/campaign-detail.php?id=<?= $c['campaign_id'] ?>" style="color:#1A2A6C;"><?= htmlspecialchars($c['title']) ?></a></td>
-                <td><?= htmlspecialchars($c['campaigner_name']) ?></td>
-                <td><?= $c['currency'] ?> <?= number_format($c['goal_amount']) ?></td>
-                <td><?= $c['currency'] ?> <?= number_format($c['raised_amount']) ?></td>
-                <td style="min-width:80px;"><div class="progress-wrap" style="margin:0;"><div class="progress-fill" data-width="<?= $pct ?>%"></div></div><span style="font-size:.72rem;color:#9ca3af;"><?= $pct ?>%</span></td>
-                <td><span class="status-badge status-<?= $c['status'] ?>"><?= ucfirst($c['status']) ?></span></td>
-                <td style="font-size:.75rem;color:#9ca3af;"><?= date('M j, Y', strtotime($c['created_at'])) ?></td>
-                <td>
-                  <div style="display:flex;gap:8px;font-size:.85rem;">
-                    <a href="<?= BASE ?>/campaign-detail.php?id=<?= $c['campaign_id'] ?>" title="View" style="color:#1A2A6C;"><i class="fas fa-eye"></i></a>
-                    <a href="<?= BASE ?>/edit-campaign.php?id=<?= $c['campaign_id'] ?>" title="Edit" style="color:#3b82f6;"><i class="fas fa-edit"></i></a>
-                    <button onclick="openAddFundsModal(<?= $c['campaign_id'] ?>, '<?= htmlspecialchars(addslashes($c['title'])) ?>', '<?= htmlspecialchars(addslashes($c['currency'])) ?>')"
-                            title="Add Funds Manually" style="color:#10b981;background:none;border:none;cursor:pointer;font-size:.85rem;">
-                      <i class="fas fa-hand-holding-usd"></i>
-                    </button>
-                    <button onclick="toggleFeatured(<?= $c['campaign_id'] ?>)"
-                            title="<?= $c['is_featured'] ? 'Remove from Featured' : 'Feature this Campaign' ?>"
-                            style="color:<?= $c['is_featured'] ? '#facc15' : '#9ca3af' ?>;background:none;border:none;cursor:pointer;font-size:.85rem;">
-                      <i class="<?= $c['is_featured'] ? 'fas' : 'far' ?> fa-star"></i>
-                    </button>
-                    <?php if ($c['status'] === 'active'): ?>
-                    <button onclick="adminCampAction(<?= $c['campaign_id'] ?>,'paused')" title="Pause" style="color:#f59e0b;background:none;border:none;cursor:pointer;font-size:.85rem;"><i class="fas fa-pause"></i></button>
-                    <?php elseif ($c['status'] === 'draft'): ?>
-                    <button onclick="adminCampAction(<?= $c['campaign_id'] ?>,'active')" title="Activate" style="color:#10b981;background:none;border:none;cursor:pointer;font-size:.85rem;"><i class="fas fa-check"></i></button>
-                    <?php elseif ($c['status'] === 'paused'): ?>
-                    <button onclick="adminCampAction(<?= $c['campaign_id'] ?>,'active')" title="Resume" style="color:#10b981;background:none;border:none;cursor:pointer;font-size:.85rem;"><i class="fas fa-play"></i></button>
-                    <?php endif; ?>
-                    <button onclick="adminCampAction(<?= $c['campaign_id'] ?>,'flagged')" title="Flag" style="color:#ef4444;background:none;border:none;cursor:pointer;font-size:.85rem;"><i class="fas fa-flag"></i></button>
-                    <button onclick="adminCampAction(<?= $c['campaign_id'] ?>,'suspended')" title="Suspend" style="color:#6b7280;background:none;border:none;cursor:pointer;font-size:.85rem;"><i class="fas fa-ban"></i></button>
-                  </div>
-                </td>
-              </tr>
-              <?php endwhile; endif; ?>
-            </tbody>
-          </table>
+        <div class="acc-list" id="campsAccList">
+          <?php if ($allCampaigns): while ($c = $allCampaigns->fetch_assoc()): $pct = min(100,(float)$c['pct']); $itemId = 'camp-acc-' . $c['campaign_id']; ?>
+          <div class="acc-item" id="<?= $itemId ?>">
+            <button type="button" class="acc-header" onclick="toggleAccordion('<?= $itemId ?>')">
+              <?= initialsAvatar($c['campaigner_name']) ?>
+              <div class="acc-header-main">
+                <div class="acc-title"><?= htmlspecialchars($c['title']) ?></div>
+                <div class="acc-sub">by <?= htmlspecialchars($c['campaigner_name']) ?> · #<?= $c['campaign_id'] ?></div>
+              </div>
+              <div class="acc-stats">
+                <div class="acc-stat"><span class="acc-stat-label">Target</span><span class="acc-stat-value"><?= $c['currency'] ?> <?= number_format($c['goal_amount']) ?></span></div>
+                <div class="acc-stat"><span class="acc-stat-label">Raised</span><span class="acc-stat-value" style="color:#10b981;"><?= $c['currency'] ?> <?= number_format($c['raised_amount']) ?></span></div>
+              </div>
+              <span class="acc-toggle"><i class="fas fa-plus"></i></span>
+            </button>
+            <div class="acc-body">
+              <div class="acc-body-inner">
+                <div>
+                  <span class="acc-field-label">Progress</span>
+                  <div class="progress-wrap" style="margin:4px 0 6px;"><div class="progress-fill" data-width="<?= $pct ?>%"></div></div>
+                  <span class="acc-field-value"><?= $pct ?>%</span>
+                </div>
+                <div>
+                  <span class="acc-field-label">Status</span>
+                  <span class="status-badge status-<?= $c['status'] ?>"><?= ucfirst($c['status']) ?></span>
+                </div>
+                <div>
+                  <span class="acc-field-label">Category</span>
+                  <span class="acc-field-value"><?= htmlspecialchars($c['category'] ?? '—') ?></span>
+                </div>
+                <div>
+                  <span class="acc-field-label">Created</span>
+                  <span class="acc-field-value"><?= date('M j, Y', strtotime($c['created_at'])) ?></span>
+                </div>
+                <div class="acc-actions-row">
+                  <a href="<?= BASE ?>/campaign-detail.php?id=<?= $c['campaign_id'] ?>" class="acc-action-btn"><i class="fas fa-eye" style="color:#1A2A6C;"></i>View</a>
+                  <a href="<?= BASE ?>/edit-campaign.php?id=<?= $c['campaign_id'] ?>" class="acc-action-btn"><i class="fas fa-edit" style="color:#3b82f6;"></i>Edit</a>
+                  <button onclick="openAddFundsModal(<?= $c['campaign_id'] ?>, '<?= htmlspecialchars(addslashes($c['title'])) ?>', '<?= htmlspecialchars(addslashes($c['currency'])) ?>')" class="acc-action-btn">
+                    <i class="fas fa-hand-holding-usd" style="color:#10b981;"></i>Add Funds
+                  </button>
+                  <button onclick="toggleFeatured(<?= $c['campaign_id'] ?>)" class="acc-action-btn">
+                    <i class="<?= $c['is_featured'] ? 'fas' : 'far' ?> fa-star" style="color:<?= $c['is_featured'] ? '#facc15' : '#9ca3af' ?>;"></i><?= $c['is_featured'] ? 'Unfeature' : 'Feature' ?>
+                  </button>
+                  <?php if ($c['status'] === 'active'): ?>
+                  <button onclick="adminCampAction(<?= $c['campaign_id'] ?>,'paused')" class="acc-action-btn"><i class="fas fa-pause" style="color:#f59e0b;"></i>Pause</button>
+                  <?php elseif ($c['status'] === 'draft'): ?>
+                  <button onclick="adminCampAction(<?= $c['campaign_id'] ?>,'active')" class="acc-action-btn"><i class="fas fa-check" style="color:#10b981;"></i>Activate</button>
+                  <?php elseif ($c['status'] === 'paused'): ?>
+                  <button onclick="adminCampAction(<?= $c['campaign_id'] ?>,'active')" class="acc-action-btn"><i class="fas fa-play" style="color:#10b981;"></i>Resume</button>
+                  <?php endif; ?>
+                  <button onclick="adminCampAction(<?= $c['campaign_id'] ?>,'flagged')" class="acc-action-btn"><i class="fas fa-flag" style="color:#ef4444;"></i>Flag</button>
+                  <button onclick="adminCampAction(<?= $c['campaign_id'] ?>,'suspended')" class="acc-action-btn"><i class="fas fa-ban" style="color:#6b7280;"></i>Suspend</button>
+                  <button onclick="deleteCampaign(<?= $c['campaign_id'] ?>, '<?= htmlspecialchars(addslashes($c['title'])) ?>')" class="acc-action-btn" style="border-color:#fecaca;color:#dc2626;"><i class="fas fa-trash" style="color:#dc2626;"></i>Delete</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <?php endwhile; endif; ?>
         </div>
       </div>
     </div>
@@ -421,7 +437,7 @@ $activeRatePct = $totalCampaigns > 0 ? round(($activeCampaigns / $totalCampaigns
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
         <h2 style="font-weight:800;color:#1A2A6C;">All Transactions</h2>
         <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
-          <div class="search-input-wrap" style="max-width:260px;"><i class="fas fa-search"></i><input type="text" class="form-input" placeholder="Search by ref or donor…" oninput="filterTable('txTable',this.value)" /></div>
+          <div class="search-input-wrap" style="max-width:260px;"><i class="fas fa-search"></i><input type="text" class="form-input" placeholder="Search by ref or donor…" oninput="filterAccList('txAccList',this.value)" /></div>
           <button class="btn btn-outline btn-sm" id="reconcileBtn" onclick="reconcilePending()" title="Re-check pending donations directly against ioTec — catches payments that succeeded but never got marked complete">
             <i class="fas fa-sync-alt" style="margin-right:6px;"></i>Reconcile Pending
           </button>
@@ -429,46 +445,69 @@ $activeRatePct = $totalCampaigns > 0 ? round(($activeCampaigns / $totalCampaigns
       </div>
       <p id="reconcileStatus" style="font-size:.82rem;margin:-12px 0 16px;display:none;"></p>
       <div class="card" style="padding:0;overflow:hidden;">
-        <div class="table-wrap">
-          <table id="txTable">
-            <thead><tr><th>Ref</th><th>Campaign</th><th>Donor</th><th>Network</th><th>Amount</th><th>Fee</th><th>Net</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
-            <tbody>
-              <?php if ($allDonations): $allDonations->data_seek(0); while ($d = $allDonations->fetch_assoc()): ?>
-              <tr>
-                <td style="font-family:monospace;font-size:.72rem;color:#9ca3af;"><?= htmlspecialchars($d['transaction_reference'] ?? '—') ?></td>
-                <td style="color:#6b7280;font-size:.82rem;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?= htmlspecialchars($d['campaign_title']) ?></td>
-                <td style="font-weight:600;color:#1A2A6C;font-size:.82rem;">
-                  <div class="cell-with-avatar">
-                    <?= initialsAvatar($d['is_anonymous'] ? 'Anonymous' : ($d['donor_name'] ?? 'Anonymous')) ?>
-                    <span>
-                      <?= $d['is_anonymous'] ? 'Anonymous' : htmlspecialchars($d['donor_name'] ?? '—') ?>
-                      <?php if (!empty($d['added_by_admin_id'])): ?>
-                        <span title="Manually added by <?= htmlspecialchars($d['added_by_admin_name'] ?? 'an admin') ?>"
-                              style="display:inline-block;margin-left:6px;background:#fef3c7;color:#92400e;font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:99px;">
-                          <i class="fas fa-user-shield" style="margin-right:3px;"></i>Manual
-                        </span>
-                      <?php endif; ?>
+        <div class="acc-list" id="txAccList">
+          <?php if ($allDonations): $allDonations->data_seek(0); while ($d = $allDonations->fetch_assoc()): $itemId = 'tx-acc-' . $d['donation_id']; ?>
+          <div class="acc-item" id="<?= $itemId ?>">
+            <button type="button" class="acc-header" onclick="toggleAccordion('<?= $itemId ?>')">
+              <?= initialsAvatar($d['is_anonymous'] ? 'Anonymous' : ($d['donor_name'] ?? 'Anonymous')) ?>
+              <div class="acc-header-main">
+                <div class="acc-title">
+                  <?= $d['is_anonymous'] ? 'Anonymous' : htmlspecialchars($d['donor_name'] ?? '—') ?>
+                  <?php if (!empty($d['added_by_admin_id'])): ?>
+                    <span title="Manually added by <?= htmlspecialchars($d['added_by_admin_name'] ?? 'an admin') ?>"
+                          style="background:#fef3c7;color:#92400e;font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:99px;white-space:nowrap;">
+                      <i class="fas fa-user-shield" style="margin-right:3px;"></i>Manual
                     </span>
-                  </div>
-                </td>
-                <td style="font-size:.78rem;color:#6b7280;"><?= htmlspecialchars($d['mobile_money_network']) ?></td>
-                <td style="color:#10b981;font-weight:700;">UGX <?= number_format($d['amount']) ?></td>
-                <td style="color:#FF6B4A;font-size:.82rem;">UGX <?= number_format($d['fee_amount']) ?></td>
-                <td style="font-weight:600;font-size:.82rem;">UGX <?= number_format($d['net_amount']) ?></td>
-                <td><span class="status-badge status-<?= $d['status']==='completed'?'approved':$d['status'] ?>"><?= ucfirst($d['status']) ?></span></td>
-                <td style="font-size:.75rem;color:#9ca3af;"><?= date('M j, Y', strtotime($d['created_at'])) ?></td>
-                <td>
-                  <?php if ($d['status'] === 'pending'): ?>
-                  <button class="btn btn-outline btn-sm" style="padding:5px 12px;font-size:.72rem;white-space:nowrap;"
-                          onclick="confirmDonationManually(<?= (int)$d['donation_id'] ?>, '<?= htmlspecialchars(addslashes($d['currency'] ?? 'UGX')) ?>', <?= (float)$d['amount'] ?>)">
-                    <i class="fas fa-check" style="margin-right:4px;"></i>Confirm Payment
-                  </button>
                   <?php endif; ?>
-                </td>
-              </tr>
-              <?php endwhile; endif; ?>
-            </tbody>
-          </table>
+                </div>
+                <div class="acc-sub"><?= htmlspecialchars($d['campaign_title']) ?></div>
+              </div>
+              <div class="acc-stats">
+                <div class="acc-stat"><span class="acc-stat-label">Amount</span><span class="acc-stat-value" style="color:#10b981;">UGX <?= number_format($d['amount']) ?></span></div>
+              </div>
+              <span class="status-badge status-<?= $d['status']==='completed'?'approved':$d['status'] ?>"><?= ucfirst($d['status']) ?></span>
+              <span class="acc-toggle"><i class="fas fa-plus"></i></span>
+            </button>
+            <div class="acc-body">
+              <div class="acc-body-inner">
+                <div>
+                  <span class="acc-field-label">Reference</span>
+                  <span class="acc-field-value" style="font-family:monospace;font-weight:500;"><?= htmlspecialchars($d['transaction_reference'] ?? '—') ?></span>
+                </div>
+                <div>
+                  <span class="acc-field-label">Network</span>
+                  <span class="acc-field-value"><?= htmlspecialchars($d['mobile_money_network'] ?? '—') ?></span>
+                </div>
+                <div>
+                  <span class="acc-field-label">Fee</span>
+                  <span class="acc-field-value" style="color:#FF6B4A;">UGX <?= number_format($d['fee_amount']) ?></span>
+                </div>
+                <div>
+                  <span class="acc-field-label">Net</span>
+                  <span class="acc-field-value">UGX <?= number_format($d['net_amount']) ?></span>
+                </div>
+                <div>
+                  <span class="acc-field-label">Contact</span>
+                  <span class="acc-field-value" style="font-weight:500;">
+                    <?= htmlspecialchars($d['donor_phone'] ?: '—') ?>
+                    <?php if (!empty($d['donor_email'])): ?><br><span class="donor-contact" style="font-size:.76rem;"><?= htmlspecialchars($d['donor_email']) ?></span><?php endif; ?>
+                  </span>
+                </div>
+                <div>
+                  <span class="acc-field-label">Date</span>
+                  <span class="acc-field-value"><?= date('M j, Y', strtotime($d['created_at'])) ?></span>
+                </div>
+                <?php if ($d['status'] === 'pending'): ?>
+                <div class="acc-actions-row">
+                  <button class="acc-action-btn" onclick="confirmDonationManually(<?= (int)$d['donation_id'] ?>, '<?= htmlspecialchars(addslashes($d['currency'] ?? 'UGX')) ?>', <?= (float)$d['amount'] ?>)">
+                    <i class="fas fa-check" style="color:#10b981;"></i>Confirm Payment
+                  </button>
+                </div>
+                <?php endif; ?>
+              </div>
+            </div>
+          </div>
+          <?php endwhile; endif; ?>
         </div>
       </div>
     </div>
@@ -901,6 +940,17 @@ async function toggleFeatured(id) {
   if (d.success) setTimeout(function(){ location.reload(); }, 900);
 }
 
+async function deleteCampaign(id, title) {
+  var msg = 'Permanently delete "' + title + '"?\n\n' +
+            'This removes the campaign and its photos completely — it cannot be undone. ' +
+            'If it already has donations or withdrawals on record, this will be blocked; suspend it instead.';
+  if (!confirm(msg)) return;
+
+  var d = await apiPost('<?= BASE ?>/api/campaigns.php?action=delete_campaign', {campaign_id: id});
+  adminAlert(d.message, d.success);
+  if (d.success) setTimeout(function(){ location.reload(); }, 1000);
+}
+
 // ── Withdrawal actions ───────────────────────────────────────
 async function approveWithdrawal(id) {
   if (!confirm('Approve withdrawal #' + id + '?')) return;
@@ -1029,12 +1079,29 @@ function filterTable(tableId, query) {
   });
 }
 
+// ── Accordion list search filter (Campaigns / Transactions) ────
+function filterAccList(listId, query) {
+  var items = document.getElementById(listId).querySelectorAll('.acc-item');
+  var q     = query.toLowerCase();
+  items.forEach(function(item) {
+    item.style.display = item.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+// ── Accordion expand/collapse ───────────────────────────────────
+function toggleAccordion(id) {
+  var item = document.getElementById(id);
+  if (item) item.classList.toggle('open');
+}
+
 // ── Topbar global search — filters whichever tab is currently open ──
 function globalSearch(query) {
   var activePanel = document.querySelector('.tab-panel.active');
   if (!activePanel) return;
   var table = activePanel.querySelector('table[id]');
-  if (table) filterTable(table.id, query);
+  if (table) { filterTable(table.id, query); return; }
+  var accList = activePanel.querySelector('.acc-list[id]');
+  if (accList) filterAccList(accList.id, query);
 }
 
 // ── Mobile layout ─────────────────────────────────────────────

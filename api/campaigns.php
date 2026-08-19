@@ -526,5 +526,53 @@ if ($action === 'set_status' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
+// ── Admin: permanently delete a campaign ────────────────────────
+// Only allowed when the campaign has no donation/withdrawal history —
+// neither table has a foreign key back to campaigns, so a hard delete
+// would silently orphan real financial records instead of failing loudly.
+// Admins should suspend a campaign with history instead of deleting it.
+if ($action === 'delete_campaign' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (($_SESSION['role'] ?? '') !== 'admin') {
+        echo json_encode(['success' => false, 'message' => 'Admin only.']);
+        exit;
+    }
+    $id = (int)($_POST['campaign_id'] ?? 0);
+    if ($id <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Invalid campaign.']);
+        exit;
+    }
+
+    $camp = $conn->query("SELECT title FROM campaigns WHERE campaign_id = $id LIMIT 1")->fetch_assoc();
+    if (!$camp) {
+        echo json_encode(['success' => false, 'message' => 'Campaign not found.']);
+        exit;
+    }
+
+    $donationCount   = $conn->query("SELECT COUNT(*) c FROM donations WHERE campaign_id = $id")->fetch_assoc()['c'];
+    $withdrawalCount = $conn->query("SELECT COUNT(*) c FROM withdrawals WHERE campaign_id = $id")->fetch_assoc()['c'];
+    if ($donationCount > 0 || $withdrawalCount > 0) {
+        echo json_encode([
+            'success' => false,
+            'message' => "Can't delete — this campaign has $donationCount donation(s) and $withdrawalCount withdrawal(s) on record. Suspend it instead to preserve financial history."
+        ]);
+        exit;
+    }
+
+    $conn->query("DELETE FROM campaign_documents WHERE campaign_id = $id");
+    $conn->query("DELETE FROM campaigns WHERE campaign_id = $id"); // campaign_images cascades via FK
+
+    $adminId    = (int)($_SESSION['user_id'] ?? 0);
+    $titleEsc   = $conn->real_escape_string($camp['title']);
+    $ip         = $conn->real_escape_string($_SERVER['REMOTE_ADDR'] ?? '');
+    $ua         = $conn->real_escape_string(substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 255));
+    $conn->query(
+        "INSERT INTO admin_logs (admin_id, action, target_type, target_id, target_name, ip_address, user_agent)
+         VALUES ($adminId, 'Deleted Campaign', 'campaign', $id, '$titleEsc', '$ip', '$ua')"
+    );
+
+    echo json_encode(['success' => true, 'message' => 'Campaign deleted.']);
+    exit;
+}
+
 http_response_code(400);
 echo json_encode(['success' => false, 'message' => 'Unknown action.']);
